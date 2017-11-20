@@ -1,0 +1,7 @@
+add:1:Robert De Niro:M:19430817:Goodfellas
+add:2:Jack Nicholson:M:19370422:The Shining
+add:3:Tom Hanks:M:19560709:The Da Vinci Code
+add:4:Marlon Brando:M:19240403:Daeboo
+update:1:=:=:=:Taxi Driver, The Deer Hunter
+delete:4::::
+add:5:Leonardo DiCaprio:M:19741111:Inception
