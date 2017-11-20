@@ -20,6 +20,7 @@ typedef struct best_movie* MOVIE;
 typedef struct director* DIRECTOR;
 
 void init_director();
+void add_list(FILE *list, char* origin);
 
 MOVIE list_movie(char* title);
 MOVIE put_list_movie(MOVIE origin, MOVIE tmp);
@@ -45,6 +46,12 @@ void init_director()
     exit(-1);
   }
 
+  if((list = fopen("director_list.txt", "w")) == NULL)
+  {
+    printf("FILE ERROR");
+    exit(-1);
+  }
+
   fseek(log, SEEK_SET, SEEK_END);
   size = ftell(log);
   line = (char*)malloc(size+1);
@@ -56,14 +63,28 @@ void init_director()
     {
       DIRECTOR director_tmp;
       MOVIE movie_tmp;
-      char *split;
+      char *split, *origin;
       char *tag, *serial_number, *name, *sex, *birth, *title;
       // printf("입력받은 문장 > %s" , line);
+      origin = (char*)malloc(size);
+      strcpy(origin, line);
 
       // tag
       split = strtok(line, ":");
       tag = (char*)malloc(strlen(split)+1);
       strcpy(tag, split);
+      if(!strcmp(tag, "add"))
+      {
+        add_list(list, origin+4);
+      }
+      else if(!strcmp(tag, "delete"))
+      {
+        // continue;
+      }
+      else if(!strcmp(tag, "update"))
+      {
+
+      }
       // printf(">>> tag : %s\n", tag);
       // serial_number
       split = strtok(NULL, ":");
@@ -130,6 +151,7 @@ void init_director()
       movie = NULL;
 
       free(tag);
+      free(origin);
       free(serial_number);
       free(sex);
       free(name);
@@ -138,12 +160,18 @@ void init_director()
     }
   }
   fclose(log);
+  fclose(list);
 
   // printf("@@@@@@@@%s\n", director->director_next->movie->title);
 
   free(line);
   free(director);
   free(movie);
+}
+
+void add_list(FILE *list, char* origin)
+{
+  fprintf(list, "%s", origin);
 }
 
 MOVIE list_movie(char* title){
@@ -246,11 +274,3 @@ int main()
 
   return 0;
 }
-
-// if((list = fopen("director_list.txt", "r+")) == NULL)
-// {
-//   printf("FILE ERROR");
-//   return -1;
-// }
-//
-// fclose(list);
