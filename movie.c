@@ -43,7 +43,42 @@ struct movie *parse_movie(char* buffer, int isFirst);
 void add_movie(struct movie *movie, FILE *mv_log_write, FILE *mv_log_read);
 struct movie *search_last_movie(struct movie *movie);
 void update_movie(struct movie* movie, FILE *mv_log);
+void init_movie();
 //함수
+void init_movie(){
+  FILE *mv_log_read,*mv_log_add, *mv_list;
+  int file_size;
+  char *buffer;
+  if((mv_log_read = fopen("movie_log.txt", "r")) == NULL){
+    printf("File Open Error");
+    exit(1);
+  }
+  if((mv_log_add = fopen("movie_log.txt", "a")) == NULL){
+    printf("File Open Error");
+    exit(1);
+  }
+  if((mv_list = fopen("movie_list.txt", "w")) == NULL){
+    printf("File Open Error");
+    exit(1);
+  }
+  char *one_line = (char*)malloc(sizeof(char)*200);
+  int main_isFirst = 1;
+  while(fgets(one_line, 200, mv_log_read) != NULL){
+    printf("%s", one_line);
+    if(main_isFirst == 1){
+      public_first_movie = parse_movie(one_line, main_isFirst);
+      main_isFirst = 0;
+    }else{
+      parse_movie(one_line, main_isFirst);
+    }
+  }
+  printf("\n==\n");
+  add_movie(public_first_movie, mv_log_add, mv_log_read);
+  print_movie(public_first_movie,mv_list);
+  fclose(mv_log_read);
+  fclose(mv_log_add);
+  fclose(mv_list);
+}
 struct linked_list_actor *create_actor_struct(char * actor_parse){
   char *p;
   p=strtok(actor_parse,",");
@@ -105,18 +140,44 @@ struct movie *parse_movie(char* buffer, int isFirst){
   }else if(!strcmp(parse_char, "delete")){
 
   }
-
+}
+char* colon_change(char* tmp_char){
+  if(strchr(tmp_char, ':') != NULL){
+    int total_size = strlen(tmp_char);
+    char *check_colon = strchr(tmp_char, ':');
+    char *inserted_char;
+    while(check_colon != NULL){
+      total_size += 2;
+      check_colon = strchr(check_colon, ':');
+    }
+    inserted_char = (char*)malloc(sizeof(char)*total_size+1);
+    strcpy(inserted_char, tmp_char);
+		for (int i = total_size - 1 ; i >= 0 ; i--) {
+			if (*(inserted_char + i) == ':') {
+				for (int j = total_size; j > i; j--) {
+					*(inserted_char + j + 2) = *(inserted_char + j);
+				}
+				*(inserted_char + i) = '?';
+				*(inserted_char + i + 1) = '?';
+				*(inserted_char + i + 2) = ';';
+			}
+		}
+    return inserted_char;
+  }else{
+    return tmp_char;
+  }
 }
 void add_movie(struct movie *movie, FILE *mv_log_write, FILE *mv_log_read){
   struct movie *inMovie;
   struct movie *lastMovie;
   int text_size = 0;
   inMovie = malloc(sizeof(struct movie));
-  char* tmp_char = (char*)malloc(sizeof(char)*100);
+  char* tmp_char = (char*)malloc(sizeof(char)*200);
   printf("title > ");
   gets(tmp_char);
   inMovie -> title = (char*)malloc(sizeof(char)*strlen(tmp_char));
   strcpy(inMovie -> title , tmp_char);
+  // inMovie -> title = colon_change(tmp_char);
   printf("genre > ");
   gets(tmp_char);
   inMovie -> genre = (char*)malloc(sizeof(char)*strlen(tmp_char));
@@ -179,37 +240,6 @@ struct movie *search_last_movie(struct movie *movie){
   return movie;
 }
 int main(){
-  FILE *mv_log_read,*mv_log_add, *mv_list;
-  int file_size;
-  char *buffer;
-  if((mv_log_read = fopen("movie_log.txt", "r")) == NULL){
-    printf("File Open Error");
-    return 1;
-  }
-  if((mv_log_add = fopen("movie_log.txt", "a")) == NULL){
-    printf("File Open Error");
-    return 1;
-  }
-  if((mv_list = fopen("movie_list.txt", "w")) == NULL){
-    printf("File Open Error");
-    return 1;
-  }
-  char *one_line = (char*)malloc(sizeof(char)*200);
-  int main_isFirst = 1;
-  while(fgets(one_line, 200, mv_log_read) != NULL){
-    printf("%s", one_line);
-    if(main_isFirst == 1){
-      public_first_movie = parse_movie(one_line, main_isFirst);
-      main_isFirst = 0;
-    }else{
-      parse_movie(one_line, main_isFirst);
-    }
-  }
-  printf("\n==\n");
-  add_movie(public_first_movie, mv_log_add, mv_log_read);
-  print_movie(public_first_movie,mv_list);
-  fclose(mv_log_read);
-  fclose(mv_log_add);
-  fclose(mv_list);
+  init_movie();
   return 0;
 }
