@@ -19,7 +19,7 @@ struct director{
 typedef struct best_movie* MOVIE;
 typedef struct director* DIRECTOR;
 
-void init();
+void init_director();
 
 MOVIE list_movie(char* title);
 MOVIE put_list_movie(MOVIE origin, MOVIE tmp);
@@ -29,7 +29,7 @@ DIRECTOR list_director(char* serial_number, char* name, char* sex, char* birth, 
 DIRECTOR put_list_director(DIRECTOR origin, DIRECTOR tmp);
 void print_movie(MOVIE movie);
 
-void init()
+void init_director()
 {
   DIRECTOR director = NULL;
   MOVIE movie = NULL;
@@ -116,7 +116,7 @@ void init()
         director_tmp = list_director(serial_number, name, sex, birth, movie);
         director = put_list_director(director, director_tmp);
       }
-      
+
       /*****************************/
       printf("DIRECTOR LIST > \n");
       print_director(director);
@@ -124,6 +124,7 @@ void init()
       printf("MOVIE LIST > \n");
       print_movie(movie);
       printf("\n");
+
       /*****************************/
 
       movie = NULL;
@@ -137,6 +138,8 @@ void init()
     }
   }
   fclose(log);
+
+  // printf("@@@@@@@@%s\n", director->director_next->movie->title);
 
   free(line);
   free(director);
@@ -210,6 +213,18 @@ DIRECTOR put_list_director(DIRECTOR origin, DIRECTOR tmp){
   return origin;
 }
 
+void print_movie(MOVIE movie){
+   if(movie == NULL)
+   {
+     printf("NULL\n");
+   }
+   else
+   {
+      printf("%s->", movie->title);
+      print_movie(movie->movie_next);
+   }
+}
+
 void print_director(DIRECTOR director){
    if(director == NULL)
    {
@@ -225,21 +240,9 @@ void print_director(DIRECTOR director){
    }
 }
 
-void print_movie(MOVIE movie){
-   if(movie == NULL)
-   {
-     printf("NULL\n");
-   }
-   else
-   {
-      printf("%s->", movie->title);
-      print_movie(movie->movie_next);
-   }
-}
-
 int main()
 {
-  init();
+  init_director();
 
   return 0;
 }
