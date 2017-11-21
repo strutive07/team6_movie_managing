@@ -1,41 +1,6 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdbool.h>
+#include "actor.h"
 
-FILE *actor_log_read, *actor_log_add,*actor_list;
-
-struct best_movie
-{
-   char* title;
-   struct best_movie *movie_next;
-};
-
-struct actor
-{
-   int serial_number;
-   char *name;
-   bool sex;
-   char* birth;
-   struct best_movie *movie;
-   struct actor *actor_next;
-};
-
-typedef struct best_movie* MOVIE;
-typedef struct actor* ACTOR;
-
-
-MOVIE list_movie(char* title);
-MOVIE put_list_movie(MOVIE origin, MOVIE tmp);
-ACTOR list_actor(int serial_number, char* name, bool sex, char* birth, MOVIE movie);
-ACTOR put_list_actor(ACTOR origin, ACTOR tmp);
-void print_movie(MOVIE movie);
-void print_actor(ACTOR actor);
-void actor_rtol(char* actor_str);
-void init_actor();
-
-MOVIE list_movie(char* title)
+MOVIE list_movie_actor(char* title)
 {
    MOVIE movie;
 
@@ -51,7 +16,7 @@ MOVIE list_movie(char* title)
    }
 }
 
-MOVIE put_list_movie(struct best_movie *origin, struct best_movie *tmp)
+MOVIE put_list_movie_actor(struct best_movie *origin, struct best_movie *tmp)
 {
    struct best_movie *new;
     new=(MOVIE)malloc(sizeof(struct best_movie));
@@ -101,7 +66,7 @@ ACTOR put_list_actor(ACTOR origin, ACTOR tmp)
    return origin;
 }
 
-void print_movie(MOVIE movie)
+void print_movie_actor(MOVIE movie)
 {
    if (movie == NULL)
    {
@@ -118,7 +83,7 @@ void print_movie(MOVIE movie)
 		 {
 			 fprintf(actor_list,"%s, ", movie->title);
 		 }
-      print_movie(movie->movie_next);
+      print_movie_actor(movie->movie_next);
    }
 }
 
@@ -139,7 +104,7 @@ void print_actor(ACTOR actor)
          fprintf(actor_list, "F:");
 
       fprintf(actor_list, "%s:", actor->birth);
-      print_movie(actor->movie);
+      print_movie_actor(actor->movie);
       print_actor(actor->actor_next);
    }
 }
@@ -177,14 +142,14 @@ void actor_rtol(char* actor_str)
       best_movie_tmp = strtok(tmp, ",");
          printf("%s\n", best_movie_tmp);
       if (actor_info->movie == NULL)
-         actor_info->movie = list_movie(best_movie_tmp);
+         actor_info->movie = list_movie_actor(best_movie_tmp);
 
       while (best_movie_tmp = strtok(NULL, ","))
       {
          printf("%s\n", best_movie_tmp);
          strcpy(best_movie_tmp, best_movie_tmp + 1);
-         movie_tmp = list_movie(best_movie_tmp);
-         actor_info->movie = put_list_movie(actor_info->movie, movie_tmp);
+         movie_tmp = list_movie_actor(best_movie_tmp);
+         actor_info->movie = put_list_movie_actor(actor_info->movie, movie_tmp);
       }
 
       if (actor == NULL)
@@ -219,10 +184,4 @@ void init_actor()
    }
 
    fclose(actor_log_read);
-}
-int main()
-{
-   init_actor();
-
-   return 0;
 }
