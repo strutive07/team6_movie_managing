@@ -1,34 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-struct best_movie{
-  char *title;
-  struct best_movie *movie_next;
-};
-
-struct director{
-  int serial_number;
-  char *name;
-  char sex;
-  char *birth;
-  struct best_movie *movie;
-  struct director *director_next;
-};
-
-typedef struct best_movie* MOVIE;
-typedef struct director* DIRECTOR;
-
-void init_director();
-void add_list(FILE *list, char* origin);
-
-MOVIE list_movie(char* title);
-MOVIE put_list_movie(MOVIE origin, MOVIE tmp);
-void print_director(DIRECTOR director);
-
-DIRECTOR list_director(char* serial_number, char* name, char* sex, char* birth, MOVIE movie);
-DIRECTOR put_list_director(DIRECTOR origin, DIRECTOR tmp);
-void print_movie(MOVIE movie);
+#include "director.h"
 
 void init_director()
 {
@@ -75,7 +45,7 @@ void init_director()
       strcpy(tag, split);
       if(!strcmp(tag, "add"))
       {
-        add_list(list, origin+4);
+        add_list_director(list, origin+4);
       }
       else if(!strcmp(tag, "delete"))
       {
@@ -117,15 +87,15 @@ void init_director()
       // printf("MOVIE TITLE : %s \n", split);
       if(movie == NULL)
       {
-        movie = list_movie(split);
+        movie = list_movie_director(split);
       }
       while(split = strtok(NULL, ","))
       {
         strcpy(split, split+1);
         // printf("MOVIE TITLE : %s \n", split);
 
-        movie_tmp = list_movie(split);
-        movie = put_list_movie(movie, movie_tmp);
+        movie_tmp = list_movie_director(split);
+        movie = put_list_movie_director(movie, movie_tmp);
       }
 
       if(director == NULL)
@@ -143,7 +113,7 @@ void init_director()
       print_director(director);
       printf("\n");
       printf("MOVIE LIST > \n");
-      print_movie(movie);
+      print_movie_director(movie);
       printf("\n");
 
       /*****************************/
@@ -169,12 +139,12 @@ void init_director()
   free(movie);
 }
 
-void add_list(FILE *list, char* origin)
+void add_list_director(FILE *list, char* origin)
 {
   fprintf(list, "%s", origin);
 }
 
-MOVIE list_movie(char* title){
+MOVIE list_movie_director(char* title){
    MOVIE movie;
 
    if(movie == NULL)
@@ -216,7 +186,7 @@ DIRECTOR list_director(char* serial_number, char* name, char* sex, char* birth, 
    }
 }
 
-MOVIE put_list_movie(MOVIE origin, MOVIE tmp){
+MOVIE put_list_movie_director(MOVIE origin, MOVIE tmp){
   MOVIE new;
   new = origin;
   while(new->movie_next != NULL)
@@ -241,7 +211,7 @@ DIRECTOR put_list_director(DIRECTOR origin, DIRECTOR tmp){
   return origin;
 }
 
-void print_movie(MOVIE movie){
+void print_movie_director(MOVIE movie){
    if(movie == NULL)
    {
      printf("NULL\n");
@@ -249,7 +219,7 @@ void print_movie(MOVIE movie){
    else
    {
       printf("%s->", movie->title);
-      print_movie(movie->movie_next);
+      print_movie_director(movie->movie_next);
    }
 }
 
@@ -266,11 +236,4 @@ void print_director(DIRECTOR director){
       printf("%s / movie_list -> ", director->birth);
       print_director(director->director_next);
    }
-}
-
-int main()
-{
-  init_director();
-
-  return 0;
 }
