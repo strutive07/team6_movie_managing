@@ -10,6 +10,7 @@
 
 struct best_movie{
   char *title;
+  struct movie *movie_link;
   struct best_movie *movie_next;
 };
 
@@ -27,8 +28,13 @@ struct director{
 typedef struct best_movie* MOVIE;
 typedef struct director* DIRECTOR;
 
+DIRECTOR public_director;
+
 void init_director();
 void add_list_director(FILE *list, char* origin);
+struct movie* search_director_to_movie_title(char* title);
+int search_director_to_movie();
+void link_director_to_movie();
 
 MOVIE list_movie_director(char* title);
 MOVIE put_list_movie_director(MOVIE origin, MOVIE tmp);
