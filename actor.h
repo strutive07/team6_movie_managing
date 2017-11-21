@@ -33,7 +33,7 @@ struct actor
 };
 
 typedef struct actor* ACTOR;
-
+ACTOR public_actor;
 
 MOVIE list_movie_actor(char* title);
 MOVIE put_list_movie_actor(MOVIE origin, MOVIE tmp);
