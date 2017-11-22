@@ -276,10 +276,14 @@ int search_director_to_movie()
       // printf("@@@@@@@@@@@@@@@@@@@@@@@@ SEARCH COMPLETE! %s /// %s\n", public_director->movie->title, result->title);
       public_director->movie->movie_link = result;
       printf("MOVIE and DIRECOTR CONNECTED > %s\n", public_director->movie->movie_link->title);
+
+      return 1;
     }
 
     public_director->movie = public_director->movie->movie_next;
   }
+
+  return 0;
 }
 
 void link_director_to_movie()
