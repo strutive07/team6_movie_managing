@@ -4,6 +4,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include "director.h"
+#include "actor.h"
 
 //전역 변수
 struct movie *public_next_movie;
@@ -47,5 +49,8 @@ void add_movie(struct movie *movie, FILE *mv_log_write, FILE *mv_log_read);
 struct movie *search_last_movie(struct movie *movie);
 void update_movie(struct movie* movie, FILE *mv_log);
 void init_movie();
-
+struct director* search_director_in_movie(DIRECTOR argument_director, char* argument_name);
+void lint_movie_to_director(DIRECTOR argument_director, struct movie* argument_movie);
+struct actor* search_actor_in_movie(ACTOR argument_actor, char* argument_actor_name);
+void lint_movie_to_actor(ACTOR argument_actor, struct movie* argument_movie);
 #endif
