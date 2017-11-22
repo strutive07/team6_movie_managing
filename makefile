@@ -1,5 +1,5 @@
 project: option.o actor.o director.o movie.o main.o
-	gcc -o project main.o movie.o director.o actor.o
+	gcc -o project main.o movie.o director.o actor.o option.o
 main.o: main.c
 	gcc -c main.c
 movie.o: movie.c movie.h
