@@ -1,33 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-struct best_movie{
-  char *title;
-  struct best_movie *movie_next;
-};
-
-struct director{
-  int serial_number;
-  char *name;
-  char sex;
-  char *birth;
-  struct best_movie *movie;
-  struct director *director_next;
-};
-
-typedef struct best_movie* MOVIE;
-typedef struct director* DIRECTOR;
-
-void init_director();
-
-MOVIE list_movie(char* title);
-MOVIE put_list_movie(MOVIE origin, MOVIE tmp);
-void print_director(DIRECTOR director);
-
-DIRECTOR list_director(char* serial_number, char* name, char* sex, char* birth, MOVIE movie);
-DIRECTOR put_list_director(DIRECTOR origin, DIRECTOR tmp);
-void print_movie(MOVIE movie);
+#include "director.h"
+#include "movie.h"
 
 void init_director()
 {
@@ -45,6 +17,12 @@ void init_director()
     exit(-1);
   }
 
+  if((list = fopen("director_list.txt", "w")) == NULL)
+  {
+    printf("FILE ERROR");
+    exit(-1);
+  }
+
   fseek(log, SEEK_SET, SEEK_END);
   size = ftell(log);
   line = (char*)malloc(size+1);
@@ -56,14 +34,28 @@ void init_director()
     {
       DIRECTOR director_tmp;
       MOVIE movie_tmp;
-      char *split;
+      char *split, *origin;
       char *tag, *serial_number, *name, *sex, *birth, *title;
       // printf("입력받은 문장 > %s" , line);
+      origin = (char*)malloc(size);
+      strcpy(origin, line);
 
       // tag
       split = strtok(line, ":");
       tag = (char*)malloc(strlen(split)+1);
       strcpy(tag, split);
+      if(!strcmp(tag, "add"))
+      {
+        add_list_director(list, origin+4);
+      }
+      else if(!strcmp(tag, "delete"))
+      {
+        // continue;
+      }
+      else if(!strcmp(tag, "update"))
+      {
+
+      }
       // printf(">>> tag : %s\n", tag);
       // serial_number
       split = strtok(NULL, ":");
@@ -89,22 +81,22 @@ void init_director()
       split = strtok(NULL, ":");
       title = (char*)malloc(strlen(split)+1);
       strcpy(title, split);
-      // printf(">>> title : %s\n", title);
+      *(title + strlen(title) - 2) = '\0';
 
       // title
-      split = strtok(title, ",");
+      split = strtok(title, ",\n");
       // printf("MOVIE TITLE : %s \n", split);
       if(movie == NULL)
       {
-        movie = list_movie(split);
+        movie = list_movie_director(split);
       }
-      while(split = strtok(NULL, ","))
+      while(split = strtok(NULL, ",\n"))
       {
         strcpy(split, split+1);
         // printf("MOVIE TITLE : %s \n", split);
 
-        movie_tmp = list_movie(split);
-        movie = put_list_movie(movie, movie_tmp);
+        movie_tmp = list_movie_director(split);
+        movie = put_list_movie_director(movie, movie_tmp);
       }
 
       if(director == NULL)
@@ -122,7 +114,7 @@ void init_director()
       print_director(director);
       printf("\n");
       printf("MOVIE LIST > \n");
-      print_movie(movie);
+      print_movie_director(movie);
       printf("\n");
 
       /*****************************/
@@ -130,6 +122,7 @@ void init_director()
       movie = NULL;
 
       free(tag);
+      free(origin);
       free(serial_number);
       free(sex);
       free(name);
@@ -138,15 +131,23 @@ void init_director()
     }
   }
   fclose(log);
+  fclose(list);
 
   // printf("@@@@@@@@%s\n", director->director_next->movie->title);
 
+  public_director = director;
+
   free(line);
-  free(director);
-  free(movie);
+  // free(director);
+  // free(movie);
 }
 
-MOVIE list_movie(char* title){
+void add_list_director(FILE *list, char* origin)
+{
+  fprintf(list, "%s", origin);
+}
+
+MOVIE list_movie_director(char* title){
    MOVIE movie;
 
    if(movie == NULL)
@@ -158,6 +159,7 @@ MOVIE list_movie(char* title){
       movie = (MOVIE)malloc(sizeof(struct best_movie));
       movie->title = (char*)malloc(strlen(title)+1);
       strcpy(movie->title, title);
+      movie->movie_link = NULL;
       movie->movie_next = NULL;
 
       return movie;
@@ -188,7 +190,7 @@ DIRECTOR list_director(char* serial_number, char* name, char* sex, char* birth, 
    }
 }
 
-MOVIE put_list_movie(MOVIE origin, MOVIE tmp){
+MOVIE put_list_movie_director(MOVIE origin, MOVIE tmp){
   MOVIE new;
   new = origin;
   while(new->movie_next != NULL)
@@ -213,7 +215,7 @@ DIRECTOR put_list_director(DIRECTOR origin, DIRECTOR tmp){
   return origin;
 }
 
-void print_movie(MOVIE movie){
+void print_movie_director(MOVIE movie){
    if(movie == NULL)
    {
      printf("NULL\n");
@@ -221,7 +223,7 @@ void print_movie(MOVIE movie){
    else
    {
       printf("%s->", movie->title);
-      print_movie(movie->movie_next);
+      print_movie_director(movie->movie_next);
    }
 }
 
@@ -240,17 +242,91 @@ void print_director(DIRECTOR director){
    }
 }
 
-int main()
+struct movie* search_director_to_movie_title(char* title)
 {
-  init_director();
+  struct movie* LINK = public_first_movie;
+
+  while(LINK != NULL)
+  {
+    if(!strcmp(title, LINK->title))
+    {
+      // printf("@@@@@@@@@@@@@@@@@@@@@@@@ SEARCH COMPLETE! %s /// %s\n", title, LINK->title);
+
+      return LINK;
+    }
+
+    LINK = LINK->movie_next;
+  }
+
+  return NULL;
+}
+
+int search_director_to_movie()
+{
+  struct movie* result = NULL;
+
+  while(public_director->movie != NULL)
+  {
+    result = search_director_to_movie_title(public_director->movie->title);
+    // printf("@@@@@@@@@@@@@@@@@@@@@@@ %d %s ///\n", strlen(public_director->movie->title), public_director->movie->title);
+
+    if(result != NULL)
+    {
+      // printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS\n");
+      // printf("@@@@@@@@@@@@@@@@@@@@@@@@ SEARCH COMPLETE! %s /// %s\n", public_director->movie->title, result->title);
+      public_director->movie->movie_link = result;
+      printf("MOVIE and DIRECOTR CONNECTED > %s\n", public_director->movie->movie_link->title);
+
+      return 1;
+    }
+
+    public_director->movie = public_director->movie->movie_next;
+  }
 
   return 0;
 }
 
-// if((list = fopen("director_list.txt", "r+")) == NULL)
-// {
-//   printf("FILE ERROR");
-//   return -1;
-// }
-//
-// fclose(list);
+void link_director_to_movie()
+{
+  int result;
+
+  while(public_director != NULL)
+  {
+    result = search_director_to_movie();
+
+    if(result)
+    {
+      break;
+    }
+
+    public_director = public_director->director_next;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////
