@@ -5,14 +5,61 @@
 #include <string.h>
 
 void you_wanna_end();
-void update_list_director(int serial, DIRECTOR director, char *option);
-void move_serial(int serial, DIRECTOR origin);
+void whats_up_commander();
+void update_list(char *command_what, char *option, char *split, DIRECTOR director);
+void update_list_director(char *option, char *serial, DIRECTOR director);
+DIRECTOR move_serial(int serial, DIRECTOR origin);
 
-void update_list_director(int serial, DIRECTOR director, char *option){
+void whats_up_commander(){
 
-  // director = move_serial(serial, director);
+  printf(">> Welcome to My Movie <<\n");
+  printf("File Loading......\n");
+  printf("You can use add, update, delete, search, sort, save, end commands.\n");
+
+  char *whats_up_commander = (char*)malloc(sizeof(char)*100);
+  char *split = (char*)malloc(sizeof(char)*100);
+  char *command_what = (char*)malloc(sizeof(char));
+  char *option = (char*)malloc(sizeof(char)*100);
+  signal(SIGINT, you_wanna_end);
+  while(1){
+    printf("(movie) ");
+    gets(whats_up_commander);
+    split = strtok(whats_up_commander, " ");
+
+    if(!strcmp(split,"update")){
+      command_what = strtok(NULL, " ");
+      option = strtok(NULL, " ");
+      split = strtok(NULL, " ");
+      update_list(command_what, option, split, director);
+    }
+  }
+
+}
+
+void update_list(char *command_what, char *option, char *split,DIRECTOR director){
+  if (!strcmp(command_what, "d")){
+    update_list_director(option, split, director);
+  }
+}
+
+
+void you_wanna_end(int sig)
+{
+  char a;
+  printf("\nGet Interrupt Signal.\n");
+  printf("Do you want to exit myMOVIE program? (Y/N) ");
+  scanf("%c", &a);
+  if((a == 'y') || (a == 'Y')){
+    printf("bye");
+    exit(1);
+  }
+}
+
+void update_list_director(char *option, char *serial, DIRECTOR director){
 
   int i = 0;
+  int serial_num = atoi(serial);
+  director = move_serial(serial_num, director);
   char option_letter = *option;
   char *tmp;
 
@@ -64,7 +111,7 @@ void update_list_director(int serial, DIRECTOR director, char *option){
 
 }
 
-void move_serial(int serial, DIRECTOR origin){
+DIRECTOR move_serial(int serial, DIRECTOR origin){
   DIRECTOR new;
   new = origin;
   int i = 0;
@@ -72,23 +119,6 @@ void move_serial(int serial, DIRECTOR origin){
   {
     new = new->director_next;
   }
-  // origin = new;
   printf("%d\n", new->serial_number);
-
-}
-
-void you_wanna_end()
-{
-  char a;
-  printf("\nGet Interrupt Signal. \n");
-  printf("Do you want to exit myMOVIE program? (Y/N) \n");
-  a = getchar();
-  if(a == 'y' || a == 'Y'){
-    printf("bye\n");
-    exit(0);
-  }else if(a == 'n' || a == 'N'){
-    getchar();
-  }
-
-
+  return new;
 }
