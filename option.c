@@ -1,14 +1,4 @@
-#include <signal.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-void you_wanna_end();
-void whats_up_commander();
-void update_list(char *command_what, char *option, char *split, DIRECTOR director);
-void update_list_director(char *option, char *serial, DIRECTOR director);
-DIRECTOR move_serial(int serial, DIRECTOR origin);
+#include "option.h"
 
 void whats_up_commander(){
 
@@ -20,7 +10,9 @@ void whats_up_commander(){
   char *split = (char*)malloc(sizeof(char)*100);
   char *command_what = (char*)malloc(sizeof(char));
   char *option = (char*)malloc(sizeof(char)*100);
+
   signal(SIGINT, you_wanna_end);
+
   while(1){
     printf("(movie) ");
     gets(whats_up_commander);
@@ -30,16 +22,19 @@ void whats_up_commander(){
       command_what = strtok(NULL, " ");
       option = strtok(NULL, " ");
       split = strtok(NULL, " ");
-      update_list(command_what, option, split, director);
+
+      if (!strcmp(command_what, "d")){
+        update_list_director(option, split, public_director);
+      }else if(!strcmp(command_what, "a")){
+        printf("update_list_actor will be starts\n");
+      }else if(!strcmp(command_what,"m")){
+        printf("update_list_movie will be starts\n");
+      }
+
+
     }
   }
 
-}
-
-void update_list(char *command_what, char *option, char *split,DIRECTOR director){
-  if (!strcmp(command_what, "d")){
-    update_list_director(option, split, director);
-  }
 }
 
 
@@ -62,6 +57,12 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   director = move_serial(serial_num, director);
   char option_letter = *option;
   char *tmp;
+  DIRECTOR before_update = director;
+  FILE *write_in_log;
+
+  write_in_log = fopen("director_log.txt","a");
+
+  fprintf(write_in_log,"update:%d",serial_num);
 
   while(i < strlen(option)){
 
@@ -107,9 +108,30 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   i++;
   }
 
-  //log 에 update 기록, 중복일 경우. 처음에 입력 어떻게 받는지.
+  // write_in_log code, before_update랑 같으면 =, 아니면 %s 출력
+  if(strcmp(director->name, before_update->name)){
+    fprintf(write_in_log, ":=");
+  }else
+    fprintf(write_in_log,":%s", director->name);
+
+  if((director->sex) == (before_update->sex)){
+      fprintf(write_in_log, ":=");
+  }else
+      fprintf(write_in_log,":%s", director->sex);
+
+  if(strcmp(director->birth, before_update->birth)){
+          fprintf(write_in_log, ":=");
+  }else
+          fprintf(write_in_log,":%s", director->birth);
+
+// 수정 필요
+  if(strcmp(director->movie->title, before_update->movie->title)){
+          fprintf(write_in_log, ":=");
+  }else
+          fprintf(write_in_log,":%s", director->movie->title);
 
 }
+
 
 DIRECTOR move_serial(int serial, DIRECTOR origin){
   DIRECTOR new;
