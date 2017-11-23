@@ -13,7 +13,14 @@
 
 void you_wanna_end();
 void whats_up_commander();
+
 void update_list_director(char *option, char *serial, DIRECTOR director);
-DIRECTOR move_serial(int serial, DIRECTOR origin);
+DIRECTOR move_serial_director(int serial, DIRECTOR origin);
+
+void update_list_actor(char *option, char *serial, ACTOR actor);
+ACTOR move_serial_actor(int serial, ACTOR origin);
+
+void update_list_movie(char *option, char *serial, struct movie *movie);
+struct movie move_serial_movie(int serial, struct movie *origin);
 
 #endif
