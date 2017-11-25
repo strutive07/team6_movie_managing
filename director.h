@@ -33,7 +33,7 @@ DIRECTOR public_director;
 void init_director();
 void add_list_director(FILE *list, char* origin);
 struct movie* search_director_to_movie_title(char* title);
-int search_director_to_movie();
+int search_director_to_movie(DIRECTOR tmp);
 void link_director_to_movie();
 
 MOVIE list_movie_director(char* title);
