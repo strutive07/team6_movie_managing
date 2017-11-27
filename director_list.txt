@@ -3,4 +3,7 @@
 3:Ridley Scott:M:19371130:Blade Runner
 4:Martin Spielberg:M:19421117:Blade, Blade Blade, Street
 5:Ridley Ridley:M:19371130:Runner Runner
-6:test_asdf:M:19371130:asdf
+6:test_asdf:M:19371130:asd
+7:ho??;ho:M:19921117:ho??;hi, a, b, c, d, e, f??;
+8:ho??;ho:M:19921117:ho, ho??;
+9:ho??;1:M:19921127:ho??;1, a
