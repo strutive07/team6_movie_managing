@@ -28,7 +28,12 @@ void whats_up_commander(){
       if(!strcmp(split,"update")){
       command_what = strtok(NULL, " ");
       option = strtok(NULL, " ");
+      if(atoi(option) == 0){ // 옵션 없이 option값이 시리얼 넘버를 받으면 atoi값은 0이 아닐테니까.
       split = strtok(NULL, " ");
+      }else{
+      strcpy(split, option);
+      strcpy(option, "ALL COMMANDS");
+      }
 
       if (!strcmp(command_what, "d")){
         update_list_director(option, split, director);
@@ -41,7 +46,23 @@ void whats_up_commander(){
       }
 
 
-    }
+    } // update
+      if(!strcmp(split, "print")){
+        printf("Print_movie will be run\n");
+
+        command_what = strtok(NULL, " ");
+        split = strtok(NULL, " ");
+
+        if (!strcmp(command_what, "d")){
+          print_list_director(director, split);
+        }else{
+            continue;
+        // }else if(!strcmp(command_what, "a")){
+        //   print_list_actor(actor);
+        // }else if(!strcmp(command_what,"m")){
+        //   print_list_movie(movies);
+        }
+      }
   }
 
 }
@@ -66,10 +87,20 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   int i = 0;
   int serial_num = atoi(serial);
   director = move_serial_director(serial_num, director);
+
+  if(director == NULL){
+    printf("No Such Record\n");
+    return;
+  }
   char option_letter = *option;
   char *tmp;
   int update_check = 1;
+  int overlap = 0;
   FILE *write_in_log;
+
+  if(!strcmp(option, "ALL COMMANDS")){
+    strcpy(option, "nsbm");
+  }
 
   write_in_log = fopen("director_log.txt","a");
 
@@ -84,28 +115,30 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   case 'n':
   printf("Director name > ");
   gets(tmp);
+  if (!strcmp(tmp, director -> name)){
+    if(director_overlap(director)){
+      return;
+    }
+  }
   director->name = (char*)malloc(strlen(tmp)+1);
   strcpy(director->name, tmp);
   free(tmp);
   update_check *= 2;
-  printf("%d update check\n", update_check);
   break;
 
   case 's':
   printf("Director sex > ");
   scanf("%c", &(director -> sex));
   update_check *= 3;
-  printf("%d update check\n", update_check);
   break;
 
   case 'b':
   printf("Director birth > ");
-  scanf("%s", tmp);
+  gets(tmp);
   director->birth = (char*)malloc(strlen(tmp)+1);
   strcpy(director->birth, tmp);
   free(tmp);
   update_check *= 5;
-  printf("%d update check\n", update_check);
   break;
 
   case 'm':
@@ -116,7 +149,6 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   // strcat(director->movie->title, tmp);
   free(tmp);
   update_check *= 7;
-  printf("%d update check\n", update_check);
   break;
 
   default:
@@ -125,39 +157,37 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
 
   i++;
   }
-  printf("%d update check\n", update_check);
 
   fprintf(write_in_log,"update:%d",serial_num);
 
    if((update_check % 2 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same name\n");
    }else{
-     printf("different name\n");
      fprintf(write_in_log,":%s", director->name);
    }
 
    if((update_check % 3 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same sex\n");
      update_check -= 100;
    }else{
-    printf("different sex\n");
     fprintf(write_in_log,":%c", director->sex);
   }
 
    if((update_check % 5 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same birth\n");
    }else{
-     printf("different birth\n" );
      fprintf(write_in_log,":%s", director->birth);
    }
  // 수정 필요
-   // if((update_check % != 0)){
-   //     fprintf(write_in_log, ":=");
-   // }else
-   //     fprintf(write_in_log,":%s", director->movie->title);
+      if((update_check % 7 != 0)){
+        fprintf(write_in_log, ":=");
+     }else{
+       fprintf(write_in_log,":");
+       while(director -> movie != NULL){
+       fprintf(write_in_log,"%s", director->movie->title);
+       director -> movie = director -> movie -> movie_next;
+     }
+   }
      fprintf(write_in_log, "\n");
 
      fclose(write_in_log);
@@ -172,6 +202,9 @@ DIRECTOR move_serial_director(int serial, DIRECTOR origin){
   while((serial != new -> serial_number) && (new != NULL))
   {
     new = new->director_next;
+    if(new == NULL){
+      return NULL;
+    }
   }
 
   return new;
@@ -182,10 +215,20 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
   int i = 0;
   int serial_num = atoi(serial);
   actor = move_serial_actor(serial_num, actor);
+
+  if(actor == NULL){
+    printf("No Such Record\n");
+    return;
+  }
+
   char option_letter = *option;
   char *tmp;
   int update_check = 1;
   FILE *write_in_log;
+
+  if(!strcmp(option, "ALL COMMANDS")){
+    strcpy(option, "nsb");
+  }
 
   write_in_log = fopen("actor_log.txt","a");
 
@@ -214,7 +257,7 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
 
   case 'b':
   printf("Actor birth > ");
-  scanf("%s", tmp);
+  gets(tmp);
   actor->birth = (char*)malloc(strlen(tmp)+1);
   strcpy(actor->birth, tmp);
   free(tmp);
@@ -242,27 +285,21 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
 
    if((update_check % 2 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same name\n");
      update_check -= 1000;
    }else{
-     printf("different name\n");
      fprintf(write_in_log,":%s", actor->name);
    }
 
    if((update_check % 3 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same sex\n");
      update_check -= 100;
    }else{
-    printf("different sex\n");
-    fprintf(write_in_log,":%d", actor->sex);
+    fprintf(write_in_log,":%c", actor->sex);
   }
 
    if((update_check % 5 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same birth\n");
    }else{
-     printf("different birth\n" );
      fprintf(write_in_log,":%s", actor->birth);
    }
  // 수정 필요
@@ -284,6 +321,9 @@ ACTOR move_serial_actor(int serial, ACTOR origin){
   while((serial != new -> serial_number) && (new != NULL))
   {
     new = new->actor_next;
+    if(new == NULL){
+      return NULL;
+    }
   }
 
   return new;
@@ -293,11 +333,21 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
 
   int i = 0;
   int serial_num = atoi(serial);
-  *movies = move_serial_movie(serial_num, movies);
+  movies = move_serial_movie(serial_num, movies);
+
+  if(movies == NULL){
+    printf("No Such Record\n");
+    return;
+  }
+
   char option_letter = *option;
   char *tmp;
   int update_check = 1;
   FILE *write_in_log;
+
+  if(!strcmp(option, "ALL COMMANDS")){
+    strcpy(option, "tgdyra");
+  }
 
   write_in_log = fopen("movie_log.txt","a");
 
@@ -329,7 +379,7 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
 
   case 'd':
   printf("Movie director > ");
-  scanf("%s", tmp);
+  gets(tmp);
   movies -> director.name = (char*)malloc(strlen(tmp)+1);
   strcpy(movies -> director.name, tmp);
   free(tmp);
@@ -368,50 +418,38 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
 
    if((update_check % 2 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same title\n");
    }else{
-     printf("different title\n");
      fprintf(write_in_log,":%s", movies->title);
    }
 
    if((update_check % 3 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same genre\n");
      update_check -= 100;
    }else{
-    printf("different genre\n");
     fprintf(write_in_log,":%d", movies->genre);
   }
 
    if((update_check % 5 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same director\n");
    }else{
-     printf("different director\n" );
      fprintf(write_in_log,":%s", movies-> director.name);
    }
 
    if((update_check % 7 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same year\n");
    }else{
-     printf("different year\n" );
      fprintf(write_in_log,":%d", movies-> year);
    }
 
    if((update_check % 11 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same runtime\n");
    }else{
-     printf("different runtime\n" );
      fprintf(write_in_log,":%d", movies-> time);
    }
 
    if((update_check % 13 != 0)){
      fprintf(write_in_log, ":=");
-     printf("same actor\n");
    }else{
-     printf("different actor\n" );
      fprintf(write_in_log,":%s", movies-> actor -> actor_name);
    }
 
@@ -422,14 +460,62 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
 }
 
 
-struct movie move_serial_movie(int serial, struct movie *origin){
+struct movie* move_serial_movie(int serial, struct movie *origin){
   struct movie *new;
   new = origin;
 
   while((serial != new -> Serial_number) && (new != NULL))
   {
     new = new->movie_next;
+
+    if(new == NULL){
+      return NULL;
+    }
+
   }
 
-  return *new;
+  return new;
+}
+
+int director_overlap(DIRECTOR director){
+  char* Y_N = (char *)malloc(sizeof(char));
+  printf("You have the same record\n");
+  printf("Director name > %s\n", director -> name);
+  printf("Director sex > %c\n", director -> sex);
+  printf("Director birth > %s\n", director -> birth);
+  while(director -> movie != NULL){
+  printf("Director movie > %s\n", director -> movie -> title);
+  director -> movie = director -> movie -> movie_next;
+  }
+  printf("Do you want to change the record? (Y/N) : ");
+  gets(Y_N);
+  if(!strcmp(Y_N, "Y") || !strcmp(Y_N, "y")){
+    return 0;
+  }else{
+    return 1;
+  }
+}
+
+
+void print_list_director(DIRECTOR director, char *serial){
+
+  int serial_num = atoi(serial);
+  director = move_serial_director(serial_num, director);
+
+    printf("%d : ", director -> serial_number);
+    printf("%s ", director -> name);
+    printf("%c ", director -> sex);
+    printf("%s \n", director -> birth);
+    while(director -> movie != NULL){
+      if (director -> movie -> movie_link == NULL){
+        printf("No linked Data\n");
+        break;
+      }else{
+      printf("%s : %d, %d\n", director -> movie -> title, director -> movie -> movie_link -> year, director -> movie -> movie_link -> time); // 제목, 제작년도, 상영시간
+      director -> movie = director -> movie -> movie_next;
+      }
+    }
+
+
+
 }

@@ -21,6 +21,10 @@ void update_list_actor(char *option, char *serial, ACTOR actor);
 ACTOR move_serial_actor(int serial, ACTOR origin);
 
 void update_list_movie(char *option, char *serial, struct movie *movie);
-struct movie move_serial_movie(int serial, struct movie *origin);
+struct movie* move_serial_movie(int serial, struct movie *origin);
+
+int director_overlap(DIRECTOR director);
+
+void print_list_director(DIRECTOR director, char *serial);
 
 #endif
