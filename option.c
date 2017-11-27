@@ -63,35 +63,6 @@ void whats_up_commander(){
         //   print_list_movie(movies);
         }
       }
-
-      else if(!strcmp(split, "save"))
-      {
-        // 옵션이 없는 경우 에러
-        command_what = strtok(NULL, " "); // mda
-        option = strtok(NULL, " "); // option
-        if(*option == '-')
-        {
-          strcpy(option, option + 1);
-        }
-        // split = strtok(NULL, " "); // -f filename
-
-        if(!strcmp(command_what, "m"))
-        {
-          save_list_movie(option, movies);
-        }
-        else if(!strcmp(command_what, "d"))
-        {
-          save_list_director(option, director);
-        }
-        else if(!strcmp(command_what, "a"))
-        {
-          save_list_actor(option, actor);
-        }
-        else
-        {
-          continue;
-        }
-      }
   }
 
 }
@@ -640,7 +611,7 @@ void option_add_director(DIRECTOR public_first_director){
   int text_size = 0;
   director = malloc(sizeof(struct director));
   char* tmp_char = (char*)malloc(sizeof(char)*200);
-  printf("\n==\n%d\n=\n", public_first_director -> serial_number);
+
   printf("name > ");
   gets(tmp_char);
   director -> name = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
@@ -663,20 +634,20 @@ void option_add_director(DIRECTOR public_first_director){
   gets(tmp_char);
   fseek(director_log_read,0,SEEK_END);
   int file_size = ftell(director_log_read);
-  printf("\n==\n%d\n=\n", file_size);
+
 
   director -> director_next = NULL;
   LastDirector = serach_last_director(public_first_director);
-  printf("\n==\n%d\n=\n", LastDirector -> serial_number);
+
   LastDirector -> director_next = director;
   director -> serial_number = (LastDirector -> serial_number) +1 ;
-printf("\n==\n%s\n=\n", tmp_char);
+
   char* split = strtok(tmp_char, ",");
-printf("\n==\n%s\n=\n", split);
+
   MOVIE movie;
   movie = list_movie_director(split);
   director -> movie = movie;
-  printf("\n==\n%s\n=\n", movie -> title);
+
   while((split = strtok(NULL, ",")) != NULL){
     if(*split+0 == ' '){
       strcpy(split, split+1);
@@ -721,13 +692,17 @@ DIRECTOR serach_last_director(DIRECTOR public_first_director){
   printf("\n==\n%d\n=\n", director -> serial_number);
   return director;
 }
-void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director){
-  FILE* mv_list, *director_list;
+void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director, ACTOR actor){
+  FILE* mv_list, *director_list, *actor_list;
   if((mv_list = fopen("movie_list.txt", "w")) == NULL){
     printf("File Open Error");
     exit(1);
   }
   if((director_list = fopen("director_list.txt", "w")) == NULL){
+    printf("File Open Error");
+    exit(1);
+  }
+  if((actor_list = fopen("actor_list.txt", "w")) == NULL){
     printf("File Open Error");
     exit(1);
   }
@@ -768,945 +743,142 @@ void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director){
     if(director -> director_next == NULL){
       break;
     }else{
-      fprintf(director_list,"\n");
+      fprintf(director_list," \n");
     }
     director = director -> director_next;
   }
+  //actor list print to actor_list.text
+  while(actor != NULL){
+    if(actor -> sex){
+      fprintf(actor_list, "%d:%s:M:%s:", actor -> serial_number, actor -> name, actor -> birth);
+    }else{
+      fprintf(actor_list, "%d:%s:F:%s:", actor -> serial_number, actor -> name, actor -> birth);
+    }
 
+    MOVIE movie_in_actor = actor -> movie;
+    while(movie_in_actor != NULL){
+      if(movie_in_actor -> movie_next == NULL){
+        fprintf(actor_list,"%s", movie_in_actor -> title);
+        break;
+      }else{
+        fprintf(actor_list,"%s, ", movie_in_actor -> title);
+      }
+      movie_in_actor = movie_in_actor -> movie_next;
+    }
+    if(actor -> actor_next == NULL){
+      break;
+    }else{
+      fprintf(actor_list,"\n");
+    }
+    actor = actor -> actor_next;
+  }
 
   fclose(mv_list);
+  fclose(director_list);
+  fclose(actor_list);
 }
-
-void save_list_movie(char* option, struct movie *movie)
-{
-  FILE *fp, *tmp, *tmp_print;
-  struct movie* save_movie = public_first_movie;
-  char *movie_list_str;
-  int size = 0;
-
-  fp = fopen("movie_list.txt", "w");
-
-  // if(option == NULL)
-  // {
-  //   // strcpy(option, "tgdyra");
-  // }
-
-    while(strlen(option))
-    {
-      switch(*option)
-      {
-        case 't' :
-        if(size == 0)
-        {
-          while(save_movie)
-          {
-            fprintf(fp ,"%d:%s:=:=:=:=:=\n", save_movie->Serial_number, save_movie->title);
-            save_movie = save_movie->movie_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          movie_list_str = (char*)malloc(size + 1);
-
-          while(fgets(movie_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(movie_list_str+strlen(movie_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(movie_list_str); i++)
-            {
-              if(*(movie_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 1)
-              {
-                movie_list_str = insert_string(movie_list_str, save_movie->title, i+1);
-                fprintf(tmp_print, "%s\n", movie_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "movie_list.txt");
-
-            save_movie = save_movie->movie_next;
-          }
-
-          free(movie_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_movie = public_first_movie;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 'g' :
-        if(size == 0)
-        {
-          while(save_movie)
-          {
-            fprintf(fp ,"%d:=:%s:=:=:=:=\n", save_movie->Serial_number, save_movie->genre);
-            save_movie = save_movie->movie_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          movie_list_str = (char*)malloc(size + 1);
-
-          while(fgets(movie_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(movie_list_str+strlen(movie_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(movie_list_str); i++)
-            {
-              if(*(movie_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 2)
-              {
-                movie_list_str = insert_string(movie_list_str, save_movie->genre, i+1);
-                fprintf(tmp_print, "%s\n", movie_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "movie_list.txt");
-
-            save_movie = save_movie->movie_next;
-          }
-
-          free(movie_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_movie = public_first_movie;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 'd' :
-        if(size == 0)
-        {
-          while(save_movie)
-          {
-            fprintf(fp ,"%d:=:=:%s:=:=:=\n", save_movie->Serial_number, save_movie->director.name);
-            save_movie = save_movie->movie_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          movie_list_str = (char*)malloc(size + 1);
-
-          while(fgets(movie_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(movie_list_str+strlen(movie_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(movie_list_str); i++)
-            {
-              if(*(movie_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 3)
-              {
-                movie_list_str = insert_string(movie_list_str, save_movie->director.name, i+1);
-                fprintf(tmp_print, "%s\n", movie_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "movie_list.txt");
-
-            save_movie = save_movie->movie_next;
-          }
-
-          free(movie_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_movie = public_first_movie;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 'y' :
-        if(size == 0)
-        {
-          while(save_movie)
-          {
-            fprintf(fp ,"%d:=:=:=:%d:=:=\n", save_movie->Serial_number, save_movie->year);
-            save_movie = save_movie->movie_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          movie_list_str = (char*)malloc(size + 1);
-
-          while(fgets(movie_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(movie_list_str+strlen(movie_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(movie_list_str); i++)
-            {
-              if(*(movie_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 4)
-              {
-                char *year;
-
-                year = (char*)malloc(sizeof(char) * 5);
-                sprintf(year, "%d", save_movie->year);
-
-                movie_list_str = insert_string(movie_list_str, year, i+1);
-                fprintf(tmp_print, "%s\n", movie_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "movie_list.txt");
-
-            save_movie = save_movie->movie_next;
-          }
-
-          free(movie_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_movie = public_first_movie;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 'r' :
-        if(size == 0)
-        {
-          while(save_movie)
-          {
-            fprintf(fp ,"%d:=:=:=:=:%d:=\n", save_movie->Serial_number, save_movie->time);
-            save_movie = save_movie->movie_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          movie_list_str = (char*)malloc(size + 1);
-
-          while(fgets(movie_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(movie_list_str+strlen(movie_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(movie_list_str); i++)
-            {
-              if(*(movie_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 5)
-              {
-                char *time;
-
-                time = (char*)malloc(sizeof(char) * 5);
-                sprintf(time, "%d", save_movie->time);
-
-                movie_list_str = insert_string(movie_list_str, time, i+1);
-                fprintf(tmp_print, "%s\n", movie_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "movie_list.txt");
-
-            save_movie = save_movie->movie_next;
-          }
-
-          free(movie_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_movie = public_first_movie;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 'a' :
-        if(size == 0)
-        {
-          while(save_movie)
-          {
-            struct linked_list_actor* actor_tmp = save_movie->actor;
-
-            fprintf(fp ,"%d:=:=:=:=:=:%s", save_movie->Serial_number, save_movie->actor->actor_name);
-
-            while(save_movie->actor->actor_next != NULL)
-            {
-              save_movie->actor = save_movie->actor->actor_next;
-              fprintf(fp, ", %s", save_movie->actor->actor_name);
-            }
-            fprintf(fp, "\n");
-            save_movie->actor = actor_tmp;
-            save_movie = save_movie->movie_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          movie_list_str = (char*)malloc(size + 1);
-
-          while(fgets(movie_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(movie_list_str+strlen(movie_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(movie_list_str); i++)
-            {
-
-              if(*(movie_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-              if(collon_cnt == 6)
-              {
-                struct linked_list_actor* actor_tmp = save_movie->actor;
-
-                movie_list_str = insert_string(movie_list_str, save_movie->actor->actor_name, i+1);
-                fprintf(tmp_print, "%s", movie_list_str);
-                fflush(tmp_print);
-
-                while(save_movie->actor->actor_next != NULL)
-                {
-                  save_movie->actor = save_movie->actor->actor_next;
-                  fprintf(tmp_print, ", %s", save_movie->actor->actor_name);
-                  fflush(tmp_print);
-                }
-                fprintf(tmp_print, "\n");
-                save_movie->actor = actor_tmp;
-
-                break;
-              }
-            }
-            rename("test.txt", "movie_list.txt");
-
-            save_movie = save_movie->movie_next;
-          }
-
-          free(movie_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_movie = public_first_movie;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        default :
-        printf("There is no option for %c\n", *option);
-        break;
-      }
-
-      size = ftell(fp);
-
-      strcpy(option, option + 1);
+//actor add
+void option_add_actor(ACTOR public_actor){
+  ACTOR actor;
+  ACTOR LastActor;
+   FILE *actor_log_write, FILE, *actor_log_read;
+   if((actor_log_read = fopen("actor_log.txt", "r")) == NULL){
+     printf("File Open Error");
+     exit(1);
+   }
+   if((actor_log_write = fopen("actor_log.txt", "a")) == NULL){
+     printf("File Open Error");
+     exit(1);
+   }
+  int text_size = 0;
+  actor = malloc(sizeof(struct actor));
+  char* tmp_char = (char*)malloc(sizeof(char)*200);
+
+  printf("name > ");
+  gets(tmp_char);
+  actor -> name = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
+  strcpy(actor -> name , colon_change(tmp_char));
+
+  printf("sex > ");
+  gets(tmp_char);
+  // director -> sex = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
+  // inMovie -> genre = colon_change(tmp_char);
+  // strcpy(inMovie -> genre , colon_change(tmp_char));
+
+  if(tmp_char[0] =='M'){
+    actor -> sex = true;
+  }else{
+    actor -> sex = false;
+  }
+
+  printf("birth > ");
+  gets(tmp_char);
+  actor -> birth = (char*)malloc(sizeof(char)*strlen(tmp_char)+5);
+  // inMovie -> director.name = colon_change(tmp_char);
+  strcpy(actor -> birth , colon_change(tmp_char));
+
+  printf("best movie > ");
+  gets(tmp_char);
+  fseek(actor_log_read,0,SEEK_END);
+  int file_size = ftell(actor_log_read);
+
+
+  actor -> actor_next = NULL;
+  LastActor = serach_last_actor(public_actor);
+
+  LastActor -> actor_next = actor;
+  actor -> serial_number = (LastActor -> serial_number) +1 ;
+
+  char* split = strtok(tmp_char, ",");
+
+  MOVIE movie;
+  movie = list_movie_director(split);
+  actor -> movie = movie;
+
+  while((split = strtok(NULL, ",")) != NULL){
+    if(*split+0 == ' '){
+      strcpy(split, split+1);
+    }
+    MOVIE movie_tmp = list_movie_director(split);
+    movie = put_list_movie_director(movie, movie_tmp);
+  }
+  if(file_size){
+    if(actor -> sex){
+      fprintf(actor_log_write, "\nadd:%d:%s:M:%s:", actor -> serial_number, actor -> name, actor -> birth);
+    }else{
+      fprintf(actor_log_write, "\nadd:%d:%s:F:%s:", actor -> serial_number, actor -> name, actor -> birth);
     }
 
-  fclose(fp);
-}
-
-void save_list_director(char* option, struct director *director)
-{
-  FILE *fp, *tmp, *tmp_print;
-  DIRECTOR save_director = public_director;
-  char *director_list_str;
-  int size = 0;
-
-  fp = fopen("director_list.txt", "w");
-
-  // if(option == NULL)
-  // {
-  //   // strcpy(option, "nsbm");
-  // }
-
-    while(strlen(option))
-    {
-      switch(*option)
-      {
-        case 'n' :
-        if(size == 0)
-        {
-          while(save_director)
-          {
-            fprintf(fp ,"%d:%s:=:=:=\n", save_director->serial_number, save_director->name);
-            save_director = save_director->director_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          director_list_str = (char*)malloc(size + 1);
-
-          while(fgets(director_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(director_list_str+strlen(director_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(director_list_str); i++)
-            {
-              if(*(director_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 1)
-              {
-                director_list_str = insert_string(director_list_str, save_director->name, i+1);
-                fprintf(tmp_print, "%s\n", director_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "director_list.txt");
-
-            save_director = save_director->director_next;
-          }
-
-          free(director_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_director = public_director;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 's' :
-        if(size == 0)
-        {
-          while(save_director)
-          {
-            fprintf(fp ,"%d:=:%c:=:=\n", save_director->serial_number, save_director->sex);
-            save_director = save_director->director_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          director_list_str = (char*)malloc(size + 1);
-
-          while(fgets(director_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(director_list_str+strlen(director_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(director_list_str); i++)
-            {
-
-              if(*(director_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 2)
-              {
-                director_list_str = insert_string(director_list_str, &(save_director->sex), i+1);
-                fprintf(tmp_print, "%s\n", director_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "director_list.txt");
-
-            save_director = save_director->director_next;
-          }
-
-          free(director_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_director = public_director;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 'b' :
-        if(size == 0)
-        {
-          while(save_director)
-          {
-            fprintf(fp ,"%d:=:=:%s:=\n", save_director->serial_number, save_director->birth);
-            save_director = save_director->director_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          director_list_str = (char*)malloc(size + 1);
-
-          while(fgets(director_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(director_list_str+strlen(director_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(director_list_str); i++)
-            {
-
-              if(*(director_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 3)
-              {
-                director_list_str = insert_string(director_list_str, save_director->birth, i+1);
-                fprintf(tmp_print, "%s\n", director_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "director_list.txt");
-
-            save_director = save_director->director_next;
-          }
-
-          free(director_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_director = public_director;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 'm' :
-        if(size == 0)
-        {
-          while(save_director)
-          {
-            struct best_movie* movie_tmp = save_director->movie;
-
-            fprintf(fp, "%d:=:=:=:%s", save_director->serial_number, save_director->movie->title);
-
-            while(save_director->movie->movie_next != NULL)
-            {
-              save_director->movie = save_director->movie->movie_next;
-              fprintf(fp, ", %s", save_director->movie->title);
-            }
-            fprintf(fp, "\n");
-            save_director->movie = movie_tmp;
-            save_director = save_director->director_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          director_list_str = (char*)malloc(size + 1);
-
-          while(fgets(director_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(director_list_str+strlen(director_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(director_list_str); i++)
-            {
-
-              if(*(director_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-              if(collon_cnt == 4)
-              {
-                struct best_movie* movie_tmp = save_director->movie;
-
-                director_list_str = insert_string(director_list_str, save_director->movie->title, i+1);
-                fprintf(tmp_print, "%s", director_list_str);
-                fflush(tmp_print);
-                while(save_director->movie->movie_next != NULL)
-                {
-                  save_director->movie = save_director->movie->movie_next;
-                  fprintf(tmp_print, ", %s", save_director->movie->title);
-                  fflush(tmp_print);
-                }
-                fprintf(tmp_print, "\n");
-                save_director->movie = movie_tmp;
-
-                break;
-              }
-            }
-            rename("test.txt", "director_list.txt");
-
-            save_director = save_director->director_next;
-          }
-
-          free(director_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_director = public_director;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        default :
-        printf("There is no option for %c\n", *option);
-        break;
+    MOVIE tmp_print_movie = actor -> movie;
+    while(tmp_print_movie != NULL){
+      if(tmp_print_movie -> movie_next == NULL){
+        fprintf(actor_log_write, "%s", tmp_print_movie -> title);
+      }else{
+        fprintf(actor_log_write, "%s, ", tmp_print_movie -> title);
       }
-
-      size = ftell(fp);
-
-      strcpy(option, option + 1);
+      tmp_print_movie = tmp_print_movie -> movie_next;
     }
-
-  fclose(fp);
-}
-
-void save_list_actor(char* option, struct actor *actor)
-{
-  FILE *fp, *tmp, *tmp_print;
-  ACTOR save_actor = public_actor;
-  char *actor_list_str;
-  int size = 0;
-
-  fp = fopen("actor_list.txt", "w");
-
-  // if(option == NULL)
-  // {
-  //   // strcpy(option, "nsbm");
-  // }
-
-    while(strlen(option))
-    {
-      switch(*option)
-      {
-        case 'n' :
-        if(size == 0)
-        {
-          while(save_actor)
-          {
-            fprintf(fp ,"%d:%s:=:=:=\n", save_actor->serial_number, save_actor->name);
-            save_actor = save_actor->actor_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          actor_list_str = (char*)malloc(size + 1);
-
-          while(fgets(actor_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(actor_list_str+strlen(actor_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(actor_list_str); i++)
-            {
-              if(*(actor_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 1)
-              {
-                actor_list_str = insert_string(actor_list_str, save_actor->name, i+1);
-                fprintf(tmp_print, "%s\n", actor_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "actor_list.txt");
-
-            save_actor = save_actor->actor_next;
-          }
-
-          free(actor_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_actor = public_actor;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 's' :
-        if(size == 0)
-        {
-          while(save_actor)
-          {
-            char sex;
-
-            if(save_actor->sex)
-            {
-              sex = 'M';
-            }
-            else
-            {
-              sex = 'F';
-            }
-
-            fprintf(fp ,"%d:=:%c:=:=\n", save_actor->serial_number, sex);
-            save_actor = save_actor->actor_next;
-          }
-        }
-        else
-        {
-          char* sex;
-
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          actor_list_str = (char*)malloc(size + 1);
-          sex = (char*)malloc(sizeof(char) + 1);
-
-          while(fgets(actor_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(actor_list_str+strlen(actor_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(actor_list_str); i++)
-            {
-
-              if(*(actor_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 2)
-              {
-                if(save_actor->sex)
-                {
-                  strcpy(sex, "M");
-                }
-                else
-                {
-                  strcpy(sex, "F");
-                }
-
-                actor_list_str = insert_string(actor_list_str, sex, i+1);
-                fprintf(tmp_print, "%s\n", actor_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "actor_list.txt");
-
-            save_actor = save_actor->actor_next;
-          }
-
-          free(actor_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_actor = public_actor;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 'b' :
-        if(size == 0)
-        {
-          while(save_actor)
-          {
-            fprintf(fp ,"%d:=:=:%s:=\n", save_actor->serial_number, save_actor->birth);
-            save_actor = save_actor->actor_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          actor_list_str = (char*)malloc(size + 1);
-
-          while(fgets(actor_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(actor_list_str+strlen(actor_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(actor_list_str); i++)
-            {
-
-              if(*(actor_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-
-              if(collon_cnt == 3)
-              {
-                actor_list_str = insert_string(actor_list_str, save_actor->birth, i+1);
-                fprintf(tmp_print, "%s\n", actor_list_str);
-                fflush(tmp_print);
-
-                break;
-              }
-            }
-            rename("test.txt", "actor_list.txt");
-
-            save_actor = save_actor->actor_next;
-          }
-
-          free(actor_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_actor = public_actor;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        case 'm' :
-        if(size == 0)
-        {
-          while(save_actor)
-          {
-            struct best_movie* movie_tmp = save_actor->movie;
-
-            fprintf(fp, "%d:=:=:=:%s", save_actor->serial_number, save_actor->movie->title);
-
-            while(save_actor->movie->movie_next != NULL)
-            {
-              save_actor->movie = save_actor->movie->movie_next;
-              fprintf(fp, ", %s", save_actor->movie->title);
-            }
-            fprintf(fp, "\n");
-            save_actor->movie = movie_tmp;
-            save_actor = save_actor->actor_next;
-          }
-        }
-        else
-        {
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
-
-          actor_list_str = (char*)malloc(size + 1);
-
-          while(fgets(actor_list_str, size, tmp))
-          {
-            size = ftell(tmp) + 1;
-            *(actor_list_str+strlen(actor_list_str)-1) = '\0';
-
-            int collon_cnt = 0;
-            for(int i = 0; i < strlen(actor_list_str); i++)
-            {
-
-              if(*(actor_list_str + i) == ':')
-              {
-                collon_cnt++;
-              }
-              if(collon_cnt == 4)
-              {
-                struct best_movie* movie_tmp = save_actor->movie;
-
-                actor_list_str = insert_string(actor_list_str, save_actor->movie->title, i+1);
-                fprintf(tmp_print, "%s", actor_list_str);
-                fflush(tmp_print);
-                while(save_actor->movie->movie_next != NULL)
-                {
-                  save_actor->movie = save_actor->movie->movie_next;
-                  fprintf(tmp_print, ", %s", save_actor->movie->title);
-                  fflush(tmp_print);
-                }
-                fprintf(tmp_print, "\n");
-                save_actor->movie = movie_tmp;
-
-                break;
-              }
-            }
-            rename("test.txt", "actor_list.txt");
-
-            save_actor = save_actor->actor_next;
-          }
-
-          free(actor_list_str);
-
-          fclose(tmp_print);
-          fclose(tmp);
-        }
-        save_actor = public_actor;
-        printf("Complete option for %c\n", *option);
-        break;
-
-        default :
-        printf("There is no option for %c\n", *option);
-        break;
+  }else{
+    fprintf(actor_log_write, "add:%d:%s:%c:%s:", actor -> serial_number, actor -> name, actor -> sex, actor -> birth);
+    MOVIE tmp_print_movie = actor -> movie;
+    while(tmp_print_movie != NULL){
+      if(tmp_print_movie -> movie_next == NULL){
+        fprintf(actor_log_write, "%s", tmp_print_movie -> title);
+      }else{
+        fprintf(actor_log_write, "%s, ", tmp_print_movie -> title);
       }
-
-      size = ftell(fp);
-
-      strcpy(option, option + 1);
+      tmp_print_movie = tmp_print_movie -> movie_next;
     }
-
-  fclose(fp);
+  }
+  free(tmp_char);
+  fclose(actor_log_read);
+  fclose(actor_log_write);
 }
-
-char* insert_string(char *origin, char *insert, int pos)
-{
-  char *str;
-  int size;
-  size = strlen(origin) + strlen(insert) + 1;
-  str = (char*)malloc(size + 30);
-  strncpy(str, origin, pos);
-  strcpy(origin, origin+pos+1);
-
-  strcat(str, insert);
-  strcat(str, origin);
-
-  return str;
+ACTOR serach_last_actor(ACTOR public_actor){
+  ACTOR actor = public_actor;
+  while((actor -> actor_next) != NULL){
+    actor = actor -> actor_next;
+  }
+  printf("%d\n", actor -> serial_number);
+  return actor;
 }
