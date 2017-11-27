@@ -157,8 +157,8 @@ MOVIE list_movie_director(char* title){
    else
    {
       movie = (MOVIE)malloc(sizeof(struct best_movie));
-      movie->title = (char*)malloc(strlen(title)+1);
-      strcpy(movie->title, title);
+      movie->title = (char*)malloc(strlen(title)+5);
+      strcpy(movie->title, colon_change(title));
       movie->movie_link = NULL;
       movie->movie_next = NULL;
 
