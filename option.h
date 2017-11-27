@@ -31,4 +31,9 @@ void option_add_movie(struct movie *movie);
 void option_add_director(DIRECTOR public_first_director);
 void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director);
 
+void save_list_movie(char* option, struct movie *movie);
+void save_list_director(char* option, struct director *director);
+void save_list_actor(char* option, struct actor *actor);
+char* insert_string(char *origin, char *insert, int pos);
+
 #endif
