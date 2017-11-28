@@ -544,190 +544,17 @@ void print_list_director(DIRECTOR director, char *serial){
       }
     }
 }
-//option - add
-void option_add_movie(struct movie *movie){
-  struct movie *inMovie;
-  struct movie *lastMovie;
-   FILE *mv_log_write, FILE, *mv_log_read;
-   if((mv_log_read = fopen("movie_log.txt", "r")) == NULL){
-     printf("File Open Error");
-     exit(1);
-   }
-   if((mv_log_write = fopen("movie_log.txt", "a")) == NULL){
-     printf("File Open Error");
-     exit(1);
-   }
-  int text_size = 0;
-  inMovie = malloc(sizeof(struct movie));
-  char* tmp_char = (char*)malloc(sizeof(char)*200);
-
-  printf("title > ");
-  gets(tmp_char);
-  inMovie -> title = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
-  strcpy(inMovie -> title , colon_change(tmp_char));
-
-  printf("genre > ");
-  gets(tmp_char);
-  inMovie -> genre = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
-  // inMovie -> genre = colon_change(tmp_char);
-  strcpy(inMovie -> genre , colon_change(tmp_char));
-
-  printf("director > ");
-  gets(tmp_char);
-  inMovie -> director.name = (char*)malloc(sizeof(char)*strlen(tmp_char)+5);
-  // inMovie -> director.name = colon_change(tmp_char);
-  strcpy(inMovie -> director.name , colon_change(tmp_char));
-
-  printf("year > ");
-  gets(tmp_char);
-  inMovie -> year = atoi(tmp_char);
-
-  printf("time > ");
-  gets(tmp_char);
-  inMovie -> time = atoi(tmp_char);
-
-  printf("actor > ");
-  gets(tmp_char);
-  fseek(mv_log_read,0,SEEK_END);
-  int file_size = ftell(mv_log_read);
-  printf("\n==\n%d\n=\n", file_size);
-
-  inMovie -> movie_next = NULL;
-  lastMovie = search_last_movie(movie);
-  lastMovie -> movie_next = inMovie;
-  inMovie -> Serial_number = (lastMovie -> Serial_number) +1 ;
-  inMovie -> actor = create_actor_struct(tmp_char);
-  if(file_size){
-    fprintf(mv_log_write, "\nadd:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
-    struct linked_list_actor *tmp_print_actor = inMovie -> actor;
-    while(tmp_print_actor != NULL){
-      if(tmp_print_actor -> actor_next == NULL){
-        fprintf(mv_log_write, "%s", tmp_print_actor -> actor_name);
-      }else{
-        fprintf(mv_log_write, "%s, ", tmp_print_actor -> actor_name);
-      }
-      tmp_print_actor = tmp_print_actor -> actor_next;
-    }
-  }else{
-    fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
-    struct linked_list_actor *tmp_print_actor = inMovie -> actor;
-    while(tmp_print_actor != NULL){
-      if(tmp_print_actor -> actor_next == NULL){
-        fprintf(mv_log_write, "%s", tmp_print_actor -> actor_name);
-      }else{
-        fprintf(mv_log_write, "%s, ", tmp_print_actor -> actor_name);
-      }
-      tmp_print_actor = tmp_print_actor -> actor_next;
-    }
-  }
-  free(tmp_char);
-  fclose(mv_log_read);
-  fclose(mv_log_write);
-}
-
-void option_add_director(DIRECTOR public_first_director){
-  DIRECTOR director;
-  DIRECTOR LastDirector;
-   FILE *director_log_write, FILE, *director_log_read;
-   if((director_log_read = fopen("director_log.txt", "r")) == NULL){
-     printf("File Open Error");
-     exit(1);
-   }
-   if((director_log_write = fopen("director_log.txt", "a")) == NULL){
-     printf("File Open Error");
-     exit(1);
-   }
-  int text_size = 0;
-  director = malloc(sizeof(struct director));
-  char* tmp_char = (char*)malloc(sizeof(char)*200);
-  printf("\n==\n%d\n=\n", public_first_director -> serial_number);
-  printf("name > ");
-  gets(tmp_char);
-  director -> name = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
-  strcpy(director -> name , colon_change(tmp_char));
-
-  printf("sex > ");
-  gets(tmp_char);
-  // director -> sex = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
-  // inMovie -> genre = colon_change(tmp_char);
-  // strcpy(inMovie -> genre , colon_change(tmp_char));
-  director -> sex = tmp_char[0];
-
-  printf("birth > ");
-  gets(tmp_char);
-  director -> birth = (char*)malloc(sizeof(char)*strlen(tmp_char)+5);
-  // inMovie -> director.name = colon_change(tmp_char);
-  strcpy(director -> birth , colon_change(tmp_char));
-
-  printf("best movie > ");
-  gets(tmp_char);
-  fseek(director_log_read,0,SEEK_END);
-  int file_size = ftell(director_log_read);
-  printf("\n==\n%d\n=\n", file_size);
-
-  director -> director_next = NULL;
-  LastDirector = serach_last_director(public_first_director);
-  printf("\n==\n%d\n=\n", LastDirector -> serial_number);
-  LastDirector -> director_next = director;
-  director -> serial_number = (LastDirector -> serial_number) +1 ;
-printf("\n==\n%s\n=\n", tmp_char);
-  char* split = strtok(tmp_char, ",");
-printf("\n==\n%s\n=\n", split);
-  MOVIE movie;
-  movie = list_movie_director(split);
-  director -> movie = movie;
-  printf("\n==\n%s\n=\n", movie -> title);
-  while((split = strtok(NULL, ",")) != NULL){
-    if(*split+0 == ' '){
-      strcpy(split, split+1);
-    }
-    MOVIE movie_tmp = list_movie_director(split);
-    movie = put_list_movie_director(movie, movie_tmp);
-  }
-  if(file_size){
-    fprintf(director_log_write, "\nadd:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
-    MOVIE tmp_print_movie = director -> movie;
-    while(tmp_print_movie != NULL){
-      if(tmp_print_movie -> movie_next == NULL){
-        fprintf(director_log_write, "%s", tmp_print_movie -> title);
-      }else{
-        fprintf(director_log_write, "%s, ", tmp_print_movie -> title);
-      }
-      tmp_print_movie = tmp_print_movie -> movie_next;
-    }
-  }else{
-    fprintf(director_log_write, "add:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
-    MOVIE tmp_print_movie = director -> movie;
-    while(tmp_print_movie != NULL){
-      if(tmp_print_movie -> movie_next == NULL){
-        fprintf(director_log_write, "%s", tmp_print_movie -> title);
-      }else{
-        fprintf(director_log_write, "%s, ", tmp_print_movie -> title);
-      }
-      tmp_print_movie = tmp_print_movie -> movie_next;
-    }
-  }
-  free(tmp_char);
-  fclose(director_log_read);
-  fclose(director_log_write);
-}
-
-DIRECTOR serach_last_director(DIRECTOR public_first_director){
-  DIRECTOR director = public_first_director;
-  printf("\n==\n%d\n=\n", director -> serial_number);
-  while((director -> director_next) != NULL){
-    director = director -> director_next;
-  }
-  printf("\n==\n%d\n=\n", director -> serial_number);
-  return director;
-}
-void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director){
-  FILE* mv_list, *director_list;
+void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director, ACTOR actor){
+  FILE* mv_list, *director_list, *actor_list;
   if((mv_list = fopen("movie_list.txt", "w")) == NULL){
     printf("File Open Error");
     exit(1);
   }
   if((director_list = fopen("director_list.txt", "w")) == NULL){
+    printf("File Open Error");
+    exit(1);
+  }
+  if((actor_list = fopen("actor_list.txt", "w")) == NULL){
     printf("File Open Error");
     exit(1);
   }
@@ -768,13 +595,306 @@ void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director){
     if(director -> director_next == NULL){
       break;
     }else{
-      fprintf(director_list,"\n");
+      fprintf(director_list," \n");
     }
     director = director -> director_next;
   }
+  //actor list print to actor_list.text
+  while(actor != NULL){
+    if(actor -> sex){
+      fprintf(actor_list, "%d:%s:M:%s:", actor -> serial_number, actor -> name, actor -> birth);
+    }else{
+      fprintf(actor_list, "%d:%s:F:%s:", actor -> serial_number, actor -> name, actor -> birth);
+    }
 
+    MOVIE movie_in_actor = actor -> movie;
+    while(movie_in_actor != NULL){
+      if(movie_in_actor -> movie_next == NULL){
+        fprintf(actor_list,"%s", movie_in_actor -> title);
+        break;
+      }else{
+        fprintf(actor_list,"%s, ", movie_in_actor -> title);
+      }
+      movie_in_actor = movie_in_actor -> movie_next;
+    }
+    if(actor -> actor_next == NULL){
+      break;
+    }else{
+      fprintf(actor_list,"\n");
+    }
+    actor = actor -> actor_next;
+  }
 
   fclose(mv_list);
+  fclose(director_list);
+  fclose(actor_list);
+}
+//actor add
+void option_add_actor(ACTOR public_actor){
+  ACTOR actor;
+  ACTOR LastActor;
+   FILE *actor_log_write, FILE, *actor_log_read;
+   if((actor_log_read = fopen("actor_log.txt", "r")) == NULL){
+     printf("File Open Error");
+     exit(1);
+   }
+   if((actor_log_write = fopen("actor_log.txt", "a")) == NULL){
+     printf("File Open Error");
+     exit(1);
+   }
+  int text_size = 0;
+  actor = malloc(sizeof(struct actor));
+  char* tmp_char = (char*)malloc(sizeof(char)*200);
+
+  printf("name > ");
+  gets(tmp_char);
+  actor -> name = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
+  strcpy(actor -> name , colon_change(tmp_char));
+
+  printf("sex > ");
+  gets(tmp_char);
+  // director -> sex = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
+  // inMovie -> genre = colon_change(tmp_char);
+  // strcpy(inMovie -> genre , colon_change(tmp_char));
+
+  if(tmp_char[0] =='M'){
+    actor -> sex = true;
+  }else{
+    actor -> sex = false;
+  }
+
+  printf("birth > ");
+  gets(tmp_char);
+  actor -> birth = (char*)malloc(sizeof(char)*strlen(tmp_char)+5);
+  // inMovie -> director.name = colon_change(tmp_char);
+  strcpy(actor -> birth , colon_change(tmp_char));
+
+  printf("best movie > ");
+  gets(tmp_char);
+  fseek(actor_log_read,0,SEEK_END);
+  int file_size = ftell(actor_log_read);
+
+
+  actor -> actor_next = NULL;
+  LastActor = serach_last_actor(public_actor);
+
+  LastActor -> actor_next = actor;
+  actor -> serial_number = (LastActor -> serial_number) +1 ;
+
+  char* split = strtok(tmp_char, ",");
+
+  MOVIE movie;
+  movie = list_movie_director(split);
+  actor -> movie = movie;
+
+  while((split = strtok(NULL, ",")) != NULL){
+    if(*split+0 == ' '){
+      strcpy(split, split+1);
+    }
+    MOVIE movie_tmp = list_movie_director(split);
+    movie = put_list_movie_director(movie, movie_tmp);
+  }
+  if(file_size){
+    if(actor -> sex){
+      fprintf(actor_log_write, "\nadd:%d:%s:M:%s:", actor -> serial_number, actor -> name, actor -> birth);
+    }else{
+      fprintf(actor_log_write, "\nadd:%d:%s:F:%s:", actor -> serial_number, actor -> name, actor -> birth);
+    }
+
+    MOVIE tmp_print_movie = actor -> movie;
+    while(tmp_print_movie != NULL){
+      if(tmp_print_movie -> movie_next == NULL){
+        fprintf(actor_log_write, "%s", tmp_print_movie -> title);
+      }else{
+        fprintf(actor_log_write, "%s, ", tmp_print_movie -> title);
+      }
+      tmp_print_movie = tmp_print_movie -> movie_next;
+    }
+  }else{
+    fprintf(actor_log_write, "add:%d:%s:%c:%s:", actor -> serial_number, actor -> name, actor -> sex, actor -> birth);
+    MOVIE tmp_print_movie = actor -> movie;
+    while(tmp_print_movie != NULL){
+      if(tmp_print_movie -> movie_next == NULL){
+        fprintf(actor_log_write, "%s", tmp_print_movie -> title);
+      }else{
+        fprintf(actor_log_write, "%s, ", tmp_print_movie -> title);
+      }
+      tmp_print_movie = tmp_print_movie -> movie_next;
+    }
+  }
+  free(tmp_char);
+  fclose(actor_log_read);
+  fclose(actor_log_write);
+}
+ACTOR serach_last_actor(ACTOR public_actor){
+  ACTOR actor = public_actor;
+  while((actor -> actor_next) != NULL){
+    actor = actor -> actor_next;
+  }
+  printf("%d\n", actor -> serial_number);
+  return actor;
+}
+
+void option_search_movie(char* string_orign, char* string_search){
+  int string_search_length = strlen(string_search);
+  int string_origin_length = strlen(string_orign);
+  if(*(search_string+0) == '*'){
+    if(*(search_string+string_length) == '*'){
+      int tmp_string_length = string_search_length - 1;
+      int i=1, j=0;
+      for(i=1; i<tmp_string_length; i++){
+        for(j=0; j<string_origin_length; j++){
+          if(*(string_orign+j) == *(string_search+i)){
+            int flag = 0;
+            int origin_cnt = 0;
+            for(int k=i; k<tmp_string_length; k++){
+              if(*(string_orign+j+origin_cnt) != *(string_search+k)){
+                flag = 1;
+              }
+              origin_cnt++;
+            }
+            if(flag == 0){
+              printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+            }
+          }
+        }
+      }
+    }else{
+      printf("\n==\n");
+    }
+  }else if(*(search_string+string_length) == '*'){
+    int tmp_string_length = string_length - 1;
+    printf("\n=\n");
+  }
+}
+
+void option_search_meta_search(char* string_orign, char* string_search){
+  int string_search_length = strlen(string_search);
+  int string_origin_length = strlen(string_orign);
+  printf("%d %d\n", string_search_length, string_origin_length);
+  if(*(string_search+0) == '*'){
+    if(*(string_search+string_search_length-1) == '*'){
+      int tmp_string_length = string_search_length - 1;
+      int last_flag = 0;
+      int flag = 0;
+      for(int i=1; i<tmp_string_length; i++){
+        for(int j=0; j<string_origin_length; j++){
+          if(*(string_orign+j) == *(string_search+i)){
+
+            int origin_cnt = 0;
+            for(int k=i; k<tmp_string_length; k++){
+              if(*(string_search+k) == '?'){
+
+              }else{
+                printf("=====\n%c %c\n=====\n", *(string_orign+j+origin_cnt) ,*(string_search+k));
+                if(*(string_orign+j+origin_cnt) != *(string_search+k)){
+                  flag = 1;
+                }
+                printf("\n%d\n", flag);
+              }
+              origin_cnt++;
+            }
+            if(flag == 0){
+              printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+              last_flag = 1;
+              break;
+            }
+          }
+          if(last_flag == 1){
+            break;
+          }
+        }
+        if(last_flag == 1){
+          break;
+        }
+      }
+    }else{
+      printf("ho?");
+      int tmp_string_length = string_search_length;
+      int last_flag = 0;
+      int flag = 0;
+      for(int i=1; i<tmp_string_length; i++){
+        for(int j=0; j<string_origin_length; j++){
+          if(*(string_orign+j) == *(string_search+i)){
+
+            int origin_cnt = 0;
+            for(int k=i; k<tmp_string_length; k++){
+              if(*(string_search+k) == '?'){
+
+              }else{
+                printf("=====\n%c %c\n=====\n", *(string_orign+j+origin_cnt) ,*(string_search+k));
+                if(*(string_orign+j+origin_cnt) != *(string_search+k)){
+                  flag = 1;
+                }
+                printf("\n%d\n", flag);
+              }
+              origin_cnt++;
+            }
+            if(flag == 0){
+              printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+              last_flag = 1;
+              break;
+            }
+          }
+          if(last_flag == 1){
+            break;
+          }
+        }
+        if(last_flag == 1){
+          break;
+        }
+      }
+      // printf("\n==\n");
+    }
+  }else if(*(string_search+string_search_length-1) == '*'){
+    int tmp_string_length = string_search_length - 1;
+    int last_flag = 0;
+    int flag = 0;
+    for(int i=0; i<tmp_string_length; i++){
+      for(int j=0; j<string_origin_length; j++){
+        if(*(string_orign+j) == *(string_search+i)){
+
+          int origin_cnt = 0;
+          for(int k=i; k<tmp_string_length; k++){
+            if(*(string_search+k) == '?'){
+
+            }else{
+              printf("=====\n%c %c\n=====\n", *(string_orign+j+origin_cnt) ,*(string_search+k));
+              if(*(string_orign+j+origin_cnt) != *(string_search+k)){
+                flag = 1;
+              }
+              printf("\n%d\n", flag);
+            }
+            origin_cnt++;
+          }
+          if(flag == 0){
+            printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+            last_flag = 1;
+            break;
+          }
+        }
+        if(last_flag == 1){
+          break;
+        }
+      }
+      if(last_flag == 1){
+        break;
+      }
+    }
+  }else{
+    int tmp_string_length = string_search_length;
+    int last_flag = 0;
+    int flag = 0;
+    for(int i=0; i<tmp_string_length; i++){
+      if(*(string_orign+i) == *(string_search+i)){
+      }else{
+        flag = 1;
+      }
+    }
+    if(flag == 0){
+      printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+    }
+  }
 }
 
 void save_list_movie(char* option, struct movie *movie)
