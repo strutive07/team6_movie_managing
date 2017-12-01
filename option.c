@@ -735,43 +735,10 @@ ACTOR serach_last_actor(ACTOR public_actor){
   return actor;
 }
 
-void option_search_movie(char* string_orign, char* string_search){
+int option_search_meta_search(char* string_orign, char* string_search){
   int string_search_length = strlen(string_search);
   int string_origin_length = strlen(string_orign);
-  if(*(search_string+0) == '*'){
-    if(*(search_string+string_length) == '*'){
-      int tmp_string_length = string_search_length - 1;
-      int i=1, j=0;
-      for(i=1; i<tmp_string_length; i++){
-        for(j=0; j<string_origin_length; j++){
-          if(*(string_orign+j) == *(string_search+i)){
-            int flag = 0;
-            int origin_cnt = 0;
-            for(int k=i; k<tmp_string_length; k++){
-              if(*(string_orign+j+origin_cnt) != *(string_search+k)){
-                flag = 1;
-              }
-              origin_cnt++;
-            }
-            if(flag == 0){
-              printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
-            }
-          }
-        }
-      }
-    }else{
-      printf("\n==\n");
-    }
-  }else if(*(search_string+string_length) == '*'){
-    int tmp_string_length = string_length - 1;
-    printf("\n=\n");
-  }
-}
 
-void option_search_meta_search(char* string_orign, char* string_search){
-  int string_search_length = strlen(string_search);
-  int string_origin_length = strlen(string_orign);
-  printf("%d %d\n", string_search_length, string_origin_length);
   if(*(string_search+0) == '*'){
     if(*(string_search+string_search_length-1) == '*'){
       int tmp_string_length = string_search_length - 1;
@@ -780,24 +747,31 @@ void option_search_meta_search(char* string_orign, char* string_search){
       for(int i=1; i<tmp_string_length; i++){
         for(int j=0; j<string_origin_length; j++){
           if(*(string_orign+j) == *(string_search+i)){
-
+            // printf("\n==\n%s     :      %s\n==\n", (string_orign+j), (string_search+i));
+            int search_last_meta_cnt = tmp_string_length - 2;
             int origin_cnt = 0;
-            for(int k=i; k<tmp_string_length; k++){
+            for(int k=i; k<tmp_string_length-1; k++){
               if(*(string_search+k) == '?'){
-
+                search_last_meta_cnt--;
               }else{
-                printf("=====\n%c %c\n=====\n", *(string_orign+j+origin_cnt) ,*(string_search+k));
+
                 if(*(string_orign+j+origin_cnt) != *(string_search+k)){
                   flag = 1;
+                }else{
+                  search_last_meta_cnt--;
                 }
-                printf("\n%d\n", flag);
+
               }
               origin_cnt++;
             }
             if(flag == 0){
-              printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
-              last_flag = 1;
-              break;
+              if(search_last_meta_cnt == 0){
+                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                last_flag = 1;
+                return 1;
+                break;
+              }
+
             }
           }
           if(last_flag == 1){
@@ -808,32 +782,53 @@ void option_search_meta_search(char* string_orign, char* string_search){
           break;
         }
       }
+      return 0;
     }else{
-      printf("ho?");
+      // printf("ho?");
       int tmp_string_length = string_search_length;
       int last_flag = 0;
       int flag = 0;
       for(int i=1; i<tmp_string_length; i++){
         for(int j=0; j<string_origin_length; j++){
           if(*(string_orign+j) == *(string_search+i)){
-
+            int search_last_meta_cnt = tmp_string_length - 1;
             int origin_cnt = 0;
             for(int k=i; k<tmp_string_length; k++){
               if(*(string_search+k) == '?'){
-
+                search_last_meta_cnt--;
               }else{
-                printf("=====\n%c %c\n=====\n", *(string_orign+j+origin_cnt) ,*(string_search+k));
+
                 if(*(string_orign+j+origin_cnt) != *(string_search+k)){
                   flag = 1;
+                }else{
+                  search_last_meta_cnt--;
                 }
-                printf("\n%d\n", flag);
+
               }
               origin_cnt++;
             }
             if(flag == 0){
-              printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
-              last_flag = 1;
-              break;
+              int z = 0;
+              for(z = 0; z< tmp_string_length; z++){
+                if(*(string_search + string_search_length - z) != '?'){
+                  if(*(string_orign+ string_origin_length  -z) != *(string_search + string_search_length - z)){
+                    break;
+                  }
+                }
+              }
+              if(z == tmp_string_length){
+                if(search_last_meta_cnt == 0){
+                  printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                  last_flag = 1;
+                  return 1;
+                  break;
+                }else{
+                  flag = 1;
+                }
+              }else{
+                flag = 1;
+              }
+
             }
           }
           if(last_flag == 1){
@@ -844,6 +839,7 @@ void option_search_meta_search(char* string_orign, char* string_search){
           break;
         }
       }
+      return 0;
       // printf("\n==\n");
     }
   }else if(*(string_search+string_search_length-1) == '*'){
@@ -853,24 +849,43 @@ void option_search_meta_search(char* string_orign, char* string_search){
     for(int i=0; i<tmp_string_length; i++){
       for(int j=0; j<string_origin_length; j++){
         if(*(string_orign+j) == *(string_search+i)){
-
+          int search_last_meta_cnt = tmp_string_length;
           int origin_cnt = 0;
           for(int k=i; k<tmp_string_length; k++){
             if(*(string_search+k) == '?'){
-
+              search_last_meta_cnt--;
             }else{
-              printf("=====\n%c %c\n=====\n", *(string_orign+j+origin_cnt) ,*(string_search+k));
+
               if(*(string_orign+j+origin_cnt) != *(string_search+k)){
                 flag = 1;
+              }else{
+                search_last_meta_cnt--;
               }
-              printf("\n%d\n", flag);
+
             }
             origin_cnt++;
           }
           if(flag == 0){
-            printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
-            last_flag = 1;
-            break;
+            int z = 0;
+            for(z = 0; z< tmp_string_length; z++){
+              if(*(string_search+z) != '?'){
+                if(*(string_orign+z) != *(string_search+z)){
+                  break;
+                }
+              }
+            }
+            if(z == tmp_string_length){
+              if(search_last_meta_cnt == 0){
+                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                last_flag = 1;
+                return 1;
+                break;
+              }else{
+                flag = 0;
+              }
+            }else{
+              flag = 0;
+            }
           }
         }
         if(last_flag == 1){
@@ -881,21 +896,128 @@ void option_search_meta_search(char* string_orign, char* string_search){
         break;
       }
     }
+    return 0;
   }else{
     int tmp_string_length = string_search_length;
     int last_flag = 0;
     int flag = 0;
     for(int i=0; i<tmp_string_length; i++){
-      if(*(string_orign+i) == *(string_search+i)){
-      }else{
-        flag = 1;
+      if(*(string_search+i) != '?'){
+        if(*(string_orign+i) == *(string_search+i)){
+        }else{
+          flag = 1;
+        }
       }
     }
     if(flag == 0){
       printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+      return 1;
+    }else{
+      return 0;
     }
   }
+  return 0;
 }
+
+int option_search_movie(struct movie* movie, char* search_string){
+  int flag = 0;
+  int tmp_flag = 0;
+  while(movie != NULL){
+    tmp_flag = option_search_meta_search(movie -> title, search_string);
+    if(flag == 0){
+      flag = tmp_flag;
+    }
+    tmp_flag = option_search_meta_search(movie -> genre, search_string);
+    if(flag == 0){
+      flag = tmp_flag;
+    }
+    tmp_flag = option_search_meta_search(movie -> director.name, search_string);
+    if(flag == 0){
+      flag = tmp_flag;
+    }
+    struct linked_list_actor* actor = movie -> actor;
+    while(actor != NULL){
+      tmp_flag = option_search_meta_search(actor -> actor_name, search_string);
+      if(flag == 0){
+        flag = tmp_flag;
+      }
+      actor = actor -> actor_next;
+    }
+    movie = movie -> movie_next;
+  }
+  if(flag == 0){
+    printf("no %s in movie", search_string);
+    return 0;
+  }else{
+    return 1;
+  }
+}
+
+
+
+int option_search_director(DIRECTOR director, char* search_string){
+  int flag = 0;
+  int tmp_flag = 0;
+  while(director != NULL){
+    tmp_flag = option_search_meta_search(director -> name, search_string);
+    if(flag == 0){
+      flag = tmp_flag;
+    }
+    tmp_flag = option_search_meta_search(director -> birth, search_string);
+    if(flag == 0){
+      flag = tmp_flag;
+    }
+    MOVIE movie_in_director = director -> movie;
+    while(movie_in_director != NULL){
+      tmp_flag = option_search_meta_search(movie_in_director -> title, search_string);
+      if(flag == 0){
+        flag = tmp_flag;
+      }
+      movie_in_director = movie_in_director -> movie_next;
+    }
+    director = director -> director_next;
+  }
+  if(flag == 0){
+    printf("no %s in director", search_string);
+    return 0;
+  }else{
+    return 1;
+  }
+}
+
+
+int option_search_actor(ACTOR actor, char* search_string){
+  int flag = 0;
+  int tmp_flag = 0;
+  while(actor != NULL){
+    tmp_flag = option_search_meta_search(actor -> name, search_string);
+    if(flag == 0){
+      flag = tmp_flag;
+    }
+    tmp_flag = option_search_meta_search(actor -> birth, search_string);
+    if(flag == 0){
+      flag = tmp_flag;
+    }
+    MOVIE movie_in_actor = actor -> movie;
+    while(movie_in_actor != NULL){
+      tmp_flag = option_search_meta_search(movie_in_actor -> title, search_string);
+      if(flag == 0){
+        flag = tmp_flag;
+      }
+      movie_in_actor = movie_in_actor -> movie_next;
+    }
+    actor = actor -> actor_next;
+  }
+  if(flag == 0){
+    printf("no %s in actor", search_string);
+    return 0;
+  }else{
+    return 1;
+  }
+}
+
+
+
 
 void save_list_movie(char* option, struct movie *movie)
 {
