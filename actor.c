@@ -1,4 +1,5 @@
 #include "actor.h"
+#include "movie.h"
 
 MOVIE list_movie_actor(char* title)
 {
@@ -222,4 +223,69 @@ void init_actor()
    }
     print_actor(public_actor);
    fclose(actor_log_read);
+}
+
+struct movie* search_actor_to_movie_title(char* title)
+{
+	struct movie* LINK=public_first_movie;
+
+	while(LINK!=NULL)
+	{
+		if (!strcmp(title,LINK->title))
+		{
+			return LINK;
+		}
+		LINK=LINK->movie_next;
+
+	}
+
+	return NULL;
+}
+
+
+int search_actor_to_movie(ACTOR public_actor_tmp)
+{
+	struct movie* result=NULL;
+	struct best_movie* BEST_MOVIE=public_actor_tmp->movie;
+
+	while (BEST_MOVIE->movie_next!=NULL)
+	{
+		result=search_actor_to_movie_title(BEST_MOVIE->title);
+		printf("@@@@@@@@@@@@@@@@@@@@@@@ %d %s ///\n", strlen(BEST_MOVIE->title), BEST_MOVIE->title);
+
+		if (result!=NULL)
+		{
+			printf("뺴애애애애ㅐ애애애애ㅐㅇ애애애액\n");
+			printf("@@@@@@@@@@@@@@@@@@@@@@@@ SEARCH COMPLETE! %s /// %s\n", BEST_MOVIE->title, result->title);
+			BEST_MOVIE->movie_link=result;
+			printf("MOVIE and ACOTR CONNECTED > %s\n", BEST_MOVIE->movie_link->title);
+			return 1;
+		}
+
+		if(BEST_MOVIE->movie_next != NULL)
+		{
+			BEST_MOVIE = BEST_MOVIE->movie_next;
+		}
+
+	}
+	return 0;
+}
+
+
+void link_actor_to_movie()
+{
+	int result;
+	ACTOR public_actor_tmp=public_actor;
+	
+	while(public_actor_tmp!=NULL)
+	{
+		result=search_actor_to_movie(public_actor_tmp);
+
+		if (result)
+		{
+			break;
+		}
+
+		public_actor_tmp=public_actor_tmp->actor_next;
+	}
 }
