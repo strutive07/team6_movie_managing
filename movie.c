@@ -2,7 +2,7 @@
 
 //함수
 void init_movie(){
-  FILE *mv_log_read,*mv_log_add, *mv_list;
+
   int file_size;
   char *buffer;
   if((mv_log_read = fopen("movie_log.txt", "r")) == NULL){
@@ -29,24 +29,78 @@ void init_movie(){
     }
   }
   printf("\n==\n");
-  add_movie(public_first_movie, mv_log_add, mv_log_read);
-  print_movie(public_first_movie,mv_list);
+  // add_movie(public_first_movie, mv_log_add, mv_log_read);
   fclose(mv_log_read);
   fclose(mv_log_add);
   fclose(mv_list);
 }
+struct director* search_director_in_movie(DIRECTOR argument_director, char* argument_name){
+  while(argument_director != NULL){
+    if(!strcmp(argument_director -> name, argument_name)){
+      return argument_director;
+    }else{
+      argument_director = argument_director -> director_next;
+    }
+  }
+  return NULL;
+}
+
+void lint_movie_to_director(DIRECTOR argument_director, struct movie* argument_movie){
+  while(argument_movie != NULL){
+    argument_movie -> director.director_pointer = search_director_in_movie(argument_director, argument_movie -> director.name);
+    argument_movie = argument_movie -> movie_next;
+  }
+}
+
+//================================
+
+struct actor* search_actor_in_movie(ACTOR argument_actor, char* argument_actor_name){
+  // printf("%s", argument_actor -> name);
+  while(argument_actor != NULL){
+    // printf("%s %s\n", argument_actor -> name, argument_actor_name);
+    if(!strcmp(argument_actor -> name, argument_actor_name)){
+      return argument_actor;
+    }else{
+      argument_actor = argument_actor -> actor_next;
+    }
+  }
+  // printf("\n\n");
+  return NULL;
+}
+
+void lint_movie_to_actor(ACTOR argument_actor, struct movie* argument_movie){
+  while(argument_movie != NULL){
+    struct linked_list_actor* actor = argument_movie -> actor;
+    while(actor != NULL){
+      actor -> actor_pointer = search_actor_in_movie(argument_actor, actor -> actor_name);
+      actor = actor -> actor_next;
+    }
+    argument_movie = argument_movie -> movie_next;
+  }
+}
+
+//================================
+
+
 struct linked_list_actor *create_actor_struct(char * actor_parse){
   char *p;
   p=strtok(actor_parse,",");
   struct linked_list_actor *actor = malloc(sizeof(struct linked_list_actor));
-  actor -> actor_name = (char*)malloc(sizeof(char)*strlen(p));
-  strcpy(actor -> actor_name, p);
+  actor -> actor_name = (char*)malloc(sizeof(char)*strlen(p+5));
+  // actor -> actor_name = colon_change(p);
+    strcpy(actor -> actor_name, colon_change(p));
+
+
   actor -> actor_next = NULL;
   struct linked_list_actor *Tmp_Actor_pointer = actor;
   while((p=strtok(NULL,","))!=NULL){
+    if(*p+0 == ' '){
+      strcpy(p, p+1);
+    }
     struct linked_list_actor *next_actor = malloc(sizeof(struct linked_list_actor));
-    next_actor -> actor_name = (char*)malloc(sizeof(char)*strlen(p));
-    strcpy(next_actor -> actor_name, p);
+    next_actor -> actor_name = (char*)malloc(sizeof(char)*strlen(p+5));
+    // next_actor -> actor_name = colon_change(p);
+    strcpy(next_actor -> actor_name, colon_change(p));
 
     next_actor -> actor_next = NULL;
     Tmp_Actor_pointer -> actor_next = next_actor;
@@ -73,6 +127,7 @@ struct movie *parse_movie(char* buffer, int isFirst){
     parse_char = strtok(NULL,":\n,");
     inMovie -> director.name = (char*)malloc(sizeof(char)*strlen(parse_char));
     strcpy(inMovie -> director.name, parse_char);
+    inMovie -> director.director_pointer = NULL;
     //그리고 여기 director 탐생해서 director 같은 이름 strcmp 로 검색한후 있으면 그 구조체의 주소 inMovie -> director.director_pointer 에 대입
     parse_char = strtok(NULL,":\n,");
     inMovie -> year = atoi(parse_char);
@@ -104,7 +159,7 @@ char* colon_change(char* tmp_char){
     char *inserted_char;
     while(check_colon != NULL){
       total_size += 2;
-      check_colon = strchr(check_colon, ':');
+      check_colon = strchr(check_colon+1, ':');
     }
     inserted_char = (char*)malloc(sizeof(char)*total_size+1);
     strcpy(inserted_char, tmp_char);
@@ -123,72 +178,11 @@ char* colon_change(char* tmp_char){
     return tmp_char;
   }
 }
-void add_movie(struct movie *movie, FILE *mv_log_write, FILE *mv_log_read){
-  struct movie *inMovie;
-  struct movie *lastMovie;
-  int text_size = 0;
-  inMovie = malloc(sizeof(struct movie));
-  char* tmp_char = (char*)malloc(sizeof(char)*200);
-  printf("title > ");
-  gets(tmp_char);
-  inMovie -> title = (char*)malloc(sizeof(char)*strlen(tmp_char));
-  strcpy(inMovie -> title , tmp_char);
-  // inMovie -> title = colon_change(tmp_char);
-  printf("genre > ");
-  gets(tmp_char);
-  inMovie -> genre = (char*)malloc(sizeof(char)*strlen(tmp_char));
-  strcpy(inMovie -> genre , tmp_char);
-  printf("director > ");
-  gets(tmp_char);
-  inMovie -> director.name = (char*)malloc(sizeof(char)*strlen(tmp_char));
-  strcpy(inMovie -> director.name , tmp_char);
-  printf("year > ");
-  gets(tmp_char);
-  inMovie -> year = atoi(tmp_char);
-  printf("time > ");
-  gets(tmp_char);
-  inMovie -> time = atoi(tmp_char);
-  printf("actor > ");
-  gets(tmp_char);
-  fseek(mv_log_read,0,SEEK_END);
-  int file_size = ftell(mv_log_read);
-  printf("\n==\n%d\n=\n", file_size);
-  inMovie -> movie_next = NULL;
-  lastMovie = search_last_movie(movie);
-  lastMovie -> movie_next = inMovie;
-  inMovie -> Serial_number = (lastMovie -> Serial_number) +1 ;
-  if(file_size){
-    fprintf(mv_log_write, "\nadd:%d:%s:%s:%s:%d:%d:%s", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time, tmp_char);
-  }else{
-    fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:%s", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time, tmp_char);
-  }
-  inMovie -> actor = create_actor_struct(tmp_char);
-  free(tmp_char);
-}
+
 void update_movie(struct movie* movie, FILE *mv_log){
 
 }
-void print_movie(struct movie *movie, FILE* mv_list){
-  while(movie != NULL){
-    fprintf(mv_list, "%d:%s:%s:%s:%d:%d:", movie -> Serial_number, movie -> title, movie -> genre, movie -> director.name, movie -> year, movie -> time);
-    struct linked_list_actor *actor = movie -> actor;
-    while(actor != NULL){
-      if(actor -> actor_next == NULL){
-        fprintf(mv_list,"%s", actor -> actor_name);
-        break;
-      }else{
-        fprintf(mv_list,"%s, ", actor -> actor_name);
-      }
-      actor = actor -> actor_next;
-    }
-    if(movie -> movie_next == NULL){
-      break;
-    }else{
-      fprintf(mv_list,"\n");
-    }
-    movie = movie -> movie_next;
-  }
-}
+
 struct movie *search_last_movie(struct movie *movie){
   while((movie -> movie_next)!=NULL){
     movie = movie -> movie_next;

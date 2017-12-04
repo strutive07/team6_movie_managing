@@ -1,4 +1,5 @@
 #include "director.h"
+#include "movie.h"
 
 void init_director()
 {
@@ -80,16 +81,16 @@ void init_director()
       split = strtok(NULL, ":");
       title = (char*)malloc(strlen(split)+1);
       strcpy(title, split);
-      // printf(">>> title : %s\n", title);
+      *(title + strlen(title) - 2) = '\0';
 
       // title
-      split = strtok(title, ",");
+      split = strtok(title, ",\n");
       // printf("MOVIE TITLE : %s \n", split);
       if(movie == NULL)
       {
         movie = list_movie_director(split);
       }
-      while(split = strtok(NULL, ","))
+      while(split = strtok(NULL, ",\n"))
       {
         strcpy(split, split+1);
         // printf("MOVIE TITLE : %s \n", split);
@@ -134,9 +135,11 @@ void init_director()
 
   // printf("@@@@@@@@%s\n", director->director_next->movie->title);
 
+  public_director = director;
+
   free(line);
-  free(director);
-  free(movie);
+  // free(director);
+  // free(movie);
 }
 
 void add_list_director(FILE *list, char* origin)
@@ -154,8 +157,9 @@ MOVIE list_movie_director(char* title){
    else
    {
       movie = (MOVIE)malloc(sizeof(struct best_movie));
-      movie->title = (char*)malloc(strlen(title)+1);
-      strcpy(movie->title, title);
+      movie->title = (char*)malloc(strlen(title)+5);
+      strcpy(movie->title, colon_change(title));
+      movie->movie_link = NULL;
       movie->movie_next = NULL;
 
       return movie;
@@ -236,4 +240,66 @@ void print_director(DIRECTOR director){
       printf("%s / movie_list -> ", director->birth);
       print_director(director->director_next);
    }
+}
+
+struct movie* search_director_to_movie_title(char* title)
+{
+  struct movie* LINK = public_first_movie;
+
+  while(LINK != NULL)
+  {
+    if(!strcmp(title, LINK->title))
+    {
+      // printf("@@@@@@@@@@@@@@@@@@@@@@@@ SEARCH COMPLETE! %s /// %s\n", title, LINK->title);
+
+      return LINK;
+    }
+
+    LINK = LINK->movie_next;
+  }
+
+  return NULL;
+}
+
+int search_director_to_movie(DIRECTOR tmp)
+{
+  struct movie* result = NULL;
+  struct best_movie* BEST_MOVIE = tmp->movie;
+
+  while(BEST_MOVIE != NULL)
+  {
+    result = search_director_to_movie_title(BEST_MOVIE->title);
+    // printf("@@@@@@@@@@@@@@@@@@@@@@@ %d %s ///\n", strlen(tmp->movie->title), tmp->movie->title);
+
+    if(result != NULL)
+    {
+      // printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS\n");
+      // printf("@@@@@@@@@@@@@@@@@@@@@@@@ SEARCH COMPLETE! %s /// %s\n", tmp->movie->title, result->title);
+      BEST_MOVIE->movie_link = result;
+      printf("MOVIE and DIRECOTR CONNECTED > %s\n", BEST_MOVIE->movie_link->title);
+
+      return 1;
+    }
+    BEST_MOVIE = BEST_MOVIE->movie_next;
+  }
+
+  return 0;
+}
+
+void link_director_to_movie()
+{
+  DIRECTOR tmp = public_director;
+  int result;
+
+  while(tmp != NULL)
+  {
+    result = search_director_to_movie(tmp);
+
+    if(result)
+    {
+      break;
+    }
+
+    tmp = tmp->director_next;
+  }
 }

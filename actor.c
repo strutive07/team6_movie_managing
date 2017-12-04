@@ -68,45 +68,84 @@ ACTOR put_list_actor(ACTOR origin, ACTOR tmp)
 
 void print_movie_actor(MOVIE movie)
 {
-   if (movie == NULL)
-   {
-      // fprintf(actor_list,"NULL\n");
-   }
-   else
-   {
+  if (movie == NULL)
+  {
+     // fprintf(actor_list,"NULL\n");
+  }
+  else
+  {
 
-		 if(movie->movie_next == NULL)
-		 {
-			 fprintf(actor_list,"%s", movie->title);
-		 }
-		 else
-		 {
-			 fprintf(actor_list,"%s, ", movie->title);
-		 }
-      print_movie_actor(movie->movie_next);
-   }
+    if(movie->movie_next == NULL)
+    {
+      fprintf(actor_list, "%s", movie->title);
+    }
+    else
+    {
+      fprintf(actor_list,"%s, ", movie->title);
+    }
+     print_movie_actor(movie->movie_next);
+  }
+   // if (movie == NULL)
+   // {
+   //    // fprintf(actor_list,"NULL\n");
+   // }
+   // else
+   // {
+   //
+		//  if(movie->movie_next == NULL)
+		//  {
+		// 	 fprintf(actor_list,"%s", movie->title);
+		//  }
+		//  else
+		//  {
+		// 	 fprintf(actor_list,"%s, ", movie->title);
+		//  }
+   //    print_movie_actor(movie->movie_next);
+   // }
 }
 
 void print_actor(ACTOR actor)
 {
+  while(actor != NULL){
+    fprintf(actor_list, "%d:", actor->serial_number);
+    fprintf(actor_list, "%s:", actor->name);
+    if (actor->sex)
+       fprintf( actor_list, "M:");
+    else
+       fprintf(actor_list, "F:");
 
-   if (actor == NULL)
-   {
-      // printf("NULL\n");
-   }
-   else
-   {
-      fprintf(actor_list, "%d:", actor->serial_number);
-      fprintf(actor_list, "%s:", actor->name);
-      if (actor->sex)
-         fprintf(actor_list, "M:");
-      else
-         fprintf(actor_list, "F:");
+    fprintf(actor_list, "%s:", actor->birth);
+    print_movie_actor(actor->movie);
 
-      fprintf(actor_list, "%s:", actor->birth);
-      print_movie_actor(actor->movie);
-      print_actor(actor->actor_next);
-   }
+    actor = actor -> actor_next;
+    // fprintf(actor_list, "%d:", actor->serial_number);
+    // fprintf(actor_list, "%s:", actor->name);
+    // if (actor->sex)
+    //    fprintf(actor_list, "M:");
+    // else
+    //    fprintf(actor_list, "F:");
+    //
+    // fprintf(actor_list, "%s:", actor->birth);
+    // print_movie_actor(actor->movie);
+    // actor = actor -> actor_next;
+  }
+   // if (actor == NULL)
+   // {
+   //    // printf("NULL\n");
+   // }
+   // else
+   // {
+   //    // fprintf(actor_list, "%d:", actor->serial_number);
+   //    // fprintf(actor_list, "%s:", actor->name);
+   //    // if (actor->sex)
+   //    //    fprintf(actor_list, "M:");
+   //    // else
+   //    //    fprintf(actor_list, "F:");
+   //    //
+   //    // fprintf(actor_list, "%s:", actor->birth);
+   //    // print_movie_actor(actor->movie);
+   //    // print_actor(actor->actor_next);
+   // }
 }
 void actor_rtol(char* actor_str)
 {
@@ -151,16 +190,15 @@ void actor_rtol(char* actor_str)
          movie_tmp = list_movie_actor(best_movie_tmp);
          actor_info->movie = put_list_movie_actor(actor_info->movie, movie_tmp);
       }
-
-      if (actor == NULL)
-         actor = list_actor(actor_info->serial_number, actor_info->name, actor_info->sex, actor_info->birth, actor_info->movie);
+      if (public_actor == NULL){
+         // actor = list_actor(actor_info->serial_number, actor_info->name, actor_info->sex, actor_info->birth, actor_info->movie);
+         public_actor = actor_info;
+      }
       else
       {
-         actor_tmp = list_actor(actor_info->serial_number, actor_info->name, actor_info->sex, actor_info->birth, actor_info->movie);
-         actor = put_list_actor(actor, actor_tmp);
+         // actor_tmp = list_actor(actor_info->serial_number, actor_info->name, actor_info->sex, actor_info->birth, actor_info->movie);
+         put_list_actor(public_actor, actor_info);
       }
-
-      print_actor(actor);
    }
 }
 
@@ -182,6 +220,6 @@ void init_actor()
    {
       actor_rtol(actor_str);
    }
-
+    print_actor(public_actor);
    fclose(actor_log_read);
 }
