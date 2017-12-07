@@ -24,11 +24,19 @@ void update_list_movie(char *option, char *serial, struct movie *movie);
 struct movie* move_serial_movie(int serial, struct movie *origin);
 
 int director_overlap(DIRECTOR director);
+int actor_overlap(ACTOR actor);
+
+char* colon_rchange(char *tmp_char);
 
 void print_list_director(DIRECTOR director, char *serial);
 DIRECTOR serach_last_director(DIRECTOR public_first_director);
 void option_add_movie(struct movie *movie);
 void option_add_director(DIRECTOR public_first_director);
 void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director);
+
+void save_list_movie(char* option, struct movie *movie);
+void save_list_director(char* option, struct director *director);
+void save_list_actor(char* option, struct actor *actor);
+char* insert_string(char *origin, char *insert, int pos);
 
 #endif
