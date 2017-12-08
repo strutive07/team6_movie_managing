@@ -26,9 +26,12 @@ struct movie* move_serial_movie(int serial, struct movie *origin);
 int director_overlap(DIRECTOR director);
 int actor_overlap(ACTOR actor);
 
-char* colon_rchange(char *tmp_char);
+void colon_rchange(char *tmp_char);
 
 void print_list_director(DIRECTOR director, char *serial);
+void print_list_actor(ACTOR actor, char *serial);
+void print_list_movie(struct movie *movie, char *serial);
+
 DIRECTOR serach_last_director(DIRECTOR public_first_director);
 void option_add_movie(struct movie *movie);
 void option_add_director(DIRECTOR public_first_director);
