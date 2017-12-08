@@ -78,7 +78,7 @@ void whats_up_commander(){
             continue;
         }
       }
-      
+
       if(!strcmp(split, "end")){
         printf("Do you want Save?\n");
         printf("[ Y : save data, N : don't Save ] : ");
@@ -3108,4 +3108,5 @@ void option_delete_actor(int num,ACTOR actor)
   free(actor_next_tmp);
   free(public_actor_next_tmp);
   free(movie_next_tmp);
+}
 }
