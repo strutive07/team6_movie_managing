@@ -45,9 +45,9 @@ int option_search_actor(ACTOR actor, char* search_string);
 
 char* now_time_string();
 
-void save_list_movie(char* option, struct movie *movie);
-void save_list_director(char* option, struct director *director);
-void save_list_actor(char* option, struct actor *actor);
+void save_list_movie(char* option, struct movie *movie, char* option2);
+void save_list_director(char* option, struct director *director, char* option2);
+void save_list_actor(char* option, struct actor *actor, char* option2);
 char* insert_string(char *origin, char *insert, int pos);
 
 int cmp_actor_n(const void* a,const void* b);

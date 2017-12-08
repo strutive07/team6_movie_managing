@@ -85,11 +85,11 @@ void whats_up_commander(){
         gets(split);
         if(!strcmp(split, "y") || !strcmp(split, "Y")){
           strcpy(option, "ALL COMMANDS");
-          save_list_movie(option, movies);
+          save_list_movie(option, movies, NULL);
           strcpy(option, "ALL COMMANDS");
-          save_list_director(option, director);
+          save_list_director(option, director, NULL);
           strcpy(option, "ALL COMMANDS");
-          save_list_actor(option, actor);
+          save_list_actor(option, actor, NULL);
           exit(1);
         }else if(!strcmp(split, "n") || !strcmp(split, "N")){
           exit(1);
@@ -123,15 +123,15 @@ void whats_up_commander(){
 
         if(!strcmp(command_what, "m"))
         {
-          save_list_movie(option, movies);
+          save_list_movie(option, movies, option2);
         }
         else if(!strcmp(command_what, "d"))
         {
-          save_list_director(option, director);
+          save_list_director(option, director, option2);
         }
         else if(!strcmp(command_what, "a"))
         {
-          save_list_actor(option, actor);
+          save_list_actor(option, actor, option2);
         }else
         {
           continue;
@@ -1794,14 +1794,29 @@ int option_search_actor(ACTOR actor, char* search_string){
     return 1;
   }
 }
-void save_list_movie(char* option, struct movie *movie)
+
+void save_list_movie(char* option, struct movie *movie, char* option2)
 {
   FILE *fp, *tmp, *tmp_print;
   struct movie* save_movie = public_first_movie;
   char *movie_list_str;
+  char* filename = (char*)malloc(sizeof(char)*100);
   int size = 0;
 
-  fp = fopen("movie_list.txt", "w");
+  if(*option == '-')
+  {
+    strcpy(option, option+1);
+  }
+
+  if(option2 == NULL)
+  {
+    strcpy(filename, "movie_list.txt");
+  }
+  else
+  {
+    strcpy(filename, option2);
+  }
+  fp = fopen(filename, "w");
 
   if(!strcmp(option, "ALL COMMANDS"))
    {
@@ -1823,10 +1838,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -1850,7 +1865,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -1875,10 +1890,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -1902,7 +1917,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -1927,10 +1942,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -1954,7 +1969,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -1979,10 +1994,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -2001,7 +2016,7 @@ void save_list_movie(char* option, struct movie *movie)
               {
                 char *year;
 
-                year = (char*)malloc(sizeof(char) * 5);
+                year = (char*)malloc(sizeof(char) * 100);
                 sprintf(year, "%d", save_movie->year);
 
                 movie_list_str = insert_string(movie_list_str, year, i+1);
@@ -2011,7 +2026,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -2036,10 +2051,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -2058,7 +2073,7 @@ void save_list_movie(char* option, struct movie *movie)
               {
                 char *time;
 
-                time = (char*)malloc(sizeof(char) * 5);
+                time = (char*)malloc(sizeof(char) * 100);
                 sprintf(time, "%d", save_movie->time);
 
                 movie_list_str = insert_string(movie_list_str, time, i+1);
@@ -2068,7 +2083,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -2103,10 +2118,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -2141,7 +2156,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -2168,14 +2183,28 @@ void save_list_movie(char* option, struct movie *movie)
   fclose(fp);
 }
 
-void save_list_director(char* option, struct director *director)
+void save_list_director(char* option, struct director *director, char* option2)
 {
   FILE *fp, *tmp, *tmp_print;
   DIRECTOR save_director = public_director;
   char *director_list_str;
+  char *filename = (char*)malloc(sizeof(char)*100);
   int size = 0;
 
-  fp = fopen("director_list.txt", "w");
+  if(*option == '-')
+  {
+    strcpy(option, option+1);
+  }
+
+  if(option2 == NULL)
+  {
+    strcpy(filename, "director_list.txt");
+  }
+  else
+  {
+    strcpy(filename, option2);
+  }
+  fp = fopen(filename, "w");
 
   if(!strcmp(option, "ALL COMMANDS"))
    {
@@ -2197,10 +2226,10 @@ void save_list_director(char* option, struct director *director)
         }
         else
         {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          director_list_str = (char*)malloc(size + 1);
+          director_list_str = (char*)malloc(size + 100);
 
           while(fgets(director_list_str, size, tmp))
           {
@@ -2224,7 +2253,7 @@ void save_list_director(char* option, struct director *director)
                 break;
               }
             }
-            rename("test.txt", "director_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_director = save_director->director_next;
           }
@@ -2249,10 +2278,10 @@ void save_list_director(char* option, struct director *director)
         }
         else
         {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          director_list_str = (char*)malloc(size + 1);
+          director_list_str = (char*)malloc(size + 100);
 
           while(fgets(director_list_str, size, tmp))
           {
@@ -2277,7 +2306,7 @@ void save_list_director(char* option, struct director *director)
                 break;
               }
             }
-            rename("test.txt", "director_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_director = save_director->director_next;
           }
@@ -2302,10 +2331,10 @@ void save_list_director(char* option, struct director *director)
         }
         else
         {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          director_list_str = (char*)malloc(size + 1);
+          director_list_str = (char*)malloc(size + 100);
 
           while(fgets(director_list_str, size, tmp))
           {
@@ -2330,7 +2359,7 @@ void save_list_director(char* option, struct director *director)
                 break;
               }
             }
-            rename("test.txt", "director_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_director = save_director->director_next;
           }
@@ -2365,10 +2394,10 @@ void save_list_director(char* option, struct director *director)
         }
         else
         {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          director_list_str = (char*)malloc(size + 1);
+          director_list_str = (char*)malloc(size + 100);
 
           while(fgets(director_list_str, size, tmp))
           {
@@ -2402,7 +2431,7 @@ void save_list_director(char* option, struct director *director)
                 break;
               }
             }
-            rename("test.txt", "director_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_director = save_director->director_next;
           }
@@ -2429,14 +2458,28 @@ void save_list_director(char* option, struct director *director)
   fclose(fp);
 }
 
-void save_list_actor(char* option, struct actor *actor)
+void save_list_actor(char* option, struct actor *actor, char* option2)
 {
   FILE *fp, *tmp, *tmp_print;
   ACTOR save_actor = public_actor;
   char *actor_list_str;
+  char *filename = (char*)malloc(sizeof(char)*100);
   int size = 0;
 
-  fp = fopen("actor_list.txt", "w");
+  if(*option == '-')
+  {
+    strcpy(option, option+1);
+  }
+
+  if(option2 == NULL)
+  {
+    strcpy(filename, "actor_list.txt");
+  }
+  else
+  {
+    strcpy(filename, option2);
+  }
+  fp = fopen(filename, "w");
 
   if(!strcmp(option, "ALL COMMANDS"))
    {
@@ -2458,10 +2501,10 @@ void save_list_actor(char* option, struct actor *actor)
         }
         else
         {
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          actor_list_str = (char*)malloc(size + 1);
+          actor_list_str = (char*)malloc(size + 100);
 
           while(fgets(actor_list_str, size, tmp))
           {
@@ -2485,7 +2528,7 @@ void save_list_actor(char* option, struct actor *actor)
                 break;
               }
             }
-            rename("test.txt", "actor_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_actor = save_actor->actor_next;
           }
@@ -2523,11 +2566,11 @@ void save_list_actor(char* option, struct actor *actor)
         {
           char* sex;
 
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          actor_list_str = (char*)malloc(size + 1);
-          sex = (char*)malloc(sizeof(char) + 1);
+          actor_list_str = (char*)malloc(size + 100);
+          sex = (char*)malloc(sizeof(char) + 10);
 
           while(fgets(actor_list_str, size, tmp))
           {
@@ -2561,7 +2604,7 @@ void save_list_actor(char* option, struct actor *actor)
                 break;
               }
             }
-            rename("test.txt", "actor_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_actor = save_actor->actor_next;
           }
@@ -2586,10 +2629,10 @@ void save_list_actor(char* option, struct actor *actor)
         }
         else
         {
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          actor_list_str = (char*)malloc(size + 1);
+          actor_list_str = (char*)malloc(size + 100);
 
           while(fgets(actor_list_str, size, tmp))
           {
@@ -2614,7 +2657,7 @@ void save_list_actor(char* option, struct actor *actor)
                 break;
               }
             }
-            rename("test.txt", "actor_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_actor = save_actor->actor_next;
           }
@@ -2649,10 +2692,10 @@ void save_list_actor(char* option, struct actor *actor)
         }
         else
         {
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          actor_list_str = (char*)malloc(size + 1);
+          actor_list_str = (char*)malloc(size + 100);
 
           while(fgets(actor_list_str, size, tmp))
           {
@@ -2686,7 +2729,7 @@ void save_list_actor(char* option, struct actor *actor)
                 break;
               }
             }
-            rename("test.txt", "actor_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_actor = save_actor->actor_next;
           }
@@ -2718,7 +2761,7 @@ char* insert_string(char *origin, char *insert, int pos)
   char *str;
   int size;
   size = strlen(origin) + strlen(insert) + 1;
-  str = (char*)malloc(size + 30);
+  str = (char*)malloc(size + 100);
   strncpy(str, origin, pos);
   strcpy(origin, origin+pos+1);
 
