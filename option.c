@@ -766,7 +766,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
             }
             if(flag == 0){
               if(search_last_meta_cnt == 0){
-                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                 last_flag = 1;
                 return 1;
                 break;
@@ -818,7 +818,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
               }
               if(z == tmp_string_length){
                 if(search_last_meta_cnt == 0){
-                  printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                  // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                   last_flag = 1;
                   return 1;
                   break;
@@ -876,7 +876,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
             }
             if(z == tmp_string_length){
               if(search_last_meta_cnt == 0){
-                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                 last_flag = 1;
                 return 1;
                 break;
@@ -910,7 +910,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
       }
     }
     if(flag == 0){
-      printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+      // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
       return 1;
     }else{
       return 0;
