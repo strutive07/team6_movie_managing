@@ -78,7 +78,7 @@ void whats_up_commander(){
           option_delete_movie(a, movies);
         }*/
       }
-	  
+
       if(!strcmp(split, "end")){
         printf("Do you want Save?\n");
         printf("[ Y : save data, N : don't Save ] : ");
@@ -1233,7 +1233,7 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
 
     }
   }
-
+}
 
 //actor add
 void option_add_actor(ACTOR public_actor){
@@ -3108,5 +3108,4 @@ void option_delete_actor(int num,ACTOR actor)
   free(actor_next_tmp);
   free(public_actor_next_tmp);
   free(movie_next_tmp);
-}
 }
