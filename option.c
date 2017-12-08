@@ -67,16 +67,16 @@ void whats_up_commander(){
 
         command_what = strtok(NULL, " ");
         split = strtok(NULL, " ");
-
-        if (!strcmp(command_what, "d")){
-          option_delete_director(split, director);
-        }else if(!strcmp(command_what, "a")){
-          option_delete_actor(split, actor);
-        }else if(!strcmp(command_what,"m")){
-          option_delete_movie(split, movies);
+        int a = atoi(split);
+    /*    if (!strcmp(command_what, "d")){
+          option_delete_director(a, director);
+        }else*/ if(!strcmp(command_what, "a")){
+          option_delete_actor(a, actor);
         }else{
             continue;
-        }
+        }/*else if(!strcmp(command_what,"m")){
+          option_delete_movie(a, movies);
+        }*/
       }
 
       if(!strcmp(split, "end")){
@@ -1233,7 +1233,7 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
 
     }
   }
-
+}
 
 //actor add
 void option_add_actor(ACTOR public_actor){
@@ -3108,5 +3108,4 @@ void option_delete_actor(int num,ACTOR actor)
   free(actor_next_tmp);
   free(public_actor_next_tmp);
   free(movie_next_tmp);
-}
 }
