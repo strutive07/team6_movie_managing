@@ -13,10 +13,10 @@ void init_movie(){
     printf("File Open Error");
     exit(1);
   }
-  if((mv_list = fopen("movie_list.txt", "w")) == NULL){
-    printf("File Open Error");
-    exit(1);
-  }
+  // if((mv_list = fopen("movie_list.txt", "w")) == NULL){
+  //   printf("File Open Error");
+  //   exit(1);
+  // }
   char *one_line = (char*)malloc(sizeof(char)*200);
   int main_isFirst = 1;
   while(fgets(one_line, 200, mv_log_read) != NULL){
@@ -32,10 +32,11 @@ void init_movie(){
   // add_movie(public_first_movie, mv_log_add, mv_log_read);
   fclose(mv_log_read);
   fclose(mv_log_add);
-  fclose(mv_list);
+  // fclose(mv_list);
 }
 struct director* search_director_in_movie(DIRECTOR argument_director, char* argument_name){
   while(argument_director != NULL){
+    // printf("%s %s\n", argument_director -> name, argument_name);
     if(!strcmp(argument_director -> name, argument_name)){
       return argument_director;
     }else{
@@ -48,6 +49,8 @@ struct director* search_director_in_movie(DIRECTOR argument_director, char* argu
 void lint_movie_to_director(DIRECTOR argument_director, struct movie* argument_movie){
   while(argument_movie != NULL){
     argument_movie -> director.director_pointer = search_director_in_movie(argument_director, argument_movie -> director.name);
+    if(argument_movie -> director.director_pointer != NULL){
+    }
     argument_movie = argument_movie -> movie_next;
   }
 }

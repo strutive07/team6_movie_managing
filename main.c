@@ -16,6 +16,8 @@ int main()
   lint_movie_to_director(public_director, public_first_movie);
   lint_movie_to_actor(public_actor, public_first_movie);
   link_director_to_movie();
+  lint_movie_to_director(public_director, public_first_movie);
+  lint_movie_to_actor(public_actor, public_first_movie);
   whats_up_commander();
   // option_add_movie(public_first_movie);
   // option_add_director(public_director);
