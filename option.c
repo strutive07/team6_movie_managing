@@ -67,18 +67,18 @@ void whats_up_commander(){
 
         command_what = strtok(NULL, " ");
         split = strtok(NULL, " ");
-
-        if (!strcmp(command_what, "d")){
-          option_delete_director(split, director);
-        }else if(!strcmp(command_what, "a")){
-          option_delete_actor(split, actor);
-        }else if(!strcmp(command_what,"m")){
-          option_delete_movie(split, movies);
+        int a = atoi(split);
+    /*    if (!strcmp(command_what, "d")){
+          option_delete_director(a, director);
+        }else*/ if(!strcmp(command_what, "a")){
+          option_delete_actor(a, actor);
         }else{
             continue;
-        }
+        }/*else if(!strcmp(command_what,"m")){
+          option_delete_movie(a, movies);
+        }*/
       }
-
+	  
       if(!strcmp(split, "end")){
         printf("Do you want Save?\n");
         printf("[ Y : save data, N : don't Save ] : ");
