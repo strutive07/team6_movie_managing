@@ -1,9 +1,4 @@
-add:1:Steven Spielberg:M:19461218:Saving Private Ryan, Catch Me??;if You can, E.T.
-add:2:Martin Scorsese:M:19421117:The Wolf of Wall Street
-add:3:Ridley Scott:M:19371130:Blade Runner
-add:4:Martin Spielberg:M:19421117:Blade, Blade Blade, Street
-add:5:Ridley Ridley:M:19371130:Runner Runner
-add:6:test_asdf:M:19371130:asdf
-add:7:ho??;ho:M:19921117:ho??;hi, a, b, c, d, e, f??;G
-add:8:ho??;ho:M:19921117:ho, ho??;ho
-add:9:ho??;1:M:19921127:ho??;1, a
+add:1:test_asdf:M:19371130:asdf
+add:2:ho??;ho:M:19921117:ho??;hi, a, b, c, d, e, f??;G, sigongjoa
+add:3:ho??;ho:M:19921117:ho, ho??;ho
+add:4:ho??;1:M:19921127:ho??;1, a
