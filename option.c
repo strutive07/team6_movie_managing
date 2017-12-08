@@ -2560,3 +2560,412 @@ char* colon_rchange(char *tmp_char){ // ??; => :
   return split2;
   }
 }
+
+int cmp_actor_n(const void* a,const void* b)
+{
+	ACTOR a_tmp=(ACTOR)a;
+	ACTOR b_tmp=(ACTOR)b;
+
+	return strcmp(a_tmp->name,b_tmp->name);
+}
+
+
+int cmp_actor_s(const void* a,const void* b)
+{
+	ACTOR a_tmp=(ACTOR)a;
+	ACTOR b_tmp=(ACTOR)b;
+
+	if (a_tmp->sex && b_tmp->sex)
+		return 0;
+	else if (a_tmp->sex)
+		return 1;
+	else
+		return -1;
+
+}
+
+int cmp_actor_b(const void* a,const void* b)
+{
+	ACTOR a_tmp=(ACTOR)a;
+	ACTOR b_tmp=(ACTOR)b;
+
+	return strcmp(a_tmp->birth,b_tmp->birth);
+}
+
+
+int cmp_actor_m(const void* a,const void* b)
+{
+	ACTOR a_tmp=(ACTOR)a;
+	ACTOR b_tmp=(ACTOR)b;
+
+	return strcmp(a_tmp->movie->title,b_tmp->movie->title);
+}
+
+int cmp_director_n(const void* a,const void* b)
+{
+	DIRECTOR a_tmp=(DIRECTOR)a;
+	DIRECTOR b_tmp=(DIRECTOR)b;
+
+	return strcmp(a_tmp->name,b_tmp->name);
+}
+
+
+int cmp_director_s(const void* a,const void* b)
+{
+	DIRECTOR a_tmp=(DIRECTOR)a;
+	DIRECTOR b_tmp=(DIRECTOR)b;
+
+	if (a_tmp->sex && b_tmp->sex)
+		return 0;
+	else if (a_tmp->sex)
+		return 1;
+	else
+		return -1;
+
+}
+
+int cmp_director_b(const void* a,const void* b)
+{
+	DIRECTOR a_tmp=(DIRECTOR)a;
+	DIRECTOR b_tmp=(DIRECTOR)b;
+
+	return strcmp(a_tmp->birth,b_tmp->birth);
+}
+
+
+int cmp_director_m(const void* a,const void* b)
+{
+	DIRECTOR a_tmp=(DIRECTOR)a;
+	DIRECTOR b_tmp=(DIRECTOR)b;
+
+	return strcmp(a_tmp->movie->title,b_tmp->movie->title);
+}
+
+int cmp_movie_tt(const void* a,const void* b)
+{
+	struct movie* a_tmp=(struct movie*)a;
+	struct movie* b_tmp=(struct movie*)b;
+
+	return strcmp(a_tmp->title,b_tmp->title);
+}
+
+int cmp_movie_g(const void* a,const void* b)
+{
+  struct movie* a_tmp=(struct movie*)a;
+	struct movie* b_tmp=(struct movie*)b;
+
+	return strcmp(a_tmp->genre,b_tmp->genre);
+}
+
+int cmp_movie_d(const void* a,const void* b)
+{
+  struct movie* a_tmp=(struct movie*)a;
+	struct movie* b_tmp=(struct movie*)b;
+
+	return strcmp(a_tmp->director.name,b_tmp->director.name);
+}
+
+int cmp_movie_y(const void* a,const void* b)
+{
+  struct movie* a_tmp=(struct movie*)a;
+	struct movie* b_tmp=(struct movie*)b;
+
+	if (a_tmp->year<b_tmp->year)
+		return 1;
+	else if (a_tmp->year==b_tmp->year)
+		return 0;
+	else
+		return -1;
+}
+
+int cmp_movie_r(const void* a,const void* b)
+{
+  struct movie* a_tmp=(struct movie*)a;
+	struct movie* b_tmp=(struct movie*)b;
+
+	if (a_tmp->time<b_tmp->time)
+		return 1;
+	else if (a_tmp->time==b_tmp->time)
+		return 0;
+	else
+		return -1;
+}
+
+int cmp_movie_a(const void* a,const void* b)
+{
+  struct movie* a_tmp=(struct movie*)a;
+	struct movie* b_tmp=(struct movie*)b;
+
+	return strcmp(a_tmp->actor->actor_name,b_tmp->actor->actor_name);
+}
+
+void sort_actor(char option, ACTOR actor)
+{
+  if (option==0)
+    option='n';
+	int n=count_actor_list(actor);
+	ACTOR actor_tmp=actor;
+
+	ACTOR sort_list=(ACTOR)malloc(sizeof(struct actor)*n);
+
+	int cnt=0;
+
+	while(actor_tmp->actor_next!=NULL)
+	{
+		(*(sort_list+cnt))= *actor_tmp;
+		cnt++;
+		actor_tmp=actor_tmp->actor_next;
+	}
+	(*(sort_list+cnt))= *actor_tmp;
+
+	if (option=='n')
+		qsort(sort_list,n,sizeof(struct actor),cmp_actor_n);
+	else if (option=='s')
+		qsort(sort_list,n,sizeof(struct actor),cmp_actor_s);
+	else if (option=='b')
+		qsort(sort_list,n,sizeof(struct actor),cmp_actor_b);
+	else if (option=='m')
+		qsort(sort_list,n,sizeof(struct actor),cmp_actor_m);
+
+	for (int i=0;i<n;i++)
+	{
+		printf("%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
+		if ((sort_list+i)->sex)
+			printf("M:");
+		else
+			printf("F:");
+		printf("%s:",(sort_list+i)->birth);
+		while((sort_list+i)->movie->movie_next!=NULL)
+		{
+			printf("%s,",(sort_list+i)->movie->title);
+			(sort_list+i)->movie=(sort_list+i)->movie->movie_next;
+		}
+		printf("%s\n",(sort_list+i)->movie->title);
+	}
+
+	printf("Sort Complete!\n");
+
+	free(sort_list);
+
+}
+
+void sort_director(char option, DIRECTOR director)
+{
+  if (option==0)
+    option='n';
+  int cnt=0;
+	int n=count_director_list(director);
+	DIRECTOR director_tmp=director;
+
+	DIRECTOR sort_list=(DIRECTOR)malloc(sizeof(struct director)*n);
+
+	while(director_tmp->director_next!=NULL)
+	{
+		(*(sort_list+cnt))=*director_tmp;
+		cnt++;
+    director_tmp=director_tmp->director_next;
+	}
+	(*(sort_list+cnt))=*director_tmp;
+
+	if (option=='n')
+		qsort(sort_list,n,sizeof(struct director),cmp_director_n);
+	else if (option=='s')
+		qsort(sort_list,n,sizeof(struct director),cmp_director_s);
+	else if (option=='b')
+		qsort(sort_list,n,sizeof(struct director),cmp_director_b);
+	else if (option=='m')
+		qsort(sort_list,n,sizeof(struct director),cmp_director_m);
+
+    for (int i=0;i<n;i++)
+  	{
+  		printf("%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
+      printf("%c:",(sort_list+i)->sex);
+  		printf("%s:",(sort_list+i)->birth);
+  		while((sort_list+i)->movie->movie_next!=NULL)
+  		{
+  			printf("%s,",(sort_list+i)->movie->title);
+  			(sort_list+i)->movie=(sort_list+i)->movie->movie_next;
+  		}
+  		printf("%s\n",(sort_list+i)->movie->title);
+  	}
+
+  	printf("Sort Complete!\n");
+
+  	free(sort_list);
+
+}
+
+void sort_movie(char option, struct movie* movie)
+{
+  if (option==0)
+    option='t';
+  int cnt=0;
+	int n=count_movie_list(movie);
+	struct movie* movie_tmp=movie;
+	struct movie* sort_list=(struct movie*)malloc(sizeof(struct movie)*n);
+
+	while(movie_tmp->movie_next!=NULL)
+	{
+		(*(sort_list+cnt))=(*movie_tmp);
+		cnt++;
+    movie_tmp=movie_tmp->movie_next;
+	}
+	(*(sort_list+cnt))=(*movie_tmp);
+
+	if (option=='t')
+		qsort(sort_list,n,sizeof(struct movie),cmp_movie_tt);
+	else if (option=='d')
+		qsort(sort_list,n,sizeof(struct movie),cmp_movie_d);
+	else if (option=='g')
+		qsort(sort_list,n,sizeof(struct movie),cmp_movie_g);
+	else if (option=='y')
+		qsort(sort_list,n,sizeof(struct movie),cmp_movie_y);
+	else if (option=='r')
+		qsort(sort_list,n,sizeof(struct movie),cmp_movie_r);
+	else if (option=='a')
+		qsort(sort_list,n,sizeof(struct movie),cmp_movie_a);
+
+    for (int i=0;i<n;i++)
+  	{
+  		printf("%d:%s:",(sort_list+i)->Serial_number,(sort_list+i)->title);
+      printf("%s:",(sort_list+i)->genre);
+  		printf("%s:",(sort_list+i)->director);
+      printf("%d:%d:",(sort_list+i)->year,(sort_list+i)->time);
+  		while((sort_list+i)->actor->actor_next!=NULL)
+  		{
+  			printf("%s,",(sort_list+i)->actor->actor_name);
+  			(sort_list+i)->actor=(sort_list+i)->actor->actor_next;
+  		}
+  		printf("%s\n",(sort_list+i)->actor->actor_name);
+  	}
+
+  	printf("Sort Complete!\n");
+
+  	free(sort_list);
+
+}
+
+int count_actor_list(ACTOR actor)
+{
+	int cnt=0;
+	ACTOR actor_tmp=actor;
+
+	while (actor_tmp->actor_next!=NULL)
+	{
+		cnt++;
+		actor_tmp=actor_tmp->actor_next;
+	}
+	cnt++;
+
+
+	return cnt;
+}
+
+int count_director_list(DIRECTOR director)
+{
+	int cnt=0;
+	DIRECTOR director_tmp=director;
+
+	while (director_tmp->director_next!=NULL)
+	{
+		cnt++;
+		director_tmp=director_tmp->director_next;
+	}
+	cnt++;
+
+	return cnt;
+}
+
+int count_movie_list(struct movie* movie)
+{
+	int cnt=0;
+	struct movie* movie_tmp=movie;
+
+  while(movie_tmp->movie_next!=NULL)
+  {
+		cnt++;
+		movie_tmp=movie_tmp->movie_next;
+  }
+	cnt++;
+
+	return cnt;
+}
+
+void option_delete_actor(int num,ACTOR actor)
+{
+  ACTOR actor_tmp=actor;
+  ACTOR actor_tmp2=actor;
+  bool break_flag=false;
+  ACTOR actor_next_tmp;
+  ACTOR public_actor_next_tmp;
+  int cnt=0;
+  struct best_movie* movie_next_tmp;
+
+  while (actor_tmp->actor_next!=NULL)
+  {
+    if (actor_tmp->serial_number==num)
+    {
+      break_flag=true;
+      actor_next_tmp=actor_tmp->actor_next;
+      break;
+    }
+    cnt++;
+  }
+  if (actor_tmp->serial_number==num)
+  {
+    actor_next_tmp=actor_tmp->actor_next;
+    break_flag=true;
+  }
+
+  if (break_flag)
+  {
+    if (cnt==0)
+    {
+      public_actor_next_tmp=public_actor->actor_next;
+      public_actor->serial_number=public_actor_next_tmp->serial_number;
+      strcpy(public_actor->name,public_actor_next_tmp->name);
+      public_actor->sex=public_actor_next_tmp->sex;
+      strcpy(public_actor->birth,public_actor_next_tmp->birth);
+      public_actor->movie=public_actor_next_tmp->movie;
+      public_actor->actor_next=public_actor_next_tmp->actor_next;
+    }
+    else
+    {
+      for (int i=0;i<cnt-1;i++)
+      {
+        actor_tmp2=actor_tmp2->actor_next;
+      }
+      actor_tmp2->actor_next=actor_next_tmp;
+
+      free(actor_tmp->name);
+      while(actor_tmp->movie->movie_next!=NULL)
+      {
+        movie_next_tmp=actor_tmp->movie->movie_next;
+        free(actor_tmp->movie->title);
+        free(actor_tmp->movie->movie_link);
+        free(actor_tmp->movie->movie_next);
+        actor_tmp->movie=movie_next_tmp;
+      }
+      free(actor_tmp->movie->title);
+      free(actor_tmp->movie->movie_link);
+      free(actor_tmp->movie->movie_next);
+
+      free(actor_tmp->actor_next);
+    }
+
+    link_actor_to_movie();
+
+    printf("Delete Complete!\n");
+    fprintf(actor_log_read,"delete:%d::::\n",num);
+  }
+  else
+  {
+    printf("No such record\n");
+  }
+
+  free(actor_tmp);
+  free(actor_tmp2);
+  free(actor_next_tmp);
+  free(public_actor_next_tmp);
+  free(movie_next_tmp);
+}
