@@ -629,7 +629,173 @@ void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director, AC
   fclose(director_list);
   fclose(actor_list);
 }
-//actor add
+//option - add
+void option_add_movie(struct movie *movie){
+  struct movie *inMovie;
+  struct movie *lastMovie;
+   FILE *mv_log_write, FILE, *mv_log_read;
+   if((mv_log_read = fopen("movie_log.txt", "r")) == NULL){
+     printf("File Open Error");
+     exit(1);
+   }
+   if((mv_log_write = fopen("movie_log.txt", "a")) == NULL){
+     printf("File Open Error");
+     exit(1);
+   }
+  int text_size = 0;
+  inMovie = malloc(sizeof(struct movie));
+  char* tmp_char = (char*)malloc(sizeof(char)*200);
+
+  printf("title > ");
+  gets(tmp_char);
+  inMovie -> title = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
+  strcpy(inMovie -> title , colon_change(tmp_char));
+
+  printf("genre > ");
+  gets(tmp_char);
+  inMovie -> genre = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
+  // inMovie -> genre = colon_change(tmp_char);
+  strcpy(inMovie -> genre , colon_change(tmp_char));
+
+  printf("director > ");
+  gets(tmp_char);
+  inMovie -> director.name = (char*)malloc(sizeof(char)*strlen(tmp_char)+5);
+  // inMovie -> director.name = colon_change(tmp_char);
+  strcpy(inMovie -> director.name , colon_change(tmp_char));
+
+  printf("year > ");
+  gets(tmp_char);
+  inMovie -> year = atoi(tmp_char);
+
+  printf("time > ");
+  gets(tmp_char);
+  inMovie -> time = atoi(tmp_char);
+
+  printf("actor > ");
+  gets(tmp_char);
+  fseek(mv_log_read,0,SEEK_END);
+  int file_size = ftell(mv_log_read);
+  printf("\n==\n%d\n=\n", file_size);
+
+  inMovie -> movie_next = NULL;
+  lastMovie = search_last_movie(movie);
+  lastMovie -> movie_next = inMovie;
+  inMovie -> Serial_number = (lastMovie -> Serial_number) +1 ;
+  inMovie -> actor = create_actor_struct(tmp_char);
+  if(file_size){
+    fprintf(mv_log_write, "\nadd:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
+    struct linked_list_actor *tmp_print_actor = inMovie -> actor;
+    while(tmp_print_actor != NULL){
+      if(tmp_print_actor -> actor_next == NULL){
+        fprintf(mv_log_write, "%s", tmp_print_actor -> actor_name);
+      }else{
+        fprintf(mv_log_write, "%s, ", tmp_print_actor -> actor_name);
+      }
+      tmp_print_actor = tmp_print_actor -> actor_next;
+    }
+  }else{
+    fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
+    struct linked_list_actor *tmp_print_actor = inMovie -> actor;
+    while(tmp_print_actor != NULL){
+      if(tmp_print_actor -> actor_next == NULL){
+        fprintf(mv_log_write, "%s", tmp_print_actor -> actor_name);
+      }else{
+        fprintf(mv_log_write, "%s, ", tmp_print_actor -> actor_name);
+      }
+      tmp_print_actor = tmp_print_actor -> actor_next;
+    }
+  }
+  free(tmp_char);
+  fclose(mv_log_read);
+  fclose(mv_log_write);
+}
+
+void option_add_director(DIRECTOR public_first_director){
+  DIRECTOR director;
+  DIRECTOR LastDirector;
+   FILE *director_log_write, FILE, *director_log_read;
+   if((director_log_read = fopen("director_log.txt", "r")) == NULL){
+     printf("File Open Error");
+     exit(1);
+   }
+   if((director_log_write = fopen("director_log.txt", "a")) == NULL){
+     printf("File Open Error");
+     exit(1);
+   }
+  int text_size = 0;
+  director = malloc(sizeof(struct director));
+  char* tmp_char = (char*)malloc(sizeof(char)*200);
+
+  printf("name > ");
+  gets(tmp_char);
+  director -> name = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
+  strcpy(director -> name , colon_change(tmp_char));
+
+  printf("sex > ");
+  gets(tmp_char);
+  // director -> sex = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
+  // inMovie -> genre = colon_change(tmp_char);
+  // strcpy(inMovie -> genre , colon_change(tmp_char));
+  director -> sex = tmp_char[0];
+
+  printf("birth > ");
+  gets(tmp_char);
+  director -> birth = (char*)malloc(sizeof(char)*strlen(tmp_char)+5);
+  // inMovie -> director.name = colon_change(tmp_char);
+  strcpy(director -> birth , colon_change(tmp_char));
+
+  printf("best movie > ");
+  gets(tmp_char);
+  fseek(director_log_read,0,SEEK_END);
+  int file_size = ftell(director_log_read);
+
+
+  director -> director_next = NULL;
+  LastDirector = serach_last_director(public_first_director);
+
+  LastDirector -> director_next = director;
+  director -> serial_number = (LastDirector -> serial_number) +1 ;
+
+  char* split = strtok(tmp_char, ",");
+
+  MOVIE movie;
+  movie = list_movie_director(split);
+  director -> movie = movie;
+
+  while((split = strtok(NULL, ",")) != NULL){
+    if(*split+0 == ' '){
+      strcpy(split, split+1);
+    }
+    MOVIE movie_tmp = list_movie_director(split);
+    movie = put_list_movie_director(movie, movie_tmp);
+  }
+  if(file_size){
+    fprintf(director_log_write, "\nadd:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
+    MOVIE tmp_print_movie = director -> movie;
+    while(tmp_print_movie != NULL){
+      if(tmp_print_movie -> movie_next == NULL){
+        fprintf(director_log_write, "%s", tmp_print_movie -> title);
+      }else{
+        fprintf(director_log_write, "%s, ", tmp_print_movie -> title);
+      }
+      tmp_print_movie = tmp_print_movie -> movie_next;
+    }
+  }else{
+    fprintf(director_log_write, "add:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
+    MOVIE tmp_print_movie = director -> movie;
+    while(tmp_print_movie != NULL){
+      if(tmp_print_movie -> movie_next == NULL){
+        fprintf(director_log_write, "%s", tmp_print_movie -> title);
+      }else{
+        fprintf(director_log_write, "%s, ", tmp_print_movie -> title);
+      }
+      tmp_print_movie = tmp_print_movie -> movie_next;
+    }
+  }
+  free(tmp_char);
+  fclose(director_log_read);
+  fclose(director_log_write);
+}
 void option_add_actor(ACTOR public_actor){
   ACTOR actor;
   ACTOR LastActor;
@@ -726,6 +892,7 @@ void option_add_actor(ACTOR public_actor){
   fclose(actor_log_read);
   fclose(actor_log_write);
 }
+
 ACTOR serach_last_actor(ACTOR public_actor){
   ACTOR actor = public_actor;
   while((actor -> actor_next) != NULL){
@@ -735,6 +902,15 @@ ACTOR serach_last_actor(ACTOR public_actor){
   return actor;
 }
 
+DIRECTOR serach_last_director(DIRECTOR public_first_director){
+  DIRECTOR director = public_first_director;
+  printf("\n==\n%d\n=\n", director -> serial_number);
+  while((director -> director_next) != NULL){
+    director = director -> director_next;
+  }
+  printf("\n==\n%d\n=\n", director -> serial_number);
+  return director;
+}
 int option_search_meta_search(char* string_orign, char* string_search){
   int string_search_length = strlen(string_search);
   int string_origin_length = strlen(string_orign);
