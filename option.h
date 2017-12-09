@@ -23,26 +23,32 @@ ACTOR move_serial_actor(int serial, ACTOR origin);
 void update_list_movie(char *option, char *serial, struct movie *movie);
 struct movie* move_serial_movie(int serial, struct movie *origin);
 
-int director_overlap(DIRECTOR director);
-int actor_overlap(ACTOR actor);
+int director_overlap(char *tmp);
+int actor_overlap(char *tmp);
+int movie_overlap(char *tmp);
 
-char* colon_rchange(char *tmp_char);
+void colon_rchange(char *tmp_char);
 
 void print_list_director(DIRECTOR director, char *serial);
+void print_list_actor(ACTOR actor, char *serial);
+void print_list_movie(struct movie *movie, char *serial);
+
 DIRECTOR serach_last_director(DIRECTOR public_first_director);
 void option_add_movie(struct movie *movie);
 void option_add_director(DIRECTOR public_first_director);
 void option_add_actor(ACTOR public_actor);
 ACTOR serach_last_actor(ACTOR public_actor);
-void fprint_list_movie_director_actor(struct movie *movie, DIRECTOR director, ACTOR actor);
+void fprint_list_movie_director_actor(char isMovie_DIrector_Actor,struct movie *movie, DIRECTOR director, ACTOR actor);
 int option_search_meta_search(char* string_orign, char* string_search);
 int option_search_movie(struct movie* movie, char* search_string);
 int option_search_director(DIRECTOR director, char* search_string);
 int option_search_actor(ACTOR actor, char* search_string);
 
-void save_list_movie(char* option, struct movie *movie);
-void save_list_director(char* option, struct director *director);
-void save_list_actor(char* option, struct actor *actor);
+char* now_time_string();
+
+void save_list_movie(char* option, struct movie *movie, char* option2);
+void save_list_director(char* option, struct director *director, char* option2);
+void save_list_actor(char* option, struct actor *actor, char* option2);
 char* insert_string(char *origin, char *insert, int pos);
 
 int cmp_actor_n(const void* a,const void* b);

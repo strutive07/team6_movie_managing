@@ -81,7 +81,7 @@ void init_director()
       split = strtok(NULL, ":");
       title = (char*)malloc(strlen(split)+1);
       strcpy(title, split);
-      *(title + strlen(title) - 2) = '\0';
+      *(title + strlen(title) - 1) = '\0';
 
       // title
       split = strtok(title, ",\n");
