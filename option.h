@@ -74,8 +74,8 @@ int count_actor_list(ACTOR actor);
 int count_director_list(DIRECTOR director);
 int count_movie_list(struct movie* movie);
 
-void option_delete_actor(int num,ACTOR actor);
-void option_delete_director(int num,DIRECTOR director);
-void option_delete_movie(int num,struct movie* movie);
+void option_delete_actor(int num,ACTOR actor,bool from_where);
+void option_delete_director(int num,DIRECTOR director,bool from_where);
+void option_delete_movie(int num,struct movie* movie,bool from_where);
 
 #endif
