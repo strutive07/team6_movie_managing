@@ -106,7 +106,7 @@ void init_director()
       else if(!strcmp(tag, "delete"))
       {
         DIRECTOR delete_director = director;
-        option_delete_director(serial_number_integer, delete_director);
+        option_delete_director(serial_number_integer, delete_director, true);
         continue;
       }
       else if(!strcmp(tag, "update"))
