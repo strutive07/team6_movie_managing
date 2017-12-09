@@ -3023,6 +3023,21 @@ void colon_rchange(char *tmp_char){ // ??; => :
   }
 }
 
+void colon_frchange(FILE* fm,char *tmp_char){ // ??; => :
+  int tmp_char_length = strlen(tmp_char);
+  for(int i=0; i<tmp_char_length; i++){
+    if(*(tmp_char+i) == '?'){
+      if(*(tmp_char+i+1) == '?'){
+        if(*(tmp_char+i+2) == ';'){
+          fprintf(fm,":");
+          i += 3;
+        }
+      }
+    }
+    fprintf(fm,"%c",*(tmp_char+i));
+  }
+}
+
 int cmp_actor_n(const void* a,const void* b)
 {
 	ACTOR a_tmp=(ACTOR)a;
@@ -3161,8 +3176,14 @@ int cmp_movie_a(const void* a,const void* b)
 	return strcmp(a_tmp->actor->actor_name,b_tmp->actor->actor_name);
 }
 
-void sort_actor(char option, ACTOR actor)
+void sort_actor(char option, ACTOR actor,char* option2)
 {
+  FILE *fm;
+  if (option2!=NULL)
+  {
+    fm=fopen("filename_sort_tmp.txt","w");
+  }
+
   if (option==0)
     option='n';
 	int n=count_actor_list(actor);
@@ -3191,19 +3212,52 @@ void sort_actor(char option, ACTOR actor)
 
 	for (int i=0;i<n;i++)
 	{
-		printf("%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
-		if ((sort_list+i)->sex)
-			printf("M:");
-		else
-			printf("F:");
-		printf("%s:",(sort_list+i)->birth);
-		while((sort_list+i)->movie->movie_next!=NULL)
-		{
-			printf("%s,",(sort_list+i)->movie->title);
-			(sort_list+i)->movie=(sort_list+i)->movie->movie_next;
-		}
-		printf("%s\n",(sort_list+i)->movie->title);
+    if (option2==NULL)
+    {
+  		printf("%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
+  		if ((sort_list+i)->sex)
+  			printf("M:");
+  		else
+  			printf("F:");
+  		printf("%s:",(sort_list+i)->birth);
+  		while((sort_list+i)->movie->movie_next!=NULL)
+  		{
+  			colon_rchange((sort_list+i)->movie->title);
+        printf(", ");
+  			(sort_list+i)->movie=(sort_list+i)->movie->movie_next;
+  		}
+  		colon_rchange((sort_list+i)->movie->title);
+      printf("\n");
+    }
+    else
+    {
+      fprintf(fm,"%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
+
+  		if ((sort_list+i)->sex)
+  			fprintf(fm,"M:");
+  		else
+  			fprintf(fm,"F:");
+
+  		fprintf(fm,"%s:",(sort_list+i)->birth);
+  		while((sort_list+i)->movie->movie_next!=NULL)
+  		{
+  			colon_frchange(fm,(sort_list+i)->movie->title);
+        fprintf(fm,", ");
+  			(sort_list+i)->movie=(sort_list+i)->movie->movie_next;
+  		}
+  		colon_frchange(fm,(sort_list+i)->movie->title);
+      fprintf(fm,"\n");
+    }
 	}
+
+  fclose(fm);
+
+  if (option2!=NULL)
+  {
+    char* opt2=(char*)malloc(sizeof(char)*100);
+    strcpy(opt2,option2);
+    rename("filename_sort_tmp.txt",opt2);
+  }
 
 	printf("Sort Complete!\n");
 
@@ -3211,8 +3265,14 @@ void sort_actor(char option, ACTOR actor)
 
 }
 
-void sort_director(char option, DIRECTOR director)
+void sort_director(char option, DIRECTOR director,char* option2)
 {
+  FILE *fm;
+  if (option2!=NULL)
+  {
+    fm=fopen("filename_sort_tmp.txt","w");
+  }
+
   if (option==0)
     option='n';
   int cnt=0;
@@ -3240,16 +3300,45 @@ void sort_director(char option, DIRECTOR director)
 
     for (int i=0;i<n;i++)
   	{
-  		printf("%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
-      printf("%c:",(sort_list+i)->sex);
-  		printf("%s:",(sort_list+i)->birth);
-  		while((sort_list+i)->movie->movie_next!=NULL)
-  		{
-  			printf("%s,",(sort_list+i)->movie->title);
-  			(sort_list+i)->movie=(sort_list+i)->movie->movie_next;
-  		}
-  		printf("%s\n",(sort_list+i)->movie->title);
+      if (option2==NULL)
+      {
+    		printf("%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
+        printf("%c:",(sort_list+i)->sex);
+    		printf("%s:",(sort_list+i)->birth);
+    		while((sort_list+i)->movie->movie_next!=NULL)
+    		{
+          colon_rchange((sort_list+i)->movie->title);
+          printf(", ");
+    			(sort_list+i)->movie=(sort_list+i)->movie->movie_next;
+    		}
+    		colon_rchange((sort_list+i)->movie->title);
+        printf("\n");
+      }
+      else
+      {
+
+        fprintf(fm,"%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
+    		fprintf(fm,"%c:",(sort_list+i)->sex);
+    		fprintf(fm,"%s:",(sort_list+i)->birth);
+    		while((sort_list+i)->movie->movie_next!=NULL)
+    		{
+          colon_frchange(fm,(sort_list+i)->movie->title);
+          fprintf(fm,", ");
+    			(sort_list+i)->movie=(sort_list+i)->movie->movie_next;
+    		}
+        colon_frchange(fm,(sort_list+i)->movie->title);
+        fprintf(fm,"\n");
+      }
   	}
+
+    fclose(fm);
+
+    if (option2!=NULL)
+    {
+      char* opt2=(char*)malloc(sizeof(char)*100);
+      strcpy(opt2,option2);
+      rename("filename_sort_tmp.txt",opt2);
+    }
 
   	printf("Sort Complete!\n");
 
@@ -3257,7 +3346,7 @@ void sort_director(char option, DIRECTOR director)
 
 }
 
-void sort_movie(char option, struct movie* movie)
+void sort_movie(char option, struct movie* movie,char* option2)
 {
   if (option==0)
     option='t';
@@ -3265,6 +3354,12 @@ void sort_movie(char option, struct movie* movie)
 	int n=count_movie_list(movie);
 	struct movie* movie_tmp=movie;
 	struct movie* sort_list=(struct movie*)malloc(sizeof(struct movie)*n);
+
+  FILE *fm;
+  if (option2!=NULL)
+  {
+    fm=fopen("filename_sort_tmp.txt","w");
+  }
 
 	while(movie_tmp->movie_next!=NULL)
 	{
@@ -3289,17 +3384,42 @@ void sort_movie(char option, struct movie* movie)
 
     for (int i=0;i<n;i++)
   	{
-  		printf("%d:%s:",(sort_list+i)->Serial_number,(sort_list+i)->title);
-      printf("%s:",(sort_list+i)->genre);
-  		printf("%s:",(sort_list+i)->director.name);
-      printf("%d:%d:",(sort_list+i)->year,(sort_list+i)->time);
-  		while((sort_list+i)->actor->actor_next!=NULL)
-  		{
-  			printf("%s,",(sort_list+i)->actor->actor_name);
-  			(sort_list+i)->actor=(sort_list+i)->actor->actor_next;
-  		}
-  		printf("%s\n",(sort_list+i)->actor->actor_name);
+      if (option2==NULL)
+      {
+    		printf("%d:%s:",(sort_list+i)->Serial_number,(sort_list+i)->title);
+        printf("%s:",(sort_list+i)->genre);
+    		printf("%s:",(sort_list+i)->director.name);
+        printf("%d:%d:",(sort_list+i)->year,(sort_list+i)->time);
+    		while((sort_list+i)->actor->actor_next!=NULL)
+    		{
+    			printf("%s,",(sort_list+i)->actor->actor_name);
+    			(sort_list+i)->actor=(sort_list+i)->actor->actor_next;
+    		}
+    		printf("%s\n",(sort_list+i)->actor->actor_name);
+      }
+      else
+      {
+        fprintf(fm,"%d:%s:",(sort_list+i)->Serial_number,(sort_list+i)->title);
+        fprintf(fm,"%s:",(sort_list+i)->genre);
+    		fprintf(fm,"%s:",(sort_list+i)->director.name);
+        fprintf(fm,"%d:%d:",(sort_list+i)->year,(sort_list+i)->time);
+    		while((sort_list+i)->actor->actor_next!=NULL)
+    		{
+    			fprintf(fm,"%s,",(sort_list+i)->actor->actor_name);
+    			(sort_list+i)->actor=(sort_list+i)->actor->actor_next;
+    		}
+    		fprintf(fm,"%s\n",(sort_list+i)->actor->actor_name);
+      }
   	}
+
+    fclose(fm);
+    if (option2!=NULL)
+    {
+      char* opt2=(char*)malloc(sizeof(char)*100);
+      strcpy(opt2,option2);
+      rename("filename_sort_tmp.txt",opt2);
+    }
+
 
   	printf("Sort Complete!\n");
 
