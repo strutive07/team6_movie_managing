@@ -1009,14 +1009,19 @@ void option_add_movie(struct movie *movie){
 
   printf("actor > ");
   gets(tmp_char);
-  fseek(mv_log_read,0,SEEK_END);
-  int file_size = ftell(mv_log_read);
-  printf("\n==\n%d\n=\n", file_size);
+  // fseek(mv_log_read,0,SEEK_END);
+  // int file_size = ftell(mv_log_read);
+  // printf("\n==\n%d\n=\n", file_size);
 
   inMovie -> movie_next = NULL;
   lastMovie = search_last_movie(movie);
-  lastMovie -> movie_next = inMovie;
-  inMovie -> Serial_number = (lastMovie -> Serial_number) +1 ;
+  if(lastMovie == NULL){
+        inMovie -> Serial_number = 1 ;
+  }else{
+    lastMovie -> movie_next = inMovie;
+    inMovie -> Serial_number = (lastMovie -> Serial_number) +1 ;
+  }
+
   inMovie -> actor = create_actor_struct(tmp_char);
   int tmp_flag_for_overlap_check = 0;
   while(tmp_head_movie != NULL){
@@ -1051,19 +1056,7 @@ void option_add_movie(struct movie *movie){
       tmp_head_movie = tmp_head_movie -> movie_next;
     }
   }
-  if(file_size){
-    fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
-    struct linked_list_actor *tmp_print_actor = inMovie -> actor;
-    while(tmp_print_actor != NULL){
-      if(tmp_print_actor -> actor_next == NULL){
-        fprintf(mv_log_write, "%s", tmp_print_actor -> actor_name);
-      }else{
-        fprintf(mv_log_write, "%s, ", tmp_print_actor -> actor_name);
-      }
-      tmp_print_actor = tmp_print_actor -> actor_next;
-    }
-    fprintf(mv_log_write, "\n");
-  }else{
+  if(1){
     fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
     struct linked_list_actor *tmp_print_actor = inMovie -> actor;
     while(tmp_print_actor != NULL){
@@ -1076,6 +1069,19 @@ void option_add_movie(struct movie *movie){
     }
     fprintf(mv_log_write, "\n");
   }
+  // else{
+  //   fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
+  //   struct linked_list_actor *tmp_print_actor = inMovie -> actor;
+  //   while(tmp_print_actor != NULL){
+  //     if(tmp_print_actor -> actor_next == NULL){
+  //       fprintf(mv_log_write, "%s", tmp_print_actor -> actor_name);
+  //     }else{
+  //       fprintf(mv_log_write, "%s, ", tmp_print_actor -> actor_name);
+  //     }
+  //     tmp_print_actor = tmp_print_actor -> actor_next;
+  //   }
+  //   fprintf(mv_log_write, "\n");
+  // }
   free(tmp_char);
   fclose(mv_log_read);
   fclose(mv_log_write);
@@ -1152,15 +1158,19 @@ void option_add_director(DIRECTOR public_first_director){
 
   printf("best movie > ");
   gets(tmp_char);
-  fseek(director_log_read,0,SEEK_END);
-  int file_size = ftell(director_log_read);
+  // fseek(director_log_read,0,SEEK_END);
+  // int file_size = ftell(director_log_read);
 
 
   director -> director_next = NULL;
   LastDirector = serach_last_director(public_first_director);
+  if(LastDirector == NULL){
+        director -> serial_number = 1 ;
+  }else{
+    LastDirector -> director_next = director;
+    director -> serial_number = (LastDirector -> serial_number) +1 ;
+  }
 
-  LastDirector -> director_next = director;
-  director -> serial_number = (LastDirector -> serial_number) +1 ;
 
   char* split = strtok(tmp_char, ",");
 
@@ -1175,19 +1185,7 @@ void option_add_director(DIRECTOR public_first_director){
     MOVIE movie_tmp = list_movie_director(split);
     movie = put_list_movie_director(movie, movie_tmp);
   }
-  if(file_size){
-    fprintf(director_log_write, "add:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
-    MOVIE tmp_print_movie = director -> movie;
-    while(tmp_print_movie != NULL){
-      if(tmp_print_movie -> movie_next == NULL){
-        fprintf(director_log_write, "%s", tmp_print_movie -> title);
-      }else{
-        fprintf(director_log_write, "%s, ", tmp_print_movie -> title);
-      }
-      tmp_print_movie = tmp_print_movie -> movie_next;
-    }
-    fprintf(director_log_write, "\n");
-  }else{
+  if(1){
     fprintf(director_log_write, "add:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
     MOVIE tmp_print_movie = director -> movie;
     while(tmp_print_movie != NULL){
@@ -1200,6 +1198,19 @@ void option_add_director(DIRECTOR public_first_director){
     }
     fprintf(director_log_write, "\n");
   }
+  // else{
+  //   fprintf(director_log_write, "add:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
+  //   MOVIE tmp_print_movie = director -> movie;
+  //   while(tmp_print_movie != NULL){
+  //     if(tmp_print_movie -> movie_next == NULL){
+  //       fprintf(director_log_write, "%s", tmp_print_movie -> title);
+  //     }else{
+  //       fprintf(director_log_write, "%s, ", tmp_print_movie -> title);
+  //     }
+  //     tmp_print_movie = tmp_print_movie -> movie_next;
+  //   }
+  //   fprintf(director_log_write, "\n");
+  // }
   free(tmp_char);
   fclose(director_log_read);
   fclose(director_log_write);
@@ -1208,11 +1219,12 @@ void option_add_director(DIRECTOR public_first_director){
 }
 DIRECTOR serach_last_director(DIRECTOR public_first_director){
   DIRECTOR director = public_first_director;
-  printf("\n==\n%d\n=\n", director -> serial_number);
+  if(public_first_director == NULL){
+    return NULL;
+  }
   while((director -> director_next) != NULL){
     director = director -> director_next;
   }
-  printf("\n==\n%d\n=\n", director -> serial_number);
   return director;
 }
 void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie *movie, DIRECTOR director, ACTOR actor){
@@ -1562,22 +1574,12 @@ void option_add_actor(ACTOR public_actor){
 
   printf("best movie > ");
   gets(tmp_char);
-  fseek(actor_log_read,0,SEEK_END);
-  int file_size = ftell(actor_log_read);
-
-
-  actor -> actor_next = NULL;
-  LastActor = serach_last_actor(public_actor);
-
-  LastActor -> actor_next = actor;
-  actor -> serial_number = (LastActor -> serial_number) +1 ;
-
+  printf("%s", tmp_char);
+  // fseek(actor_log_read,0,SEEK_END);
   char* split = strtok(tmp_char, ",");
-
   MOVIE movie;
   movie = list_movie_director(split);
   actor -> movie = movie;
-
   while((split = strtok(NULL, ",")) != NULL){
     if(*split+0 == ' '){
       strcpy(split, split+1);
@@ -1585,25 +1587,24 @@ void option_add_actor(ACTOR public_actor){
     MOVIE movie_tmp = list_movie_director(split);
     movie = put_list_movie_director(movie, movie_tmp);
   }
-  if(file_size){
+  int file_size = ftell(actor_log_read);
+  actor -> actor_next = NULL;
+
+  LastActor = serach_last_actor(public_actor);
+  if(LastActor == NULL){
+    actor -> serial_number = 1 ;
+  }else{
+    LastActor -> actor_next = actor;
+    actor -> serial_number = (LastActor -> serial_number) +1 ;
+  }
+
+  if(1){
     if(actor -> sex){
       fprintf(actor_log_write, "add:%d:%s:M:%s:", actor -> serial_number, actor -> name, actor -> birth);
     }else{
       fprintf(actor_log_write, "add:%d:%s:F:%s:", actor -> serial_number, actor -> name, actor -> birth);
     }
 
-    MOVIE tmp_print_movie = actor -> movie;
-    while(tmp_print_movie != NULL){
-      if(tmp_print_movie -> movie_next == NULL){
-        fprintf(actor_log_write, "%s", tmp_print_movie -> title);
-      }else{
-        fprintf(actor_log_write, "%s, ", tmp_print_movie -> title);
-      }
-      tmp_print_movie = tmp_print_movie -> movie_next;
-    }
-    fprintf(actor_log_write, "\n");
-  }else{
-    fprintf(actor_log_write, "add:%d:%s:%c:%s:", actor -> serial_number, actor -> name, actor -> sex, actor -> birth);
     MOVIE tmp_print_movie = actor -> movie;
     while(tmp_print_movie != NULL){
       if(tmp_print_movie -> movie_next == NULL){
@@ -1623,6 +1624,9 @@ void option_add_actor(ACTOR public_actor){
 }
 ACTOR serach_last_actor(ACTOR public_actor){
   ACTOR actor = public_actor;
+  if(public_actor == NULL){
+    return NULL;
+  }
   while((actor -> actor_next) != NULL){
     actor = actor -> actor_next;
   }
