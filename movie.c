@@ -249,6 +249,9 @@ void update_movie(struct movie* movie, FILE *mv_log){
 }
 
 struct movie *search_last_movie(struct movie *movie){
+  if(movie == NULL){
+    return NULL;
+  }
   while((movie -> movie_next)!=NULL){
     movie = movie -> movie_next;
   }
