@@ -23,8 +23,9 @@ ACTOR move_serial_actor(int serial, ACTOR origin);
 void update_list_movie(char *option, char *serial, struct movie *movie);
 struct movie* move_serial_movie(int serial, struct movie *origin);
 
-int director_overlap(DIRECTOR director);
-int actor_overlap(ACTOR actor);
+int director_overlap(char *tmp);
+int actor_overlap(char *tmp);
+int movie_overlap(char *tmp);
 
 void colon_rchange(char *tmp_char);
 
