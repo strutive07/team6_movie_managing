@@ -164,19 +164,32 @@ void whats_up_commander(){
 
           if(*option == '-')
           strcpy(option, option+1);
-
+          int search_flag = 1;
         while(*option != '\0'){
           if(*option == 'm'){
-            option_search_movie(public_first_movie, option2);
+            int tmp_flag = 1;
+            tmp_flag = option_search_movie(public_first_movie, option2);
+            if(search_flag == 1){
+              search_flag = tmp_flag;
+            }
           }else if(*option == 'd'){
-            option_search_director(public_director, option2);
+            int tmp_flag = 1;
+            tmp_flag = option_search_director(public_director, option2);
+            if(search_flag == 1){
+              search_flag = tmp_flag;
+            }
           }else if(*option == 'a'){
-            option_search_actor(public_actor, option2);
+            int tmp_flag = 1;
+            tmp_flag = option_search_actor(public_actor, option2);
+            if(search_flag == 1){
+              search_flag = tmp_flag;
+            }
           }
           strcpy(option, option+1);
         }
-
-
+        if(search_flag == 0){
+          printf("@@ No such record.\n");
+        }
       }
 
       if(!strcmp(split, "sort")){
@@ -1547,7 +1560,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
             }
             if(flag == 0){
               if(search_last_meta_cnt == 0){
-                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                 last_flag = 1;
                 return 1;
                 break;
@@ -1599,7 +1612,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
               }
               if(z == tmp_string_length){
                 if(search_last_meta_cnt == 0){
-                  printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                  // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                   last_flag = 1;
                   return 1;
                   break;
@@ -1657,7 +1670,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
             }
             if(z == tmp_string_length){
               if(search_last_meta_cnt == 0){
-                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                 last_flag = 1;
                 return 1;
                 break;
@@ -1691,7 +1704,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
       }
     }
     if(flag == 0){
-      printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+      // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
       return 1;
     }else{
       return 0;
@@ -1748,17 +1761,17 @@ int option_search_movie(struct movie* movie, char* search_string){
         }
         tmp_print_actor = tmp_print_actor -> actor_next;
       }
+      printf("\n");
     }
     movie = movie -> movie_next;
   }
   if(flag == 0){
-    printf("no %s in movie", search_string);
+    // printf("no %s in movie", search_string);
     return 0;
   }else{
     return 1;
   }
 }
-
 
 
 int option_search_director(DIRECTOR director, char* search_string){
@@ -1802,17 +1815,18 @@ int option_search_director(DIRECTOR director, char* search_string){
         }
         tmp_print_movie = tmp_print_movie -> movie_next;
       }
+      printf("\n");
     }
+
     director = director -> director_next;
   }
   if(flag == 0){
-    printf("no %s in director", search_string);
+    // printf("no %s in director", search_string);
     return 0;
   }else{
     return 1;
   }
 }
-
 char* now_time_string(){
       time_t timer;
       struct tm *t_time;
@@ -1906,17 +1920,17 @@ int option_search_actor(ACTOR actor, char* search_string){
         }
         tmp_print_movie = tmp_print_movie -> movie_next;
       }
+      printf("\n");
     }
     actor = actor -> actor_next;
   }
   if(flag == 0){
-    printf("no %s in actor", search_string);
+    // printf("no %s in actor", search_string);
     return 0;
   }else{
     return 1;
   }
 }
-
 void save_list_movie(char* option, struct movie *movie, char* option2)
 {
   FILE *fp, *tmp, *tmp_print;
