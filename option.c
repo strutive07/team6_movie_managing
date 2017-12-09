@@ -954,7 +954,7 @@ void print_list_movie(struct movie *movie, char *serial){
     while(movie_printonly != NULL){
       b++;
       printf("A%d : ", b);
-      printf("%s",movie_printonly -> actor_name);
+      colon_rchange(movie_printonly -> actor_name);
       if(movie_printonly -> actor_pointer == NULL){
       putchar('\n');
       }else{
