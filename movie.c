@@ -214,7 +214,7 @@ struct movie *parse_movie(char* buffer, int isFirst){
   }else if(!strcmp(parse_char, "delete")){
     parse_char = strtok(NULL,":");
     int serial_num = atoi(parse_char);
-    option_delete_movie(serial_num, public_first_movie);
+    option_delete_movie(serial_num, public_first_movie, true);
   }
 }
 char* colon_change(char* tmp_char){
