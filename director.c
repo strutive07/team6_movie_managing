@@ -114,7 +114,7 @@ void init_director()
         DIRECTOR update_director = director;
         MOVIE update_movie;
         update_director = move_serial_director(serial_number_integer, update_director);
-        movie = update_director->movie;
+        update_movie = update_director->movie;
 
         // name
         split = strtok(NULL, ":");
@@ -159,20 +159,16 @@ void init_director()
         }
         else
         {
-          free(movie);
-          movie = (MOVIE)malloc(sizeof(struct best_movie));
-
           split = strtok(title, ",\n");
-          strcpy(movie->title, title);
+          update_movie = list_movie_director(split);
           while(split = strtok(NULL, ",\n"))
           {
-            movie = movie->movie_next;
-            movie = (MOVIE)malloc(sizeof(struct best_movie));
+            MOVIE update_movie_next = NULL;
             strcpy(split, split+1);
-            strcpy(movie->title, split);
+            update_movie_next = list_movie_director(split);
+            update_movie = put_list_movie_director(update_movie, update_movie_next);
           }
         }
-
         continue;
       }
 
