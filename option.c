@@ -276,7 +276,6 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   char option_letter = *option;
   char *tmp;
   char *tmp2 = (char*)malloc(sizeof(char)*100);
-
   int update_check = 1;
   int overlap = 0;
 
@@ -317,6 +316,7 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   char letter = *tmp;
   if(letter != 'M' && letter != 'W'){
     printf("Wrong(Only M or W)\n");
+    i--;
     break;
   }
   update_check *= 3;
@@ -334,17 +334,24 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   case 'm':
   printf("Director movie > ");
   gets(tmp); // 문장 받고
-  if((tmp2 = strtok(tmp, ",")) != NULL){ // 자르고
-  movie_copy_tmp->title = (char*)malloc(strlen(tmp2)+1); // 공간 만든다음
-  strcpy(movie_copy_tmp -> title, colon_change(tmp2)); // 문장 넣어주고
 
+  if((tmp2 = strtok(tmp, ",")) != NULL){ // 자르고
+  movie_copy_tmp->title = (char*)malloc(strlen(tmp2)+5); // 공간 만든다음
+  strcpy(movie_copy_tmp -> title, colon_change(tmp2)); // 문장 넣어주고
   while((tmp2 = strtok(NULL,",")) != NULL){ // 잘라서 더 있으면
+    if(movie_copy_tmp -> movie_next == NULL){
+      MOVIE next_movie = (MOVIE)malloc(sizeof(struct best_movie));
+      movie_copy_tmp -> movie_next = next_movie;
+      next_movie -> title = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후 <- 에러
+      strcpy(next_movie -> title, colon_change(tmp2)); // 내용을 복사해서 넣고
+    }else{
     movie_copy_tmp = movie_copy_tmp -> movie_next; // next로 넘겨서
-    movie_copy_tmp -> title = (char*)malloc(strlen(tmp2)+1); // title에 공간을 할당한 후
+    movie_copy_tmp -> title = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후
     strcpy(movie_copy_tmp -> title, colon_change(tmp2)); // 내용을 복사해서 넣고
+      }
+    }
     lint_movie_to_director(public_director, public_first_movie); // 링크로 연결할게 있는지 체크
     link_director_to_movie();
-    }
   }
   free(tmp);
   update_check *= 7;
@@ -392,7 +399,6 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
 
      fclose(write_in_log);
      fprint_list_movie_director_actor('D', public_first_movie, public_director, public_actor);
-
 }
 
 
@@ -485,16 +491,20 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
   case 'm':
   printf("Actor movie > ");
   gets(tmp);
-  if((tmp2 = strtok(tmp, ",")) != NULL){
-  movie_copy_tmp->title = (char*)malloc(strlen(tmp2)+1);
-  strcpy(movie_copy_tmp -> title, colon_change(tmp2));
-
-  while((tmp2 = strtok(NULL,",")) != NULL){
-    movie_copy_tmp = movie_copy_tmp -> movie_next;
-    movie_copy_tmp -> title = (char*)malloc(strlen(tmp2)+1); // next 이후 title 접근 자체가 문제?
-    strcpy(movie_copy_tmp -> title, colon_change(tmp2));
-    lint_movie_to_actor(public_actor, public_first_movie);
-    link_actor_to_movie();
+  if((tmp2 = strtok(tmp, ",")) != NULL){ // 자르고
+  movie_copy_tmp->title = (char*)malloc(strlen(tmp2)+5); // 공간 만든다음
+  strcpy(movie_copy_tmp -> title, colon_change(tmp2)); // 문장 넣어주고
+  while((tmp2 = strtok(NULL,",")) != NULL){ // 잘라서 더 있으면
+    if(movie_copy_tmp -> movie_next == NULL){
+      MOVIE next_movie = (MOVIE)malloc(sizeof(struct best_movie));
+      movie_copy_tmp -> movie_next = next_movie;
+      next_movie -> title = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후 <- 에러
+      strcpy(next_movie -> title, colon_change(tmp2)); // 내용을 복사해서 넣고
+    }else{
+    movie_copy_tmp = movie_copy_tmp -> movie_next; // next로 넘겨서
+    movie_copy_tmp -> title = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후
+    strcpy(movie_copy_tmp -> title, colon_change(tmp2)); // 내용을 복사해서 넣고
+      }
     }
   }
   free(tmp);
@@ -653,15 +663,20 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
   case 'a':
   printf("Movie actor > ");
   gets(tmp);
-  if((tmp2 = strtok(tmp, ",")) != NULL){
-  actor_copy_tmp->actor_name = (char*)malloc(strlen(tmp2)+1);
-  strcpy(actor_copy_tmp -> actor_name, colon_change(tmp2));
-
-  while((tmp2 = strtok(NULL,",")) != NULL){
-    actor_copy_tmp = actor_copy_tmp -> actor_next;
-    actor_copy_tmp -> actor_name = (char*)malloc(strlen(tmp2)+1); // next 이후 title 접근 자체가 문제?
-    strcpy(actor_copy_tmp -> actor_name, colon_change(tmp2));
-
+  if((tmp2 = strtok(tmp, ",")) != NULL){ // 자르고
+  actor_copy_tmp->actor_name = (char*)malloc(strlen(tmp2)+5); // 공간 만든다음
+  strcpy(actor_copy_tmp -> actor_name, colon_change(tmp2)); // 문장 넣어주고
+  while((tmp2 = strtok(NULL,",")) != NULL){ // 잘라서 더 있으면
+    if(actor_copy_tmp -> actor_next == NULL){
+      struct linked_list_actor *next_actor = (struct linked_list_actor*)malloc(sizeof(struct linked_list_actor));
+      actor_copy_tmp -> actor_next = next_actor;
+      next_actor -> actor_name = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후 <- 에러
+      strcpy(next_actor -> actor_name, colon_change(tmp2)); // 내용을 복사해서 넣고
+    }else{
+    actor_copy_tmp = actor_copy_tmp -> actor_next; // next로 넘겨서
+    actor_copy_tmp -> actor_name = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후
+    strcpy(actor_copy_tmp -> actor_name, colon_change(tmp2)); // 내용을 복사해서 넣고
+      }
     }
   }
   lint_movie_to_actor(public_actor, public_first_movie);
