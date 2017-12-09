@@ -78,7 +78,7 @@ void print_movie_actor(MOVIE movie)
 
     if(movie->movie_next == NULL)
     {
-      fprintf(actor_list, "%s", movie->title);
+      fprintf(actor_list, "%s\n", movie->title);
     }
     else
     {
@@ -153,12 +153,12 @@ void actor_rtol(char* actor_str)
    MOVIE movie_tmp=NULL;
    ACTOR actor = NULL, actor_tmp=NULL;
    char* tag = strtok(actor_str, ":");
+   char *tmp;
 
    if (!(strcmp(tag, "add")))
    {
       struct actor *actor_info;
       actor_info = (struct actor*)malloc(sizeof(struct actor));
-      char *tmp;
       char *best_movie_tmp;
 
       tmp = strtok(NULL, ":");
@@ -179,12 +179,12 @@ void actor_rtol(char* actor_str)
       strcpy(actor_info->birth, tmp);
 
       tmp = strtok(NULL, ":");
-      best_movie_tmp = strtok(tmp, ",");
+      best_movie_tmp = strtok(tmp, ",\n");
          printf("%s\n", best_movie_tmp);
       if (actor_info->movie == NULL)
          actor_info->movie = list_movie_actor(best_movie_tmp);
 
-      while (best_movie_tmp = strtok(NULL, ","))
+      while (best_movie_tmp = strtok(NULL, ",\n"))
       {
          printf("%s\n", best_movie_tmp);
          strcpy(best_movie_tmp, best_movie_tmp + 1);
@@ -200,6 +200,102 @@ void actor_rtol(char* actor_str)
          // actor_tmp = list_actor(actor_info->serial_number, actor_info->name, actor_info->sex, actor_info->birth, actor_info->movie);
          put_list_actor(public_actor, actor_info);
       }
+   }
+   else if (!(strcmp(tag, "delete")))
+   {
+     tmp=strtok(NULL,":");
+     int num=atoi(tmp);
+     option_delete_actor(num,public_actor,true);
+   }
+   else if (!(strcmp(tag,"update")))
+   {
+      ACTOR actor=public_actor;
+      tmp=strtok(NULL,":");
+      int num=atoi(tmp);
+      if (num!=1)
+        actor=move_serial_actor(num,actor);
+
+      if (actor==NULL)
+      {
+        printf("No Such Record while loading actor_log.txt\n");
+        exit(1);
+      }
+
+      tmp=strtok(NULL,":");
+      if (strlen(tmp)==0)
+      {
+
+      }
+      else if (strlen(tmp)==1 && *(tmp+0)=='=')
+      {
+
+      }
+      else
+      {
+        free(actor->name);
+        actor->name=(char*)malloc(strlen(tmp)+5);
+        strcpy(actor->name,colon_change(tmp));
+      }
+
+      tmp=strtok(NULL,":");
+      if (strlen(tmp)==0)
+      {
+
+      }
+      else if (strlen(tmp)==1 && *(tmp+0)=='=')
+      {
+
+      }
+      else
+      {
+        if (!strcmp(tmp,"M"))
+          actor->sex=true;
+        else
+          actor->sex=false;
+      }
+
+      tmp=strtok(NULL,":");
+      if (strlen(tmp)==0)
+      {
+
+      }
+      else if (strlen(tmp)==1 && *(tmp+0)=='=')
+      {
+
+      }
+      else
+      {
+        free(actor->birth);
+        actor->birth=(char*)malloc(strlen(tmp)+5);
+        strcpy(actor->birth,colon_change(tmp));
+      }
+
+      tmp=strtok(NULL,":\n");
+
+      if (strlen(tmp)==0)
+      {
+
+      }
+      else if (strlen(tmp)==1 && *(tmp+0)=='=')
+      {
+
+      }
+      else
+      {
+        char *best_movie_tmp;
+
+        best_movie_tmp = strtok(tmp, ",\n");
+
+        actor->movie = list_movie_actor(best_movie_tmp);
+
+        while (best_movie_tmp = strtok(NULL, ",\n"))
+        {
+           strcpy(best_movie_tmp, best_movie_tmp + 1);
+           movie_tmp = list_movie_actor(best_movie_tmp);
+           actor->movie = put_list_movie_actor(actor->movie, movie_tmp);
+        }
+      }
+
    }
 }
 
@@ -276,7 +372,7 @@ void link_actor_to_movie()
 {
 	int result;
 	ACTOR public_actor_tmp=public_actor;
-	
+
 	while(public_actor_tmp!=NULL)
 	{
 		result=search_actor_to_movie(public_actor_tmp);
