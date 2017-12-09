@@ -167,6 +167,8 @@ void init_director()
             strcpy(split, split+1);
             update_movie_next = list_movie_director(split);
             update_movie = put_list_movie_director(update_movie, update_movie_next);
+
+            update_director = list_director(serial_number, name, sex, birth, update_movie);
           }
         }
         continue;
