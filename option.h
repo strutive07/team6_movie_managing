@@ -28,6 +28,7 @@ int actor_overlap(char *tmp);
 int movie_overlap(char *tmp);
 
 void colon_rchange(char *tmp_char);
+void colon_frchange(FILE* fm,char *tmp_char);
 
 void print_list_director(DIRECTOR director, char *serial);
 void print_list_actor(ACTOR actor, char *serial);

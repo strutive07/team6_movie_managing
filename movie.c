@@ -87,7 +87,7 @@ void lint_movie_to_actor(ACTOR argument_actor, struct movie* argument_movie){
 
 struct linked_list_actor *create_actor_struct(char * actor_parse){
   char *p;
-  p=strtok(actor_parse,",");
+  p=strtok(actor_parse,",\n");
   struct linked_list_actor *actor = malloc(sizeof(struct linked_list_actor));
   actor -> actor_name = (char*)malloc(sizeof(char)*strlen(p+5));
   // actor -> actor_name = colon_change(p);
@@ -96,7 +96,7 @@ struct linked_list_actor *create_actor_struct(char * actor_parse){
 
   actor -> actor_next = NULL;
   struct linked_list_actor *Tmp_Actor_pointer = actor;
-  while((p=strtok(NULL,","))!=NULL){
+  while((p=strtok(NULL,",\n"))!=NULL){
     if(*p+0 == ' '){
       strcpy(p, p+1);
     }
@@ -150,12 +150,14 @@ struct movie *parse_movie(char* buffer, int isFirst){
     inMovie -> actor = create_actor_struct(actor_parse);
     return inMovie;
   }else if(!strcmp(parse_char, "update")){
+    printf("updateupdateupdateupdate");
     struct movie *movies = public_first_movie;
     parse_char = strtok(NULL,":");
     int serial_num = atoi(parse_char);
     if(serial_num != 1){
       movies = move_serial_movie(serial_num, movies);
     }
+    printf("asdfasdf :<::::<< %s\n", movies-> title);
     if(movies == NULL){
       printf("No Such Record while loading movie_log.txt\n");
       exit(1);
@@ -210,7 +212,9 @@ struct movie *parse_movie(char* buffer, int isFirst){
 
     movies -> actor = create_actor_struct(parse_char);
   }else if(!strcmp(parse_char, "delete")){
-
+    parse_char = strtok(NULL,":");
+    int serial_num = atoi(parse_char);
+    option_delete_movie(serial_num, public_first_movie, true);
   }
 }
 char* colon_change(char* tmp_char){
@@ -245,6 +249,9 @@ void update_movie(struct movie* movie, FILE *mv_log){
 }
 
 struct movie *search_last_movie(struct movie *movie){
+  if(movie == NULL){
+    return NULL;
+  }
   while((movie -> movie_next)!=NULL){
     movie = movie -> movie_next;
   }

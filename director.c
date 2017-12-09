@@ -25,7 +25,7 @@ void init_director()
 
   fseek(log, SEEK_SET, SEEK_END);
   size = ftell(log);
-  line = (char*)malloc(size+1);
+  line = (char*)malloc(size+3);
   fseek(log, 0, SEEK_SET);
 
   while(fgets(line, size, log))
@@ -36,78 +36,144 @@ void init_director()
       MOVIE movie_tmp;
       char *split, *origin;
       char *tag, *serial_number, *name, *sex, *birth, *title;
+      int serial_number_integer;
       // printf("입력받은 문장 > %s" , line);
-      origin = (char*)malloc(size);
+      origin = (char*)malloc(size+3);
       strcpy(origin, line);
 
       // tag
       split = strtok(line, ":");
-      tag = (char*)malloc(strlen(split)+1);
+      tag = (char*)malloc(strlen(split)+3);
       strcpy(tag, split);
-      if(!strcmp(tag, "add"))
-      {
-        add_list_director(list, origin+4);
-      }
-      else if(!strcmp(tag, "delete"))
-      {
-        // continue;
-      }
-      else if(!strcmp(tag, "update"))
-      {
-
-      }
       // printf(">>> tag : %s\n", tag);
       // serial_number
       split = strtok(NULL, ":");
-      serial_number = (char*)malloc(strlen(split)+1);
+      serial_number = (char*)malloc(strlen(split)+3);
       strcpy(serial_number, split);
+      serial_number_integer = atoi(serial_number);
       // printf(">>> serial_number : %s\n", serial_number);
-      // name
-      split = strtok(NULL, ":");
-      name = (char*)malloc(strlen(split)+1);
-      strcpy(name, split);
-      // printf(">>> name : %s\n", name);
-      // sex
-      split = strtok(NULL, ":");
-      sex = (char*)malloc(strlen(split)+1);
-      strcpy(sex, split);
-      // printf(">>> sex : %s\n", sex);
-      // birth
-      split = strtok(NULL, ":");
-      birth = (char*)malloc(strlen(split)+1);
-      strcpy(birth, split);
-      // printf(">>> birth : %s\n", birth);
-      // title
-      split = strtok(NULL, ":");
-      title = (char*)malloc(strlen(split)+1);
-      strcpy(title, split);
-      *(title + strlen(title) - 1) = '\0';
+      if(!strcmp(tag, "add"))
+      {
+        add_list_director(list, origin+4);
 
-      // title
-      split = strtok(title, ",\n");
-      // printf("MOVIE TITLE : %s \n", split);
-      if(movie == NULL)
-      {
-        movie = list_movie_director(split);
-      }
-      while(split = strtok(NULL, ",\n"))
-      {
-        strcpy(split, split+1);
+        // name
+        split = strtok(NULL, ":");
+        name = (char*)malloc(strlen(split)+3);
+        strcpy(name, split);
+        // printf(">>> name : %s\n", name);
+        // sex
+        split = strtok(NULL, ":");
+        sex = (char*)malloc(strlen(split)+3);
+        strcpy(sex, split);
+        // printf(">>> sex : %s\n", sex);
+        // birth
+        split = strtok(NULL, ":");
+        birth = (char*)malloc(strlen(split)+3);
+        strcpy(birth, split);
+        // printf(">>> birth : %s\n", birth);
+        // title
+        split = strtok(NULL, ":");
+        title = (char*)malloc(strlen(split)+3);
+        strcpy(title, split);
+        *(title + strlen(title) - 1) = '\0';
+
+        // title
+        split = strtok(title, ",\n");
         // printf("MOVIE TITLE : %s \n", split);
+        if(movie == NULL)
+        {
+          movie = list_movie_director(split);
+        }
+        while(split = strtok(NULL, ",\n"))
+        {
+          strcpy(split, split+1);
+          // printf("MOVIE TITLE : %s \n", split);
 
-        movie_tmp = list_movie_director(split);
-        movie = put_list_movie_director(movie, movie_tmp);
+          movie_tmp = list_movie_director(split);
+          movie = put_list_movie_director(movie, movie_tmp);
+        }
+
+        if(director == NULL)
+        {
+          director = list_director(serial_number, name, sex, birth, movie);
+        }
+        else
+        {
+          director_tmp = list_director(serial_number, name, sex, birth, movie);
+          director = put_list_director(director, director_tmp);
+        }
+      }
+      else if(!strcmp(tag, "delete"))
+      {
+        DIRECTOR delete_director = director;
+        option_delete_director(serial_number_integer, delete_director, true);
+        continue;
+      }
+      else if(!strcmp(tag, "update"))
+      {
+        DIRECTOR update_director = director;
+        MOVIE update_movie;
+        update_director = move_serial_director(serial_number_integer, update_director);
+        update_movie = update_director->movie;
+
+        // name
+        split = strtok(NULL, ":");
+        name = (char*)malloc(strlen(split)+3);
+        strcpy(name, split);
+        if(strcmp(name, "="))
+        {
+          free(update_director->name);
+          update_director->name= (char*)malloc(strlen(name)+3);
+          strcpy(update_director->name, name);
+        }
+        // printf(">>> name : %s\n", name);
+        // sex
+        split = strtok(NULL, ":");
+        sex = (char*)malloc(strlen(split)+3);
+        strcpy(sex, split);
+        if(*sex != '=')
+        {
+          update_director->sex = *sex;
+        }
+        // printf(">>> sex : %s\n", sex);
+        // birth
+        split = strtok(NULL, ":");
+        birth = (char*)malloc(strlen(split)+3);
+        strcpy(birth, split);
+        if(strcmp(birth, "="))
+        {
+          free(update_director->birth);
+          update_director->birth= (char*)malloc(strlen(birth)+3);
+          strcpy(update_director->birth, birth);
+        }
+        // printf(">>> birth : %s\n", birth);
+        // title
+        split = strtok(NULL, ":");
+        title = (char*)malloc(strlen(split)+3);
+        strcpy(title, split);
+        *(title + strlen(title) - 1) = '\0';
+
+        if(!strlen(title))
+        {
+          continue;
+        }
+        else
+        {
+          split = strtok(title, ",\n");
+          update_movie = list_movie_director(split);
+          while(split = strtok(NULL, ",\n"))
+          {
+            MOVIE update_movie_next = NULL;
+            strcpy(split, split+1);
+            update_movie_next = list_movie_director(split);
+            update_movie = put_list_movie_director(update_movie, update_movie_next);
+
+            update_director = list_director(serial_number, name, sex, birth, update_movie);
+          }
+        }
+        continue;
       }
 
-      if(director == NULL)
-      {
-        director = list_director(serial_number, name, sex, birth, movie);
-      }
-      else
-      {
-        director_tmp = list_director(serial_number, name, sex, birth, movie);
-        director = put_list_director(director, director_tmp);
-      }
 
       /*****************************/
       printf("DIRECTOR LIST > \n");
@@ -176,8 +242,8 @@ DIRECTOR list_director(char* serial_number, char* name, char* sex, char* birth, 
    else
    {
       director = (DIRECTOR)malloc(sizeof(struct director));
-      director->name = (char*)malloc(strlen(name)+1);
-      director->birth = (char*)malloc(strlen(birth)+1);
+      director->name = (char*)malloc(strlen(name)+3);
+      director->birth = (char*)malloc(strlen(birth)+3);
 
       director->serial_number = atoi(serial_number);
       director->sex = *sex;
