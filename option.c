@@ -3357,7 +3357,7 @@ int count_movie_list(struct movie* movie)
 	return cnt;
 }
 
-void option_delete_actor(int num,ACTOR actor)
+void option_delete_actor(int num,ACTOR actor,bool from_where)
 {
   ACTOR actor_tmp=actor;
   ACTOR actor_tmp2=actor;
@@ -3443,11 +3443,14 @@ void option_delete_actor(int num,ACTOR actor)
 
     printf("Delete Complete!\n");
 
-    FILE *actor_log_write;
-    actor_log_write=fopen("actor_log.txt","a");
-    fprintf(actor_log_write,"delete:%d::::\n",num);
-    fclose(actor_log_write);
-    fprint_list_movie_director_actor('A',public_first_movie,public_director,public_actor);
+    if (!from_where)
+    {
+      FILE *actor_log_write;
+      actor_log_write=fopen("actor_log.txt","a");
+      fprintf(actor_log_write,"delete:%d::::\n",num);
+      fclose(actor_log_write);
+      fprint_list_movie_director_actor('A',public_first_movie,public_director,public_actor);
+    }
   }
   else
   {
@@ -3455,7 +3458,7 @@ void option_delete_actor(int num,ACTOR actor)
   }
 }
 
-void option_delete_director(int num,DIRECTOR director)
+void option_delete_director(int num,DIRECTOR director,bool from_where)
 {
   DIRECTOR director_tmp=director;
   DIRECTOR director_tmp2=director;
@@ -3537,11 +3540,14 @@ void option_delete_director(int num,DIRECTOR director)
 
     printf("Delete Complete!\n");
 
-    FILE *director_log_write;
-    director_log_write=fopen("director_log.txt","a");
-    fprintf(director_log_write,"delete:%d::::\n",num);
-    fclose(director_log_write);
-    fprint_list_movie_director_actor('D',public_first_movie,public_director,public_actor);
+    if (!from_where)
+    {
+      FILE *director_log_write;
+      director_log_write=fopen("director_log.txt","a");
+      fprintf(director_log_write,"delete:%d::::\n",num);
+      fclose(director_log_write);
+      fprint_list_movie_director_actor('D',public_first_movie,public_director,public_actor);
+    }
   }
   else
   {
@@ -3550,7 +3556,7 @@ void option_delete_director(int num,DIRECTOR director)
 
 }
 
-void option_delete_movie(int num,struct movie* movie)
+void option_delete_movie(int num,struct movie* movie,bool from_where)
 {
   struct movie* movie_tmp=movie;
   struct movie* movie_tmp2=movie;
@@ -3638,12 +3644,14 @@ void option_delete_movie(int num,struct movie* movie)
 
     printf("Delete Complete!\n");
 
-    FILE *movie_log_write;
-    movie_log_write=fopen("movie_log.txt","a");
-    fprintf(movie_log_write,"delete:%d::::\n",num);
-    fclose(movie_log_write);
-
-    fprint_list_movie_director_actor('M',public_first_movie,public_director,public_actor);
+    if (!from_where)
+    {
+      FILE *movie_log_write;
+      movie_log_write=fopen("movie_log.txt","a");
+      fprintf(movie_log_write,"delete:%d::::\n",num);
+      fclose(movie_log_write);
+      fprint_list_movie_director_actor('M',public_first_movie,public_director,public_actor);
+    }
   }
   else
   {

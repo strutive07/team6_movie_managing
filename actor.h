@@ -34,6 +34,8 @@ struct actor
 };
 
 typedef struct actor* ACTOR;
+
+#include "option.h"
 ACTOR public_actor;
 
 MOVIE list_movie_actor(char* title);
