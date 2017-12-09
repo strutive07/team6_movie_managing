@@ -85,11 +85,11 @@ void whats_up_commander(){
         gets(split);
         if(!strcmp(split, "y") || !strcmp(split, "Y")){
           strcpy(option, "ALL COMMANDS");
-          save_list_movie(option, movies);
+          save_list_movie(option, movies, NULL);
           strcpy(option, "ALL COMMANDS");
-          save_list_director(option, director);
+          save_list_director(option, director, NULL);
           strcpy(option, "ALL COMMANDS");
-          save_list_actor(option, actor);
+          save_list_actor(option, actor, NULL);
           exit(1);
         }else if(!strcmp(split, "n") || !strcmp(split, "N")){
           exit(1);
@@ -123,15 +123,15 @@ void whats_up_commander(){
 
         if(!strcmp(command_what, "m"))
         {
-          save_list_movie(option, movies);
+          save_list_movie(option, movies, option2);
         }
         else if(!strcmp(command_what, "d"))
         {
-          save_list_director(option, director);
+          save_list_director(option, director, option2);
         }
         else if(!strcmp(command_what, "a"))
         {
-          save_list_actor(option, actor);
+          save_list_actor(option, actor, option2);
         }else
         {
           continue;
@@ -164,19 +164,32 @@ void whats_up_commander(){
 
           if(*option == '-')
           strcpy(option, option+1);
-
+          int search_flag = 1;
         while(*option != '\0'){
           if(*option == 'm'){
-            option_search_movie(public_first_movie, option2);
+            int tmp_flag = 1;
+            tmp_flag = option_search_movie(public_first_movie, option2);
+            if(search_flag == 1){
+              search_flag = tmp_flag;
+            }
           }else if(*option == 'd'){
-            option_search_director(public_director, option2);
+            int tmp_flag = 1;
+            tmp_flag = option_search_director(public_director, option2);
+            if(search_flag == 1){
+              search_flag = tmp_flag;
+            }
           }else if(*option == 'a'){
-            option_search_actor(public_actor, option2);
+            int tmp_flag = 1;
+            tmp_flag = option_search_actor(public_actor, option2);
+            if(search_flag == 1){
+              search_flag = tmp_flag;
+            }
           }
           strcpy(option, option+1);
         }
-
-
+        if(search_flag == 0){
+          printf("@@ No such record.\n");
+        }
       }
 
       if(!strcmp(split, "sort")){
@@ -870,14 +883,6 @@ void option_add_movie(struct movie *movie){
   printf("title > ");
   gets(tmp_char);
   struct movie *tmp_head_movie = movie;
-  while(tmp_head_movie != NULL){
-    if(!strcmp(tmp_head_movie -> title, tmp_char)){
-      printf("You have the same record.\n");
-      return;
-    }else{
-      tmp_head_movie = tmp_head_movie -> movie_next;
-    }
-  }
   inMovie -> title = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
   strcpy(inMovie -> title , colon_change(tmp_char));
 
@@ -912,8 +917,41 @@ void option_add_movie(struct movie *movie){
   lastMovie -> movie_next = inMovie;
   inMovie -> Serial_number = (lastMovie -> Serial_number) +1 ;
   inMovie -> actor = create_actor_struct(tmp_char);
+  int tmp_flag_for_overlap_check = 0;
+  while(tmp_head_movie != NULL){
+    if(!strcmp(tmp_head_movie -> title, inMovie -> title)){
+      printf("%s", tmp_head_movie -> title);
+      printf("You have the same record in movie list. \n%d:%s:%s:%s:%d:%d:", tmp_head_movie->Serial_number, tmp_head_movie-> title, tmp_head_movie->genre, tmp_head_movie->director.name,tmp_head_movie-> year, tmp_head_movie->time);
+      struct linked_list_actor* tmp_head_overlap_actor = tmp_head_movie -> actor;
+      while(tmp_head_overlap_actor != NULL){
+        if(tmp_head_overlap_actor -> actor_next == NULL){
+          printf("%s", tmp_head_overlap_actor->actor_name );
+          break;
+        }else{
+          printf("%s, ", tmp_head_overlap_actor-> actor_name);
+          tmp_head_overlap_actor = tmp_head_overlap_actor -> actor_next;
+        }
+      }
+      printf("\nDo you want to add any way? ");
+      gets(tmp_char);
+      if(*(tmp_char+0) == 'y' || *(tmp_char+0) == 'Y'){
+        if(*(tmp_char+1) == 'e' || *(tmp_char+1) == 'E'){
+          if(*(tmp_char+2) == 's' || *(tmp_char+2) == 's'){
+            tmp_flag_for_overlap_check = 1;
+          }
+        }
+      }
+      if(tmp_flag_for_overlap_check == 1){
+        break;
+      }else{
+        return;
+      }
+    }else{
+      tmp_head_movie = tmp_head_movie -> movie_next;
+    }
+  }
   if(file_size){
-    fprintf(mv_log_write, "\nadd:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
+    fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
     struct linked_list_actor *tmp_print_actor = inMovie -> actor;
     while(tmp_print_actor != NULL){
       if(tmp_print_actor -> actor_next == NULL){
@@ -923,6 +961,7 @@ void option_add_movie(struct movie *movie){
       }
       tmp_print_actor = tmp_print_actor -> actor_next;
     }
+    fprintf(mv_log_write, "\n");
   }else{
     fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
     struct linked_list_actor *tmp_print_actor = inMovie -> actor;
@@ -934,13 +973,15 @@ void option_add_movie(struct movie *movie){
       }
       tmp_print_actor = tmp_print_actor -> actor_next;
     }
+    fprintf(mv_log_write, "\n");
   }
   free(tmp_char);
   fclose(mv_log_read);
   fclose(mv_log_write);
   fprint_list_movie_director_actor('M', public_first_movie, public_director, public_actor);
+  lint_movie_to_actor(public_actor, public_first_movie);
+  lint_movie_to_director(public_director, public_first_movie);
 }
-
 void option_add_director(DIRECTOR public_first_director){
   DIRECTOR director;
   DIRECTOR LastDirector;
@@ -962,10 +1003,34 @@ void option_add_director(DIRECTOR public_first_director){
   director -> name = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
   strcpy(director -> name , colon_change(tmp_char));
   DIRECTOR tmp_head_director = public_first_director;
+  int tmp_flag_for_overlap_check = 0;
   while(tmp_head_director != NULL){
     if(!strcmp(tmp_head_director -> name, tmp_char)){
-      printf("You have the same record.\n");
-      return;
+      printf("You have the same record in actor list. \n%d:%s:%c:%s:", tmp_head_director->serial_number, tmp_head_director-> name, tmp_head_director->sex, tmp_head_director-> birth);
+      MOVIE tmp_head_overlap_actor = tmp_head_director -> movie;
+      while(tmp_head_overlap_actor != NULL){
+        if(tmp_head_overlap_actor -> movie_next == NULL){
+          printf("%s", tmp_head_overlap_actor->title );
+          break;
+        }else{
+          printf("%s, ", tmp_head_overlap_actor-> title);
+          tmp_head_overlap_actor = tmp_head_overlap_actor -> movie_next;
+        }
+      }
+      printf("\nDo you want to add any way? ");
+      gets(tmp_char);
+      if(*(tmp_char+0) == 'y' || *(tmp_char+0) == 'Y'){
+        if(*(tmp_char+1) == 'e' || *(tmp_char+1) == 'E'){
+          if(*(tmp_char+2) == 's' || *(tmp_char+2) == 's'){
+            tmp_flag_for_overlap_check = 1;
+          }
+        }
+      }
+      if(tmp_flag_for_overlap_check == 1){
+        break;
+      }else{
+        return;
+      }
     }else{
       tmp_head_director = tmp_head_director -> director_next;
     }
@@ -1010,7 +1075,7 @@ void option_add_director(DIRECTOR public_first_director){
     movie = put_list_movie_director(movie, movie_tmp);
   }
   if(file_size){
-    fprintf(director_log_write, "\nadd:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
+    fprintf(director_log_write, "add:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
     MOVIE tmp_print_movie = director -> movie;
     while(tmp_print_movie != NULL){
       if(tmp_print_movie -> movie_next == NULL){
@@ -1020,6 +1085,7 @@ void option_add_director(DIRECTOR public_first_director){
       }
       tmp_print_movie = tmp_print_movie -> movie_next;
     }
+    fprintf(director_log_write, "\n");
   }else{
     fprintf(director_log_write, "add:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
     MOVIE tmp_print_movie = director -> movie;
@@ -1031,13 +1097,14 @@ void option_add_director(DIRECTOR public_first_director){
       }
       tmp_print_movie = tmp_print_movie -> movie_next;
     }
+    fprintf(director_log_write, "\n");
   }
   free(tmp_char);
   fclose(director_log_read);
   fclose(director_log_write);
   fprint_list_movie_director_actor('D', public_first_movie, public_director, public_actor);
+  link_director_to_movie();
 }
-
 DIRECTOR serach_last_director(DIRECTOR public_first_director){
   DIRECTOR director = public_first_director;
   printf("\n==\n%d\n=\n", director -> serial_number);
@@ -1083,7 +1150,20 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
       FILE * create_tmp_mv_list;
       char* time_string = now_time_string();
       char* file_name = (char*)malloc(sizeof(char)*100);
-      strcat(file_name, "movie_list.");
+      *(file_name + 0) = 'm';
+      *(file_name + 1) = 'o';
+      *(file_name + 2) = 'v';
+      *(file_name + 3) = 'i';
+      *(file_name + 4) = 'e';
+      *(file_name + 5) = '_';
+      *(file_name + 6) = 'l';
+      *(file_name + 7) = 'i';
+      *(file_name + 8) = 's';
+      *(file_name + 9) = 't';
+      *(file_name + 10) = '.';
+      *(file_name + 11) = '\0';
+
+      // strcat(file_name, "movie_list.");
       strcat(file_name, time_string);
       if((create_tmp_mv_list = fopen(file_name, "w")) == NULL){
         printf("File Open Error");
@@ -1154,7 +1234,21 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
       FILE * create_tmp_director_list;
       char* time_string = now_time_string();
       char* file_name = (char*)malloc(sizeof(char)*100);
-      strcat(file_name, "director_list.");
+      *(file_name + 0) = 'd';
+      *(file_name + 1) = 'i';
+      *(file_name + 2) = 'r';
+      *(file_name + 3) = 'e';
+      *(file_name + 4) = 'c';
+      *(file_name + 5) = 't';
+      *(file_name + 6) = 'o';
+      *(file_name + 7) = 'r';
+      *(file_name + 8) = '_';
+      *(file_name + 9) = 'l';
+      *(file_name + 10) = 'i';
+      *(file_name + 11) = 's';
+      *(file_name + 12) = 't';
+      *(file_name + 13) = '.';
+      *(file_name + 14) = '\0';
       strcat(file_name, time_string);
       if((create_tmp_director_list = fopen(file_name, "w")) == NULL){
         printf("File Open Error");
@@ -1197,7 +1291,7 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
   }else if(isMovie_DIrector_Actor == 'A'){
     if((tmp_actor_list = fopen("actor_list.txt", "r")) == NULL){
       if((actor_list = fopen("actor_list.txt", "w")) == NULL){
-        printf("File Open Error");
+        printf(" actor_list File Open Error");
         exit(1);
       }
       while(actor != NULL){
@@ -1229,11 +1323,22 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
     }else{
       FILE * create_tmp_actor_list;
       char* time_string = now_time_string();
-      char* file_name = (char*)malloc(sizeof(char)*100);
-      strcat(file_name, "actor_list.");
-      strcat(file_name, time_string);
-      if((create_tmp_actor_list = fopen(file_name, "w")) == NULL){
-        printf("File Open Error");
+      char* ffile_nname = (char*)malloc(sizeof(char)*50);
+      *(ffile_nname + 0) = 'a';
+      *(ffile_nname + 1) = 'c';
+      *(ffile_nname + 2) = 't';
+      *(ffile_nname + 3) = 'o';
+      *(ffile_nname + 4) = 'r';
+      *(ffile_nname + 5) = '_';
+      *(ffile_nname + 6) = 'l';
+      *(ffile_nname + 7) = 'i';
+      *(ffile_nname + 8) = 's';
+      *(ffile_nname + 9) = 't';
+      *(ffile_nname + 10) = '.';
+      *(ffile_nname + 11) = '\0';
+      strcat(ffile_nname, time_string);
+      if((create_tmp_actor_list = fopen(ffile_nname, "w")) == NULL){
+        printf("create_tmp_actor_list File Open Error");
         exit(1);
       }
       char chch;
@@ -1243,7 +1348,7 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
       }
       fclose(create_tmp_actor_list);
       if((actor_list = fopen("actor_list.txt", "w")) == NULL){
-        printf("File Open Error");
+        printf("actor_list in two File Open Error");
         exit(1);
       }
       while(actor != NULL){
@@ -1276,7 +1381,6 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
     }
   }
 }
-
 //actor add
 void option_add_actor(ACTOR public_actor){
   ACTOR actor;
@@ -1300,15 +1404,43 @@ void option_add_actor(ACTOR public_actor){
   strcpy(actor -> name , colon_change(tmp_char));
 
   ACTOR tmp_head_actor = public_actor;
+  int tmp_flag_for_overlap_check = 0;
   while(tmp_head_actor != NULL){
     if(!strcmp(tmp_head_actor -> name, tmp_char)){
-      printf("You have the same record.\n");
-      return;
+      if(tmp_head_actor -> sex){
+        printf("You have the same record in actor list. \n%d:%s:M:%s:", tmp_head_actor->serial_number, tmp_head_actor-> name, tmp_head_actor-> birth);
+      }else{
+        printf("You have the same record in actor list. \n%d:%s:F:%s:", tmp_head_actor->serial_number, tmp_head_actor-> name, tmp_head_actor-> birth);
+      }
+      MOVIE tmp_head_overlap_actor = tmp_head_actor -> movie;
+      while(tmp_head_overlap_actor != NULL){
+        if(tmp_head_overlap_actor -> movie_next == NULL){
+          printf("%s", tmp_head_overlap_actor->title );
+          break;
+        }else{
+          printf("%s, ", tmp_head_overlap_actor-> title);
+          tmp_head_overlap_actor = tmp_head_overlap_actor -> movie_next;
+        }
+      }
+      printf("\nDo you want to add any way? ");
+      gets(tmp_char);
+      if(*(tmp_char+0) == 'y' || *(tmp_char+0) == 'Y'){
+        if(*(tmp_char+1) == 'e' || *(tmp_char+1) == 'E'){
+          if(*(tmp_char+2) == 's' || *(tmp_char+2) == 's'){
+            tmp_flag_for_overlap_check = 1;
+          }
+        }
+      }
+      if(tmp_flag_for_overlap_check == 1){
+        break;
+      }else{
+        return;
+      }
     }else{
       tmp_head_actor = tmp_head_actor -> actor_next;
     }
   }
-
+  printf("ho?");
   printf("sex > ");
   gets(tmp_char);
   // director -> sex = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
@@ -1354,9 +1486,9 @@ void option_add_actor(ACTOR public_actor){
   }
   if(file_size){
     if(actor -> sex){
-      fprintf(actor_log_write, "\nadd:%d:%s:M:%s:", actor -> serial_number, actor -> name, actor -> birth);
+      fprintf(actor_log_write, "add:%d:%s:M:%s:", actor -> serial_number, actor -> name, actor -> birth);
     }else{
-      fprintf(actor_log_write, "\nadd:%d:%s:F:%s:", actor -> serial_number, actor -> name, actor -> birth);
+      fprintf(actor_log_write, "add:%d:%s:F:%s:", actor -> serial_number, actor -> name, actor -> birth);
     }
 
     MOVIE tmp_print_movie = actor -> movie;
@@ -1368,6 +1500,7 @@ void option_add_actor(ACTOR public_actor){
       }
       tmp_print_movie = tmp_print_movie -> movie_next;
     }
+    fprintf(actor_log_write, "\n");
   }else{
     fprintf(actor_log_write, "add:%d:%s:%c:%s:", actor -> serial_number, actor -> name, actor -> sex, actor -> birth);
     MOVIE tmp_print_movie = actor -> movie;
@@ -1379,11 +1512,13 @@ void option_add_actor(ACTOR public_actor){
       }
       tmp_print_movie = tmp_print_movie -> movie_next;
     }
+    fprintf(actor_log_write, "\n");
   }
   free(tmp_char);
   fclose(actor_log_read);
   fclose(actor_log_write);
   fprint_list_movie_director_actor('A', public_first_movie, public_director, public_actor);
+  link_actor_to_movie();
 }
 ACTOR serach_last_actor(ACTOR public_actor){
   ACTOR actor = public_actor;
@@ -1425,7 +1560,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
             }
             if(flag == 0){
               if(search_last_meta_cnt == 0){
-                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                 last_flag = 1;
                 return 1;
                 break;
@@ -1477,7 +1612,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
               }
               if(z == tmp_string_length){
                 if(search_last_meta_cnt == 0){
-                  printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                  // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                   last_flag = 1;
                   return 1;
                   break;
@@ -1535,7 +1670,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
             }
             if(z == tmp_string_length){
               if(search_last_meta_cnt == 0){
-                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                 last_flag = 1;
                 return 1;
                 break;
@@ -1569,7 +1704,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
       }
     }
     if(flag == 0){
-      printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+      // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
       return 1;
     }else{
       return 0;
@@ -1626,17 +1761,17 @@ int option_search_movie(struct movie* movie, char* search_string){
         }
         tmp_print_actor = tmp_print_actor -> actor_next;
       }
+      printf("\n");
     }
     movie = movie -> movie_next;
   }
   if(flag == 0){
-    printf("no %s in movie", search_string);
+    // printf("no %s in movie", search_string);
     return 0;
   }else{
     return 1;
   }
 }
-
 
 
 int option_search_director(DIRECTOR director, char* search_string){
@@ -1680,17 +1815,18 @@ int option_search_director(DIRECTOR director, char* search_string){
         }
         tmp_print_movie = tmp_print_movie -> movie_next;
       }
+      printf("\n");
     }
+
     director = director -> director_next;
   }
   if(flag == 0){
-    printf("no %s in director", search_string);
+    // printf("no %s in director", search_string);
     return 0;
   }else{
     return 1;
   }
 }
-
 char* now_time_string(){
       time_t timer;
       struct tm *t_time;
@@ -1784,24 +1920,39 @@ int option_search_actor(ACTOR actor, char* search_string){
         }
         tmp_print_movie = tmp_print_movie -> movie_next;
       }
+      printf("\n");
     }
     actor = actor -> actor_next;
   }
   if(flag == 0){
-    printf("no %s in actor", search_string);
+    // printf("no %s in actor", search_string);
     return 0;
   }else{
     return 1;
   }
 }
-void save_list_movie(char* option, struct movie *movie)
+void save_list_movie(char* option, struct movie *movie, char* option2)
 {
   FILE *fp, *tmp, *tmp_print;
   struct movie* save_movie = public_first_movie;
   char *movie_list_str;
+  char* filename = (char*)malloc(sizeof(char)*100);
   int size = 0;
 
-  fp = fopen("movie_list.txt", "w");
+  if(*option == '-')
+  {
+    strcpy(option, option+1);
+  }
+
+  if(option2 == NULL)
+  {
+    strcpy(filename, "movie_list.txt");
+  }
+  else
+  {
+    strcpy(filename, option2);
+  }
+  fp = fopen(filename, "w");
 
   if(!strcmp(option, "ALL COMMANDS"))
    {
@@ -1823,10 +1974,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -1850,7 +2001,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -1875,10 +2026,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -1902,7 +2053,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -1927,10 +2078,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -1954,7 +2105,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -1979,10 +2130,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -2001,7 +2152,7 @@ void save_list_movie(char* option, struct movie *movie)
               {
                 char *year;
 
-                year = (char*)malloc(sizeof(char) * 5);
+                year = (char*)malloc(sizeof(char) * 100);
                 sprintf(year, "%d", save_movie->year);
 
                 movie_list_str = insert_string(movie_list_str, year, i+1);
@@ -2011,7 +2162,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -2036,10 +2187,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -2058,7 +2209,7 @@ void save_list_movie(char* option, struct movie *movie)
               {
                 char *time;
 
-                time = (char*)malloc(sizeof(char) * 5);
+                time = (char*)malloc(sizeof(char) * 100);
                 sprintf(time, "%d", save_movie->time);
 
                 movie_list_str = insert_string(movie_list_str, time, i+1);
@@ -2068,7 +2219,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -2103,10 +2254,10 @@ void save_list_movie(char* option, struct movie *movie)
         }
         else
         {
-          tmp = fopen("movie_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          movie_list_str = (char*)malloc(size + 1);
+          movie_list_str = (char*)malloc(size + 100);
 
           while(fgets(movie_list_str, size, tmp))
           {
@@ -2141,7 +2292,7 @@ void save_list_movie(char* option, struct movie *movie)
                 break;
               }
             }
-            rename("test.txt", "movie_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_movie = save_movie->movie_next;
           }
@@ -2168,14 +2319,28 @@ void save_list_movie(char* option, struct movie *movie)
   fclose(fp);
 }
 
-void save_list_director(char* option, struct director *director)
+void save_list_director(char* option, struct director *director, char* option2)
 {
   FILE *fp, *tmp, *tmp_print;
   DIRECTOR save_director = public_director;
   char *director_list_str;
+  char *filename = (char*)malloc(sizeof(char)*100);
   int size = 0;
 
-  fp = fopen("director_list.txt", "w");
+  if(*option == '-')
+  {
+    strcpy(option, option+1);
+  }
+
+  if(option2 == NULL)
+  {
+    strcpy(filename, "director_list.txt");
+  }
+  else
+  {
+    strcpy(filename, option2);
+  }
+  fp = fopen(filename, "w");
 
   if(!strcmp(option, "ALL COMMANDS"))
    {
@@ -2197,10 +2362,10 @@ void save_list_director(char* option, struct director *director)
         }
         else
         {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          director_list_str = (char*)malloc(size + 1);
+          director_list_str = (char*)malloc(size + 100);
 
           while(fgets(director_list_str, size, tmp))
           {
@@ -2224,7 +2389,7 @@ void save_list_director(char* option, struct director *director)
                 break;
               }
             }
-            rename("test.txt", "director_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_director = save_director->director_next;
           }
@@ -2249,10 +2414,10 @@ void save_list_director(char* option, struct director *director)
         }
         else
         {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          director_list_str = (char*)malloc(size + 1);
+          director_list_str = (char*)malloc(size + 100);
 
           while(fgets(director_list_str, size, tmp))
           {
@@ -2277,7 +2442,7 @@ void save_list_director(char* option, struct director *director)
                 break;
               }
             }
-            rename("test.txt", "director_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_director = save_director->director_next;
           }
@@ -2302,10 +2467,10 @@ void save_list_director(char* option, struct director *director)
         }
         else
         {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          director_list_str = (char*)malloc(size + 1);
+          director_list_str = (char*)malloc(size + 100);
 
           while(fgets(director_list_str, size, tmp))
           {
@@ -2330,7 +2495,7 @@ void save_list_director(char* option, struct director *director)
                 break;
               }
             }
-            rename("test.txt", "director_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_director = save_director->director_next;
           }
@@ -2365,10 +2530,10 @@ void save_list_director(char* option, struct director *director)
         }
         else
         {
-          tmp = fopen("director_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          director_list_str = (char*)malloc(size + 1);
+          director_list_str = (char*)malloc(size + 100);
 
           while(fgets(director_list_str, size, tmp))
           {
@@ -2402,7 +2567,7 @@ void save_list_director(char* option, struct director *director)
                 break;
               }
             }
-            rename("test.txt", "director_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_director = save_director->director_next;
           }
@@ -2429,14 +2594,28 @@ void save_list_director(char* option, struct director *director)
   fclose(fp);
 }
 
-void save_list_actor(char* option, struct actor *actor)
+void save_list_actor(char* option, struct actor *actor, char* option2)
 {
   FILE *fp, *tmp, *tmp_print;
   ACTOR save_actor = public_actor;
   char *actor_list_str;
+  char *filename = (char*)malloc(sizeof(char)*100);
   int size = 0;
 
-  fp = fopen("actor_list.txt", "w");
+  if(*option == '-')
+  {
+    strcpy(option, option+1);
+  }
+
+  if(option2 == NULL)
+  {
+    strcpy(filename, "actor_list.txt");
+  }
+  else
+  {
+    strcpy(filename, option2);
+  }
+  fp = fopen(filename, "w");
 
   if(!strcmp(option, "ALL COMMANDS"))
    {
@@ -2458,10 +2637,10 @@ void save_list_actor(char* option, struct actor *actor)
         }
         else
         {
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          actor_list_str = (char*)malloc(size + 1);
+          actor_list_str = (char*)malloc(size + 100);
 
           while(fgets(actor_list_str, size, tmp))
           {
@@ -2485,7 +2664,7 @@ void save_list_actor(char* option, struct actor *actor)
                 break;
               }
             }
-            rename("test.txt", "actor_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_actor = save_actor->actor_next;
           }
@@ -2523,11 +2702,11 @@ void save_list_actor(char* option, struct actor *actor)
         {
           char* sex;
 
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          actor_list_str = (char*)malloc(size + 1);
-          sex = (char*)malloc(sizeof(char) + 1);
+          actor_list_str = (char*)malloc(size + 100);
+          sex = (char*)malloc(sizeof(char) + 10);
 
           while(fgets(actor_list_str, size, tmp))
           {
@@ -2561,7 +2740,7 @@ void save_list_actor(char* option, struct actor *actor)
                 break;
               }
             }
-            rename("test.txt", "actor_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_actor = save_actor->actor_next;
           }
@@ -2586,10 +2765,10 @@ void save_list_actor(char* option, struct actor *actor)
         }
         else
         {
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          actor_list_str = (char*)malloc(size + 1);
+          actor_list_str = (char*)malloc(size + 100);
 
           while(fgets(actor_list_str, size, tmp))
           {
@@ -2614,7 +2793,7 @@ void save_list_actor(char* option, struct actor *actor)
                 break;
               }
             }
-            rename("test.txt", "actor_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_actor = save_actor->actor_next;
           }
@@ -2649,10 +2828,10 @@ void save_list_actor(char* option, struct actor *actor)
         }
         else
         {
-          tmp = fopen("actor_list.txt", "r");
-          tmp_print = fopen("test.txt", "w");
+          tmp = fopen(filename, "r");
+          tmp_print = fopen("filename_list_tmp.txt", "w");
 
-          actor_list_str = (char*)malloc(size + 1);
+          actor_list_str = (char*)malloc(size + 100);
 
           while(fgets(actor_list_str, size, tmp))
           {
@@ -2686,7 +2865,7 @@ void save_list_actor(char* option, struct actor *actor)
                 break;
               }
             }
-            rename("test.txt", "actor_list.txt");
+            rename("filename_list_tmp.txt", filename);
 
             save_actor = save_actor->actor_next;
           }
@@ -2718,7 +2897,7 @@ char* insert_string(char *origin, char *insert, int pos)
   char *str;
   int size;
   size = strlen(origin) + strlen(insert) + 1;
-  str = (char*)malloc(size + 30);
+  str = (char*)malloc(size + 100);
   strncpy(str, origin, pos);
   strcpy(origin, origin+pos+1);
 
