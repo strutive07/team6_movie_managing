@@ -6,7 +6,7 @@
 #include<string.h>
 #include "director.h"
 #include "actor.h"
-
+#include "option.h"
 //전역 변수
 struct movie *public_next_movie;
 struct movie *public_first_movie;

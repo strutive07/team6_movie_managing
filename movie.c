@@ -150,9 +150,69 @@ struct movie *parse_movie(char* buffer, int isFirst){
     inMovie -> actor = create_actor_struct(actor_parse);
     return inMovie;
   }else if(!strcmp(parse_char, "update")){
+    struct movie *movies = public_first_movie;
+    parse_char = strtok(NULL,":");
+    int serial_num = atoi(parse_char);
+    if(serial_num != 1){
+      movies = move_serial_movie(serial_num, movies);
+    }
+    if(movies == NULL){
+      printf("No Such Record while loading movie_log.txt\n");
+      exit(1);
+    }
+    parse_char = strtok(NULL,":");
+    if(strlen(parse_char) == 0){
 
+    }else if(strlen(parse_char) == 1 && *(parse_char+0) == '='){
+
+    }else{
+      free(movies -> title);
+      movies -> title = (char*)malloc(strlen(parse_char)+5);
+      strcpy(movies -> title, colon_change(parse_char));
+    }
+    parse_char = strtok(NULL,":");
+    if(strlen(parse_char) == 0){
+
+    }else if(strlen(parse_char) == 1 && *(parse_char+0) == '='){
+
+    }else{
+      free(movies -> genre);
+      movies -> genre = (char*)malloc(strlen(parse_char)+5);
+      strcpy(movies -> genre, colon_change(parse_char));
+    }
+    parse_char = strtok(NULL,":");
+    if(strlen(parse_char) == 0){
+
+    }else if(strlen(parse_char) == 1 && *(parse_char+0) == '='){
+
+    }else{
+      free(movies -> director.name);
+      movies -> director.name = (char*)malloc(strlen(parse_char)+5);
+      strcpy(movies -> director.name, colon_change(parse_char));
+    }
+    parse_char = strtok(NULL,":");
+    if(strlen(parse_char) == 0){
+
+    }else if(strlen(parse_char) == 1 && *(parse_char+0) == '='){
+
+    }else{
+      movies -> year = atoi(parse_char);
+    }
+    parse_char = strtok(NULL,":");
+    if(strlen(parse_char) == 0){
+
+    }else if(strlen(parse_char) == 1 && *(parse_char+0) == '='){
+
+    }else{
+      movies -> time = atoi(parse_char);
+    }
+    parse_char = strtok(NULL,":");
+
+    movies -> actor = create_actor_struct(parse_char);
   }else if(!strcmp(parse_char, "delete")){
-
+    parse_char = strtok(NULL,":");
+    int serial_num = atoi(parse_char);
+    option_delete_movie(serial_num, public_first_movie);
   }
 }
 char* colon_change(char* tmp_char){

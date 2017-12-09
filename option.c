@@ -47,7 +47,6 @@ void whats_up_commander(){
 
     } // update
       if(!strcmp(split, "print")){
-        printf("Print_movie will be run\n");
 
         command_what = strtok(NULL, " ");
         split = strtok(NULL, " ");
@@ -101,24 +100,24 @@ void whats_up_commander(){
         // 옵션이 없는 경우 에러
 
         // save m option -f filename
+
         command_what = strtok(NULL, " "); // mda
         printf("command\n");
         if((option = strtok(NULL, " ")) != NULL){ // option이든 filename이든 있을 때
-          printf("\n\noption is %s \n\n", option);
           if(!strcmp(option, "-f")){ // tgdyra, nsbm이 아니고 -f면 옵션이 없다는 뜻
           strcpy(option, "ALL COMMANDS");
         }else if((split = strtok(NULL, " ")) != NULL){ // split이 잘랐을때 NULL이 아니면 -f를 저장
           if(strcmp(split, "-f")){ // -f가 아닐 경우 == filename를 바로 입력했을때
-            printf("Where is Filename? \n"); // -f 없이 filename을 입력하면 실행을 안하도록 하고
             continue;
-          }
+          }else{
+          option2 = (char *)malloc(sizeof(char)*100);
           option2 = strtok(NULL, " "); // -f filename
           printf("\n\nfilename is %s\n\n",option2);
+        }
           }
         }else{ // save m 처럼 전부 디폴트일 때
         option = (char *)malloc(sizeof(char)*13); // token 과정에서 NULL처리가 되서 할당안하면 안되네
         strcpy(option, "ALL COMMANDS");
-        option2 = NULL; //filename default
       }
 
         if(!strcmp(command_what, "m"))
@@ -164,19 +163,32 @@ void whats_up_commander(){
 
           if(*option == '-')
           strcpy(option, option+1);
-
+          int search_flag = 1;
         while(*option != '\0'){
           if(*option == 'm'){
-            option_search_movie(public_first_movie, option2);
+            int tmp_flag = 1;
+            tmp_flag = option_search_movie(public_first_movie, option2);
+            if(search_flag == 1){
+              search_flag = tmp_flag;
+            }
           }else if(*option == 'd'){
-            option_search_director(public_director, option2);
+            int tmp_flag = 1;
+            tmp_flag = option_search_director(public_director, option2);
+            if(search_flag == 1){
+              search_flag = tmp_flag;
+            }
           }else if(*option == 'a'){
-            option_search_actor(public_actor, option2);
+            int tmp_flag = 1;
+            tmp_flag = option_search_actor(public_actor, option2);
+            if(search_flag == 1){
+              search_flag = tmp_flag;
+            }
           }
           strcpy(option, option+1);
         }
-
-
+        if(search_flag == 0){
+          printf("@@ No such record.\n");
+        }
       }
 
       if(!strcmp(split, "sort")){
@@ -186,12 +198,10 @@ void whats_up_commander(){
         command_what = strtok(NULL, " "); // mda
         printf("command\n");
         if((option = strtok(NULL, " ")) != NULL){ // option이든 filename이든 있을 때
-          printf("\n\noption is %s \n\n", option);
           if(!strcmp(option, "-f")){ // tgdyra, nsbm이 아니고 -f면 옵션이 없다는 뜻
           strcpy(option, "ALL COMMANDS");
         }else if((split = strtok(NULL, " ")) != NULL){ // split이 잘랐을때 NULL이 아니면 -f를 저장
           if(strcmp(split, "-f")){ // -f가 아닐 경우 == filename를 바로 입력했을때
-            printf("Where is Filename? \n"); // -f 없이 filename을 입력하면 실행을 안하도록 하고
             continue;
           }
           option2 = strtok(NULL, " "); // -f filename
@@ -266,7 +276,6 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   char option_letter = *option;
   char *tmp;
   char *tmp2 = (char*)malloc(sizeof(char)*100);
-
   int update_check = 1;
   int overlap = 0;
 
@@ -292,10 +301,8 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   case 'n':
   printf("Director name > ");
   gets(tmp);
-  if (!strcmp(tmp, director -> name)){
-    if(director_overlap(director)){
-      return;
-    }
+  if(director_overlap(colon_change(tmp))){
+    return;
   }
   director->name = (char*)malloc(strlen(tmp)+1);
   strcpy(director->name, tmp);
@@ -309,6 +316,7 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   char letter = *tmp;
   if(letter != 'M' && letter != 'W'){
     printf("Wrong(Only M or W)\n");
+    i--;
     break;
   }
   update_check *= 3;
@@ -325,18 +333,25 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
 
   case 'm':
   printf("Director movie > ");
-  gets(tmp);
-  if((tmp2 = strtok(tmp, ",")) != NULL){
-  movie_copy_tmp->title = (char*)malloc(strlen(tmp2)+1);
-  strcpy(movie_copy_tmp -> title, colon_change(tmp2));
+  gets(tmp); // 문장 받고
 
-  while((tmp2 = strtok(NULL,",")) != NULL){
-    movie_copy_tmp = movie_copy_tmp -> movie_next;
-    movie_copy_tmp -> title = (char*)malloc(strlen(tmp2)+1); // next 이후 title 접근 자체가 문제?
-    strcpy(movie_copy_tmp -> title, colon_change(tmp2));
-    lint_movie_to_director(public_director, public_first_movie);
-    link_director_to_movie();
+  if((tmp2 = strtok(tmp, ",")) != NULL){ // 자르고
+  movie_copy_tmp->title = (char*)malloc(strlen(tmp2)+5); // 공간 만든다음
+  strcpy(movie_copy_tmp -> title, colon_change(tmp2)); // 문장 넣어주고
+  while((tmp2 = strtok(NULL,",")) != NULL){ // 잘라서 더 있으면
+    if(movie_copy_tmp -> movie_next == NULL){
+      MOVIE next_movie = (MOVIE)malloc(sizeof(struct best_movie));
+      movie_copy_tmp -> movie_next = next_movie;
+      next_movie -> title = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후 <- 에러
+      strcpy(next_movie -> title, colon_change(tmp2)); // 내용을 복사해서 넣고
+    }else{
+    movie_copy_tmp = movie_copy_tmp -> movie_next; // next로 넘겨서
+    movie_copy_tmp -> title = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후
+    strcpy(movie_copy_tmp -> title, colon_change(tmp2)); // 내용을 복사해서 넣고
+      }
     }
+    lint_movie_to_director(public_director, public_first_movie); // 링크로 연결할게 있는지 체크
+    link_director_to_movie();
   }
   free(tmp);
   update_check *= 7;
@@ -383,7 +398,7 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
      fprintf(write_in_log, "\n");
 
      fclose(write_in_log);
-
+     fprint_list_movie_director_actor('D', public_first_movie, public_director, public_actor);
 }
 
 
@@ -442,10 +457,8 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
   case 'n':
   printf("Actor name > ");
   gets(tmp);
-  if (!strcmp(tmp, actor -> name)){
-    if(actor_overlap(actor)){
+  if(director_overlap(colon_change(tmp))){
       return;
-    }
   }
   actor->name = (char*)malloc(strlen(tmp)+1);
   strcpy(actor->name, tmp);
@@ -478,16 +491,20 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
   case 'm':
   printf("Actor movie > ");
   gets(tmp);
-  if((tmp2 = strtok(tmp, ",")) != NULL){
-  movie_copy_tmp->title = (char*)malloc(strlen(tmp2)+1);
-  strcpy(movie_copy_tmp -> title, colon_change(tmp2));
-
-  while((tmp2 = strtok(NULL,",")) != NULL){
-    movie_copy_tmp = movie_copy_tmp -> movie_next;
-    movie_copy_tmp -> title = (char*)malloc(strlen(tmp2)+1); // next 이후 title 접근 자체가 문제?
-    strcpy(movie_copy_tmp -> title, colon_change(tmp2));
-    lint_movie_to_actor(public_actor, public_first_movie);
-    link_actor_to_movie();
+  if((tmp2 = strtok(tmp, ",")) != NULL){ // 자르고
+  movie_copy_tmp->title = (char*)malloc(strlen(tmp2)+5); // 공간 만든다음
+  strcpy(movie_copy_tmp -> title, colon_change(tmp2)); // 문장 넣어주고
+  while((tmp2 = strtok(NULL,",")) != NULL){ // 잘라서 더 있으면
+    if(movie_copy_tmp -> movie_next == NULL){
+      MOVIE next_movie = (MOVIE)malloc(sizeof(struct best_movie));
+      movie_copy_tmp -> movie_next = next_movie;
+      next_movie -> title = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후 <- 에러
+      strcpy(next_movie -> title, colon_change(tmp2)); // 내용을 복사해서 넣고
+    }else{
+    movie_copy_tmp = movie_copy_tmp -> movie_next; // next로 넘겨서
+    movie_copy_tmp -> title = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후
+    strcpy(movie_copy_tmp -> title, colon_change(tmp2)); // 내용을 복사해서 넣고
+      }
     }
   }
   free(tmp);
@@ -539,7 +556,7 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
      fprintf(write_in_log, "\n");
 
      fclose(write_in_log);
-
+  fprint_list_movie_director_actor('A', public_first_movie, public_director, public_actor);
 }
 
 
@@ -598,8 +615,11 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
   case 't':
   printf("Movie title > ");
   gets(tmp);
+  if(movie_overlap(colon_change(tmp))){
+      return;
+  }
   movies -> title = (char*)malloc(strlen(tmp)+1);
-  strcpy(movies -> title, tmp);
+  strcpy(movies -> title, colon_change(tmp));
   free(tmp);
   update_check *= 2;
   break;
@@ -619,36 +639,47 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
   movies -> director.name = (char*)malloc(strlen(tmp)+1);
   strcpy(movies -> director.name, tmp);
   free(tmp);
+  link_director_to_movie();
+  lint_movie_to_director(public_director, public_first_movie);
   update_check *= 5;
   break;
 
   case 'y':
   printf("Movie year > ");
-  scanf("%d", &(movies -> year));
+  gets(tmp);
+  movies->year = atoi(tmp);
+  free(tmp);
   update_check *= 7;
   break;
 
   case 'r':
   printf("Movie time > ");
-  scanf("%d", &(movies -> time));
+  gets(tmp);
+  movies->time = atoi(tmp);
+  free(tmp);
   update_check *= 11;
   break;
 
   case 'a':
   printf("Movie actor > ");
   gets(tmp);
-  if((tmp2 = strtok(tmp, ",")) != NULL){
-  actor_copy_tmp->actor_name = (char*)malloc(strlen(tmp2)+1);
-  strcpy(actor_copy_tmp -> actor_name, colon_change(tmp2));
-
-  while((tmp2 = strtok(NULL,",")) != NULL){
-    actor_copy_tmp = actor_copy_tmp -> actor_next;
-    actor_copy_tmp -> actor_name = (char*)malloc(strlen(tmp2)+1); // next 이후 title 접근 자체가 문제?
-    strcpy(actor_copy_tmp -> actor_name, colon_change(tmp2));
-    lint_movie_to_actor(public_actor, public_first_movie);
-    link_actor_to_movie();
+  if((tmp2 = strtok(tmp, ",")) != NULL){ // 자르고
+  actor_copy_tmp->actor_name = (char*)malloc(strlen(tmp2)+5); // 공간 만든다음
+  strcpy(actor_copy_tmp -> actor_name, colon_change(tmp2)); // 문장 넣어주고
+  while((tmp2 = strtok(NULL,",")) != NULL){ // 잘라서 더 있으면
+    if(actor_copy_tmp -> actor_next == NULL){
+      struct linked_list_actor *next_actor = (struct linked_list_actor*)malloc(sizeof(struct linked_list_actor));
+      actor_copy_tmp -> actor_next = next_actor;
+      next_actor -> actor_name = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후 <- 에러
+      strcpy(next_actor -> actor_name, colon_change(tmp2)); // 내용을 복사해서 넣고
+    }else{
+    actor_copy_tmp = actor_copy_tmp -> actor_next; // next로 넘겨서
+    actor_copy_tmp -> actor_name = (char*)malloc(strlen(tmp2)+5); // title에 공간을 할당한 후
+    strcpy(actor_copy_tmp -> actor_name, colon_change(tmp2)); // 내용을 복사해서 넣고
+      }
     }
   }
+  lint_movie_to_actor(public_actor, public_first_movie);
   free(tmp);
   update_check *= 13;
   break;
@@ -659,7 +690,6 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
 
   i++;
   }
-
     fprintf(write_in_log,"update:%d",serial_num);
 
    if((update_check % 2 != 0)){
@@ -670,9 +700,8 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
 
    if((update_check % 3 != 0)){
      fprintf(write_in_log, ":=");
-     update_check -= 100;
    }else{
-    fprintf(write_in_log,":%d", movies->genre);
+    fprintf(write_in_log,":%s", movies->genre);
   }
 
    if((update_check % 5 != 0)){
@@ -697,17 +726,16 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
      fprintf(write_in_log, ":=");
    }else{
     fprintf(write_in_log,":");
-    while(actor_write_tmp ->actor_name != NULL){
+    while(actor_write_tmp != NULL){
     fprintf(write_in_log,"%s", actor_write_tmp->actor_name);
     actor_write_tmp = actor_write_tmp -> actor_next;
-    if(actor_write_tmp != NULL)
+    if(actor_write_tmp   != NULL)
     fprintf(write_in_log,",");
     }
   }
      fprintf(write_in_log, "\n");
-
      fclose(write_in_log);
-
+       fprint_list_movie_director_actor('M', public_first_movie, public_director, public_actor);
 }
 
 
@@ -728,59 +756,138 @@ struct movie* move_serial_movie(int serial, struct movie *origin){
 }
 
 
-int director_overlap(DIRECTOR director){ // 다른 번호일때 찾는거 해야됨
+int director_overlap(char *tmp){ // 다른 번호일때 찾는거 해야됨
+
   char* Y_N = (char *)malloc(sizeof(char));
-  printf("You have the same record\n");
-  printf("Director name > %s\n", director -> name);
-  printf("Director sex > %c\n", director -> sex);
-  printf("Director birth > %s\n", director -> birth);
-  while(director -> movie != NULL){
-  printf("Director movie > %s\n", director -> movie -> title);
-  director -> movie = director -> movie -> movie_next;
+  DIRECTOR check_overlap = public_director;
+  while(check_overlap -> name != NULL){
+  if(!strcmp(tmp ,check_overlap -> name)){
+    break;
+  }else{
+    check_overlap = check_overlap -> director_next;
   }
+  if(check_overlap == NULL){
+    return 0;
+  }
+} //처음부터 이름을 전부 비교하고, 같다 -> break, 아니면 넘기고, if로 마지막이면 return 0
+  printf("You have the same record\n");
+  MOVIE movie_printonly = check_overlap->movie;
+    printf("%d : ", check_overlap-> serial_number);
+    colon_rchange(check_overlap -> name);
+    printf("%c ", check_overlap -> sex);
+    printf("%s \n", check_overlap -> birth);
+    while(movie_printonly != NULL){
+      printf("Best movie : ");
+      colon_rchange(movie_printonly -> title);
+      putchar('\n');
+      movie_printonly = movie_printonly ->  movie_next;
+    }
   printf("Do you want to change the record? (Y/N) : ");
   gets(Y_N);
+  while(1){
   if(!strcmp(Y_N, "Y") || !strcmp(Y_N, "y")){
     return 0;
-  }else{
+  }else if(!strcmp(Y_N, "N") || !strcmp(Y_N, "n")){
     return 1;
+  }else{
+    printf("y or n please\n");
+    continue;
+    }
   }
 }
 
-int actor_overlap(ACTOR actor){
+int actor_overlap(char *tmp){
   char* Y_N = (char *)malloc(sizeof(char));
-  printf("You have the same record\n");
-  printf("Actor name > %s\n", actor -> name);
-  printf("Actor sex > ");
-  if(actor -> sex){
-    printf("M\n");
+  ACTOR check_overlap = public_actor;
+  while(check_overlap -> name != NULL){
+  if(!strcmp(tmp ,check_overlap -> name)){
+    break;
   }else{
-    printf("W\n");
+    check_overlap = check_overlap -> actor_next;
   }
-  printf("Actor birth > %s\n", actor -> birth);
-  while(actor -> movie != NULL){
-  printf("Actor movie > %s\n", actor -> movie -> title);
-  actor -> movie = actor -> movie -> movie_next;
+  if(check_overlap == NULL){
+    return 0;
   }
+}
+  printf("You have the same record\n");
+  MOVIE movie_printonly = check_overlap->movie;
+    printf("%d : ", check_overlap-> serial_number);
+    colon_rchange(check_overlap -> name);
+    printf("%c ", check_overlap -> sex);
+    printf("%s \n", check_overlap -> birth);
+    while(movie_printonly != NULL){
+      printf("Best movie : ");
+      colon_rchange(movie_printonly -> title);
+      putchar('\n');
+      movie_printonly = movie_printonly ->  movie_next;
+    }
   printf("Do you want to change the record? (Y/N) : ");
   gets(Y_N);
+  while(1){
   if(!strcmp(Y_N, "Y") || !strcmp(Y_N, "y")){
     return 0;
-  }else{
+  }else if(!strcmp(Y_N, "N") || !strcmp(Y_N, "n")){
     return 1;
+  }else{
+    printf("y or n please\n");
+    continue;
+    }
   }
 }
 
+int movie_overlap(char *tmp){
+  char* Y_N = (char *)malloc(sizeof(char));
+  int i = 1;
+  struct movie *check_overlap = public_first_movie;
+  while(check_overlap -> title != NULL){
+  if(!strcmp(tmp ,check_overlap -> title)){
+    break;
+  }else{
+    check_overlap = check_overlap -> movie_next;
+  }
+  if(check_overlap == NULL){
+    return 0;
+  }
+}
+  printf("You have the same record\n");
+  struct linked_list_actor *actor_printonly = check_overlap->actor;
+    printf("%d : ", check_overlap-> Serial_number);
+    colon_rchange(check_overlap -> title);
+    printf("%s ", check_overlap -> genre);
+    printf("%s \n", check_overlap->director.name);
+    while(actor_printonly != NULL){
+      printf("Actor %d : ",i++);
+      colon_rchange(actor_printonly -> actor_name);
+      putchar('\n');
+      actor_printonly = actor_printonly ->  actor_next;
+    }
+  printf("Do you want to change the record? (Y/N) : ");
+  gets(Y_N);
+  while(1){
+  if(!strcmp(Y_N, "Y") || !strcmp(Y_N, "y")){
+    return 0;
+  }else if(!strcmp(Y_N, "N") || !strcmp(Y_N, "n")){
+    return 1;
+  }else{
+    printf("y or n please\n");
+    continue;
+    }
+  }
+}
 void print_list_director(DIRECTOR director, char *serial){
 
   int serial_num = atoi(serial);
 
   if(serial_num != 1)
   director = move_serial_director(serial_num, director);
+  if(director == NULL){
+    printf("No Such Record\n");
+    return;
+  }
   MOVIE movie_printonly = director->movie;
     printf("%d : ", director-> serial_number);
     colon_rchange(director -> name);
-    printf("%c ", director -> sex);
+    printf(" %c ", director -> sex);
     printf("%s \n", director -> birth);
     while(movie_printonly != NULL){
       printf("Best movie : ");
@@ -799,10 +906,14 @@ void print_list_actor(ACTOR actor, char *serial){
 
   if(serial_num != 1)
   actor = move_serial_actor(serial_num, actor);
+  if(actor == NULL){
+    printf("No Such Record\n");
+    return;
+  }
   MOVIE actor_printonly = actor -> movie;
     printf("%d : ", actor -> serial_number);
     colon_rchange(actor -> name);
-    printf("%c ", actor -> sex);
+    printf(" %c ", actor -> sex);
     printf("%s \n", actor -> birth);
 
     while(actor_printonly != NULL){
@@ -816,13 +927,16 @@ void print_list_actor(ACTOR actor, char *serial){
       actor_printonly = actor_printonly -> movie_next;
     }
 }
-
 void print_list_movie(struct movie *movie, char *serial){
 
   int serial_num = atoi(serial);
 
   if(serial_num != 1)
   movie = move_serial_movie(serial_num, movie);
+  if(movie == NULL){
+    printf("No Such Record\n");
+    return;
+  }
   struct linked_list_actor *movie_printonly = movie -> actor;
     printf("%d : ", movie -> Serial_number);
     colon_rchange(movie -> title);
@@ -840,7 +954,7 @@ void print_list_movie(struct movie *movie, char *serial){
     while(movie_printonly != NULL){
       b++;
       printf("A%d : ", b);
-      printf("%s",movie_printonly -> actor_name);
+      colon_rchange(movie_printonly -> actor_name);
       if(movie_printonly -> actor_pointer == NULL){
       putchar('\n');
       }else{
@@ -870,14 +984,6 @@ void option_add_movie(struct movie *movie){
   printf("title > ");
   gets(tmp_char);
   struct movie *tmp_head_movie = movie;
-  while(tmp_head_movie != NULL){
-    if(!strcmp(tmp_head_movie -> title, tmp_char)){
-      printf("You have the same record.\n");
-      return;
-    }else{
-      tmp_head_movie = tmp_head_movie -> movie_next;
-    }
-  }
   inMovie -> title = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
   strcpy(inMovie -> title , colon_change(tmp_char));
 
@@ -912,8 +1018,41 @@ void option_add_movie(struct movie *movie){
   lastMovie -> movie_next = inMovie;
   inMovie -> Serial_number = (lastMovie -> Serial_number) +1 ;
   inMovie -> actor = create_actor_struct(tmp_char);
+  int tmp_flag_for_overlap_check = 0;
+  while(tmp_head_movie != NULL){
+    if(!strcmp(tmp_head_movie -> title, inMovie -> title)){
+      printf("%s", tmp_head_movie -> title);
+      printf("You have the same record in movie list. \n%d:%s:%s:%s:%d:%d:", tmp_head_movie->Serial_number, tmp_head_movie-> title, tmp_head_movie->genre, tmp_head_movie->director.name,tmp_head_movie-> year, tmp_head_movie->time);
+      struct linked_list_actor* tmp_head_overlap_actor = tmp_head_movie -> actor;
+      while(tmp_head_overlap_actor != NULL){
+        if(tmp_head_overlap_actor -> actor_next == NULL){
+          printf("%s", tmp_head_overlap_actor->actor_name );
+          break;
+        }else{
+          printf("%s, ", tmp_head_overlap_actor-> actor_name);
+          tmp_head_overlap_actor = tmp_head_overlap_actor -> actor_next;
+        }
+      }
+      printf("\nDo you want to add any way? ");
+      gets(tmp_char);
+      if(*(tmp_char+0) == 'y' || *(tmp_char+0) == 'Y'){
+        if(*(tmp_char+1) == 'e' || *(tmp_char+1) == 'E'){
+          if(*(tmp_char+2) == 's' || *(tmp_char+2) == 's'){
+            tmp_flag_for_overlap_check = 1;
+          }
+        }
+      }
+      if(tmp_flag_for_overlap_check == 1){
+        break;
+      }else{
+        return;
+      }
+    }else{
+      tmp_head_movie = tmp_head_movie -> movie_next;
+    }
+  }
   if(file_size){
-    fprintf(mv_log_write, "\nadd:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
+    fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
     struct linked_list_actor *tmp_print_actor = inMovie -> actor;
     while(tmp_print_actor != NULL){
       if(tmp_print_actor -> actor_next == NULL){
@@ -923,6 +1062,7 @@ void option_add_movie(struct movie *movie){
       }
       tmp_print_actor = tmp_print_actor -> actor_next;
     }
+    fprintf(mv_log_write, "\n");
   }else{
     fprintf(mv_log_write, "add:%d:%s:%s:%s:%d:%d:", inMovie -> Serial_number, inMovie -> title, inMovie -> genre, inMovie -> director.name, inMovie -> year, inMovie -> time);
     struct linked_list_actor *tmp_print_actor = inMovie -> actor;
@@ -934,13 +1074,15 @@ void option_add_movie(struct movie *movie){
       }
       tmp_print_actor = tmp_print_actor -> actor_next;
     }
+    fprintf(mv_log_write, "\n");
   }
   free(tmp_char);
   fclose(mv_log_read);
   fclose(mv_log_write);
   fprint_list_movie_director_actor('M', public_first_movie, public_director, public_actor);
+  lint_movie_to_actor(public_actor, public_first_movie);
+  lint_movie_to_director(public_director, public_first_movie);
 }
-
 void option_add_director(DIRECTOR public_first_director){
   DIRECTOR director;
   DIRECTOR LastDirector;
@@ -962,10 +1104,34 @@ void option_add_director(DIRECTOR public_first_director){
   director -> name = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
   strcpy(director -> name , colon_change(tmp_char));
   DIRECTOR tmp_head_director = public_first_director;
+  int tmp_flag_for_overlap_check = 0;
   while(tmp_head_director != NULL){
     if(!strcmp(tmp_head_director -> name, tmp_char)){
-      printf("You have the same record.\n");
-      return;
+      printf("You have the same record in actor list. \n%d:%s:%c:%s:", tmp_head_director->serial_number, tmp_head_director-> name, tmp_head_director->sex, tmp_head_director-> birth);
+      MOVIE tmp_head_overlap_actor = tmp_head_director -> movie;
+      while(tmp_head_overlap_actor != NULL){
+        if(tmp_head_overlap_actor -> movie_next == NULL){
+          printf("%s", tmp_head_overlap_actor->title );
+          break;
+        }else{
+          printf("%s, ", tmp_head_overlap_actor-> title);
+          tmp_head_overlap_actor = tmp_head_overlap_actor -> movie_next;
+        }
+      }
+      printf("\nDo you want to add any way? ");
+      gets(tmp_char);
+      if(*(tmp_char+0) == 'y' || *(tmp_char+0) == 'Y'){
+        if(*(tmp_char+1) == 'e' || *(tmp_char+1) == 'E'){
+          if(*(tmp_char+2) == 's' || *(tmp_char+2) == 's'){
+            tmp_flag_for_overlap_check = 1;
+          }
+        }
+      }
+      if(tmp_flag_for_overlap_check == 1){
+        break;
+      }else{
+        return;
+      }
     }else{
       tmp_head_director = tmp_head_director -> director_next;
     }
@@ -1010,7 +1176,7 @@ void option_add_director(DIRECTOR public_first_director){
     movie = put_list_movie_director(movie, movie_tmp);
   }
   if(file_size){
-    fprintf(director_log_write, "\nadd:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
+    fprintf(director_log_write, "add:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
     MOVIE tmp_print_movie = director -> movie;
     while(tmp_print_movie != NULL){
       if(tmp_print_movie -> movie_next == NULL){
@@ -1020,6 +1186,7 @@ void option_add_director(DIRECTOR public_first_director){
       }
       tmp_print_movie = tmp_print_movie -> movie_next;
     }
+    fprintf(director_log_write, "\n");
   }else{
     fprintf(director_log_write, "add:%d:%s:%c:%s:", director -> serial_number, director -> name, director -> sex, director -> birth);
     MOVIE tmp_print_movie = director -> movie;
@@ -1031,13 +1198,14 @@ void option_add_director(DIRECTOR public_first_director){
       }
       tmp_print_movie = tmp_print_movie -> movie_next;
     }
+    fprintf(director_log_write, "\n");
   }
   free(tmp_char);
   fclose(director_log_read);
   fclose(director_log_write);
   fprint_list_movie_director_actor('D', public_first_movie, public_director, public_actor);
+  link_director_to_movie();
 }
-
 DIRECTOR serach_last_director(DIRECTOR public_first_director){
   DIRECTOR director = public_first_director;
   printf("\n==\n%d\n=\n", director -> serial_number);
@@ -1083,7 +1251,20 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
       FILE * create_tmp_mv_list;
       char* time_string = now_time_string();
       char* file_name = (char*)malloc(sizeof(char)*100);
-      strcat(file_name, "movie_list.");
+      *(file_name + 0) = 'm';
+      *(file_name + 1) = 'o';
+      *(file_name + 2) = 'v';
+      *(file_name + 3) = 'i';
+      *(file_name + 4) = 'e';
+      *(file_name + 5) = '_';
+      *(file_name + 6) = 'l';
+      *(file_name + 7) = 'i';
+      *(file_name + 8) = 's';
+      *(file_name + 9) = 't';
+      *(file_name + 10) = '.';
+      *(file_name + 11) = '\0';
+
+      // strcat(file_name, "movie_list.");
       strcat(file_name, time_string);
       if((create_tmp_mv_list = fopen(file_name, "w")) == NULL){
         printf("File Open Error");
@@ -1154,7 +1335,21 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
       FILE * create_tmp_director_list;
       char* time_string = now_time_string();
       char* file_name = (char*)malloc(sizeof(char)*100);
-      strcat(file_name, "director_list.");
+      *(file_name + 0) = 'd';
+      *(file_name + 1) = 'i';
+      *(file_name + 2) = 'r';
+      *(file_name + 3) = 'e';
+      *(file_name + 4) = 'c';
+      *(file_name + 5) = 't';
+      *(file_name + 6) = 'o';
+      *(file_name + 7) = 'r';
+      *(file_name + 8) = '_';
+      *(file_name + 9) = 'l';
+      *(file_name + 10) = 'i';
+      *(file_name + 11) = 's';
+      *(file_name + 12) = 't';
+      *(file_name + 13) = '.';
+      *(file_name + 14) = '\0';
       strcat(file_name, time_string);
       if((create_tmp_director_list = fopen(file_name, "w")) == NULL){
         printf("File Open Error");
@@ -1197,7 +1392,7 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
   }else if(isMovie_DIrector_Actor == 'A'){
     if((tmp_actor_list = fopen("actor_list.txt", "r")) == NULL){
       if((actor_list = fopen("actor_list.txt", "w")) == NULL){
-        printf("File Open Error");
+        printf(" actor_list File Open Error");
         exit(1);
       }
       while(actor != NULL){
@@ -1229,11 +1424,22 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
     }else{
       FILE * create_tmp_actor_list;
       char* time_string = now_time_string();
-      char* file_name = (char*)malloc(sizeof(char)*100);
-      strcat(file_name, "actor_list.");
-      strcat(file_name, time_string);
-      if((create_tmp_actor_list = fopen(file_name, "w")) == NULL){
-        printf("File Open Error");
+      char* ffile_nname = (char*)malloc(sizeof(char)*50);
+      *(ffile_nname + 0) = 'a';
+      *(ffile_nname + 1) = 'c';
+      *(ffile_nname + 2) = 't';
+      *(ffile_nname + 3) = 'o';
+      *(ffile_nname + 4) = 'r';
+      *(ffile_nname + 5) = '_';
+      *(ffile_nname + 6) = 'l';
+      *(ffile_nname + 7) = 'i';
+      *(ffile_nname + 8) = 's';
+      *(ffile_nname + 9) = 't';
+      *(ffile_nname + 10) = '.';
+      *(ffile_nname + 11) = '\0';
+      strcat(ffile_nname, time_string);
+      if((create_tmp_actor_list = fopen(ffile_nname, "w")) == NULL){
+        printf("create_tmp_actor_list File Open Error");
         exit(1);
       }
       char chch;
@@ -1243,7 +1449,7 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
       }
       fclose(create_tmp_actor_list);
       if((actor_list = fopen("actor_list.txt", "w")) == NULL){
-        printf("File Open Error");
+        printf("actor_list in two File Open Error");
         exit(1);
       }
       while(actor != NULL){
@@ -1276,7 +1482,6 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
     }
   }
 }
-
 //actor add
 void option_add_actor(ACTOR public_actor){
   ACTOR actor;
@@ -1300,15 +1505,43 @@ void option_add_actor(ACTOR public_actor){
   strcpy(actor -> name , colon_change(tmp_char));
 
   ACTOR tmp_head_actor = public_actor;
+  int tmp_flag_for_overlap_check = 0;
   while(tmp_head_actor != NULL){
     if(!strcmp(tmp_head_actor -> name, tmp_char)){
-      printf("You have the same record.\n");
-      return;
+      if(tmp_head_actor -> sex){
+        printf("You have the same record in actor list. \n%d:%s:M:%s:", tmp_head_actor->serial_number, tmp_head_actor-> name, tmp_head_actor-> birth);
+      }else{
+        printf("You have the same record in actor list. \n%d:%s:F:%s:", tmp_head_actor->serial_number, tmp_head_actor-> name, tmp_head_actor-> birth);
+      }
+      MOVIE tmp_head_overlap_actor = tmp_head_actor -> movie;
+      while(tmp_head_overlap_actor != NULL){
+        if(tmp_head_overlap_actor -> movie_next == NULL){
+          printf("%s", tmp_head_overlap_actor->title );
+          break;
+        }else{
+          printf("%s, ", tmp_head_overlap_actor-> title);
+          tmp_head_overlap_actor = tmp_head_overlap_actor -> movie_next;
+        }
+      }
+      printf("\nDo you want to add any way? ");
+      gets(tmp_char);
+      if(*(tmp_char+0) == 'y' || *(tmp_char+0) == 'Y'){
+        if(*(tmp_char+1) == 'e' || *(tmp_char+1) == 'E'){
+          if(*(tmp_char+2) == 's' || *(tmp_char+2) == 's'){
+            tmp_flag_for_overlap_check = 1;
+          }
+        }
+      }
+      if(tmp_flag_for_overlap_check == 1){
+        break;
+      }else{
+        return;
+      }
     }else{
       tmp_head_actor = tmp_head_actor -> actor_next;
     }
   }
-
+  printf("ho?");
   printf("sex > ");
   gets(tmp_char);
   // director -> sex = (char*)malloc(sizeof(char)*strlen(tmp_char+5));
@@ -1354,9 +1587,9 @@ void option_add_actor(ACTOR public_actor){
   }
   if(file_size){
     if(actor -> sex){
-      fprintf(actor_log_write, "\nadd:%d:%s:M:%s:", actor -> serial_number, actor -> name, actor -> birth);
+      fprintf(actor_log_write, "add:%d:%s:M:%s:", actor -> serial_number, actor -> name, actor -> birth);
     }else{
-      fprintf(actor_log_write, "\nadd:%d:%s:F:%s:", actor -> serial_number, actor -> name, actor -> birth);
+      fprintf(actor_log_write, "add:%d:%s:F:%s:", actor -> serial_number, actor -> name, actor -> birth);
     }
 
     MOVIE tmp_print_movie = actor -> movie;
@@ -1368,6 +1601,7 @@ void option_add_actor(ACTOR public_actor){
       }
       tmp_print_movie = tmp_print_movie -> movie_next;
     }
+    fprintf(actor_log_write, "\n");
   }else{
     fprintf(actor_log_write, "add:%d:%s:%c:%s:", actor -> serial_number, actor -> name, actor -> sex, actor -> birth);
     MOVIE tmp_print_movie = actor -> movie;
@@ -1379,11 +1613,13 @@ void option_add_actor(ACTOR public_actor){
       }
       tmp_print_movie = tmp_print_movie -> movie_next;
     }
+    fprintf(actor_log_write, "\n");
   }
   free(tmp_char);
   fclose(actor_log_read);
   fclose(actor_log_write);
   fprint_list_movie_director_actor('A', public_first_movie, public_director, public_actor);
+  link_actor_to_movie();
 }
 ACTOR serach_last_actor(ACTOR public_actor){
   ACTOR actor = public_actor;
@@ -1425,7 +1661,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
             }
             if(flag == 0){
               if(search_last_meta_cnt == 0){
-                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                 last_flag = 1;
                 return 1;
                 break;
@@ -1477,7 +1713,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
               }
               if(z == tmp_string_length){
                 if(search_last_meta_cnt == 0){
-                  printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                  // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                   last_flag = 1;
                   return 1;
                   break;
@@ -1535,7 +1771,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
             }
             if(z == tmp_string_length){
               if(search_last_meta_cnt == 0){
-                printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+                // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
                 last_flag = 1;
                 return 1;
                 break;
@@ -1569,7 +1805,7 @@ int option_search_meta_search(char* string_orign, char* string_search){
       }
     }
     if(flag == 0){
-      printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
+      // printf("right !\norigin : %s, search_data : %s\n", string_orign, string_search);
       return 1;
     }else{
       return 0;
@@ -1626,17 +1862,17 @@ int option_search_movie(struct movie* movie, char* search_string){
         }
         tmp_print_actor = tmp_print_actor -> actor_next;
       }
+      printf("\n");
     }
     movie = movie -> movie_next;
   }
   if(flag == 0){
-    printf("no %s in movie", search_string);
+    // printf("no %s in movie", search_string);
     return 0;
   }else{
     return 1;
   }
 }
-
 
 
 int option_search_director(DIRECTOR director, char* search_string){
@@ -1680,17 +1916,18 @@ int option_search_director(DIRECTOR director, char* search_string){
         }
         tmp_print_movie = tmp_print_movie -> movie_next;
       }
+      printf("\n");
     }
+
     director = director -> director_next;
   }
   if(flag == 0){
-    printf("no %s in director", search_string);
+    // printf("no %s in director", search_string);
     return 0;
   }else{
     return 1;
   }
 }
-
 char* now_time_string(){
       time_t timer;
       struct tm *t_time;
@@ -1784,17 +2021,17 @@ int option_search_actor(ACTOR actor, char* search_string){
         }
         tmp_print_movie = tmp_print_movie -> movie_next;
       }
+      printf("\n");
     }
     actor = actor -> actor_next;
   }
   if(flag == 0){
-    printf("no %s in actor", search_string);
+    // printf("no %s in actor", search_string);
     return 0;
   }else{
     return 1;
   }
 }
-
 void save_list_movie(char* option, struct movie *movie, char* option2)
 {
   FILE *fp, *tmp, *tmp_print;
@@ -3123,6 +3360,7 @@ void option_delete_actor(int num,ACTOR actor)
   bool break_flag=false;
   ACTOR actor_next_tmp;
   ACTOR public_actor_next_tmp;
+  int n=count_actor_list(actor);
   int cnt=0;
   struct best_movie* movie_next_tmp;
 
@@ -3145,17 +3383,39 @@ void option_delete_actor(int num,ACTOR actor)
 
   if (break_flag)
   {
-    if (cnt==0)
+    if (cnt==0 && n!=1)
     {
       public_actor_next_tmp=public_actor->actor_next;
       public_actor->serial_number=public_actor_next_tmp->serial_number;
       strcpy(public_actor->name,public_actor_next_tmp->name);
       public_actor->sex=public_actor_next_tmp->sex;
       strcpy(public_actor->birth,public_actor_next_tmp->birth);
+      while(public_actor->movie->movie_next!=NULL)
+      {
+        movie_next_tmp=public_actor->movie->movie_next;
+        free(actor_tmp->movie->title);
+        public_actor->movie=movie_next_tmp;
+      }
       public_actor->movie=public_actor_next_tmp->movie;
-      public_actor->actor_next=public_actor_next_tmp->actor_next;
-    }
 
+      public_actor->actor_next=public_actor_next_tmp->actor_next;
+
+      free(public_actor_next_tmp->name);
+      free(public_actor_next_tmp->birth);
+    }
+    else if (cnt==0 && n==1)
+    {
+      free(public_actor->name);
+      free(public_actor->birth);
+      while(public_actor->movie->movie_next!=NULL)
+      {
+        movie_next_tmp=public_actor->movie->movie_next;
+        free(actor_tmp->movie->title);
+        public_actor->movie=movie_next_tmp;
+      }
+      free(public_actor->actor_next);
+      public_actor=NULL;
+    }
     else
     {
       for (int i=0;i<cnt-1;i++)
@@ -3184,6 +3444,202 @@ void option_delete_actor(int num,ACTOR actor)
     fprintf(actor_log_write,"delete:%d::::\n",num);
     fclose(actor_log_write);
     fprint_list_movie_director_actor('A',public_first_movie,public_director,public_actor);
+  }
+  else
+  {
+    printf("No such record\n");
+  }
+}
+
+void option_delete_director(int num,DIRECTOR director)
+{
+  DIRECTOR director_tmp=director;
+  DIRECTOR director_tmp2=director;
+  bool break_flag=false;
+  DIRECTOR director_next_tmp;
+  DIRECTOR public_director_next_tmp;
+  int n=count_director_list(director);
+  int cnt=0;
+  struct best_movie* movie_next_tmp;
+
+  while (director_tmp->director_next!=NULL)
+  {
+    if (director_tmp->serial_number==num)
+    {
+      break_flag=true;
+      director_next_tmp=director_tmp->director_next;
+      break;
+    }
+    cnt++;
+    director_tmp=director_tmp->director_next;
+  }
+  if (director_tmp->serial_number==num)
+  {
+    director_next_tmp=director_tmp->director_next;
+    break_flag=true;
+  }
+
+  if (break_flag)
+  {
+    if (cnt==0 && n!=1)
+    {
+      public_director_next_tmp=public_director->director_next;
+      public_director->serial_number=public_director_next_tmp->serial_number;
+      strcpy(public_director->name,public_director_next_tmp->name);
+      public_director->sex=public_director_next_tmp->sex;
+      strcpy(public_director->birth,public_director_next_tmp->birth);
+      while(public_director->movie->movie_next!=NULL)
+      {
+        movie_next_tmp=public_director->movie->movie_next;
+        free(public_director->movie->title);
+        public_director->movie=movie_next_tmp;
+      }
+      public_director->movie=public_director_next_tmp->movie;
+      public_director->director_next=public_director_next_tmp->director_next;
+    }
+    else if (cnt==0 && n==1)
+    {
+      free(public_director->name);
+      free(public_director->birth);
+      while(director_tmp->movie->movie_next!=NULL)
+      {
+        movie_next_tmp=public_director->movie->movie_next;
+        free(public_director->movie->title);
+        public_director->movie=movie_next_tmp;
+      }
+      free(public_director->movie->title);
+      public_director=NULL;
+    }
+    else
+    {
+      for (int i=0;i<cnt-1;i++)
+      {
+        director_tmp2=director_tmp2->director_next;
+      }
+      director_tmp2->director_next=director_next_tmp;
+
+      free(director_tmp->name);
+
+      while(director_tmp->movie->movie_next!=NULL)
+      {
+        movie_next_tmp=director_tmp->movie->movie_next;
+        free(director_tmp->movie->title);
+        director_tmp->movie=movie_next_tmp;
+      }
+      free(director_tmp->movie->title);
+    }
+
+    link_director_to_movie();
+
+    printf("Delete Complete!\n");
+
+    FILE *director_log_write;
+    director_log_write=fopen("director_log.txt","a");
+    fprintf(director_log_write,"delete:%d::::\n",num);
+    fclose(director_log_write);
+    fprint_list_movie_director_actor('D',public_first_movie,public_director,public_actor);
+  }
+  else
+  {
+    printf("No such record\n");
+  }
+
+}
+
+void option_delete_movie(int num,struct movie* movie)
+{
+  struct movie* movie_tmp=movie;
+  struct movie* movie_tmp2=movie;
+  bool break_flag=false;
+  struct movie* movie_next_tmp;
+  struct movie* public_first_movie_next_tmp;
+  int n=count_movie_list(movie);
+  int cnt=0;
+  struct linked_list_actor* actor_next_tmp;
+
+  while (movie_tmp->movie_next!=NULL)
+  {
+    if (movie_tmp->Serial_number==num)
+    {
+      break_flag=true;
+      movie_next_tmp=movie_tmp->movie_next;
+      break;
+    }
+    cnt++;
+    movie_tmp=movie_tmp->movie_next;
+  }
+  if (movie_tmp->Serial_number==num)
+  {
+    movie_next_tmp=movie_tmp->movie_next;
+    break_flag=true;
+  }
+
+  if (break_flag)
+  {
+    if (cnt==0 && n!=1)
+    {
+      public_first_movie_next_tmp=public_first_movie->movie_next;
+      public_first_movie->Serial_number=public_first_movie_next_tmp->Serial_number;
+      strcpy(public_first_movie->title,public_first_movie_next_tmp->title);
+      strcpy(public_first_movie->genre,public_first_movie_next_tmp->genre);
+      public_first_movie->director=public_first_movie_next_tmp->director;
+      public_first_movie->year=public_first_movie_next_tmp->year;
+      public_first_movie->time=public_first_movie_next_tmp->time;
+      while(public_first_movie->actor->actor_next!=NULL)
+      {
+        actor_next_tmp=public_first_movie->actor->actor_next;
+        free(public_first_movie->actor->actor_name);
+        public_first_movie->actor=actor_next_tmp;
+      }
+      free(movie_tmp->actor->actor_name);
+      public_first_movie->actor=public_first_movie_next_tmp->actor;
+
+      public_first_movie->movie_next=public_first_movie_next_tmp->movie_next;
+    }
+    else if (cnt==0 && n==1)
+    {
+      free(public_first_movie->title);
+      free(public_first_movie->genre);
+      while(public_first_movie->actor->actor_next!=NULL)
+      {
+        actor_next_tmp=public_first_movie->actor->actor_next;
+        free(public_first_movie->actor->actor_name);
+        public_first_movie->actor=actor_next_tmp;
+      }
+      free(movie_tmp->actor->actor_name);
+      public_first_movie=NULL;
+    }
+    else
+    {
+      for (int i=0;i<cnt-1;i++)
+      {
+        movie_tmp2=movie_tmp2->movie_next;
+      }
+      movie_tmp2->movie_next=movie_next_tmp;
+
+      free(movie_tmp->title);
+      free(movie_tmp->genre);
+
+      while(movie_tmp->actor->actor_next!=NULL)
+      {
+        actor_next_tmp=movie_tmp->actor->actor_next;
+        free(movie_tmp->actor->actor_name);
+        movie_tmp->actor=actor_next_tmp;
+      }
+      free(movie_tmp->actor->actor_name);
+    }
+
+    lint_movie_to_actor(public_actor,public_first_movie);
+    lint_movie_to_director(public_director,public_first_movie);
+
+    printf("Delete Complete!\n");
+
+    FILE *movie_log_write;
+    movie_log_write=fopen("movie_log.txt","a");
+    fprintf(movie_log_write,"delete:%d::::\n",num);
+    fclose(movie_log_write);
+
+    fprint_list_movie_director_actor('M',public_first_movie,public_director,public_actor);
   }
   else
   {
