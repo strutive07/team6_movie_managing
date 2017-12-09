@@ -210,7 +210,9 @@ struct movie *parse_movie(char* buffer, int isFirst){
 
     movies -> actor = create_actor_struct(parse_char);
   }else if(!strcmp(parse_char, "delete")){
-
+    parse_char = strtok(NULL,":");
+    int serial_num = atoi(parse_char);
+    option_delete_movie(serial_num, public_first_movie);
   }
 }
 char* colon_change(char* tmp_char){
