@@ -309,7 +309,7 @@ int search_actor_to_movie(ACTOR public_actor_tmp)
 		if (result!=NULL)//대표영화와 같은 영화가 movie구조체에 있을경우
 		{
 			BEST_MOVIE->movie_link=result;//연결
-			printf("MOVIE and ACOTR CONNECTED > %s\n", BEST_MOVIE->movie_link->title);
+			//printf("MOVIE and ACOTR CONNECTED > %s\n", BEST_MOVIE->movie_link->title);
 			return 1;
 		}
 
