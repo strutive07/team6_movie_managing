@@ -11,23 +11,27 @@ void init_director()
   char *line;
   int size;
 
+ // 파일 에러 체크
   if((log = fopen("director_log.txt", "r+")) == NULL)
   {
     printf("FILE ERROR");
     exit(-1);
   }
 
+// 파일 에러 체크
   if((list = fopen("director_list.txt", "w")) == NULL)
   {
     printf("FILE ERROR");
     exit(-1);
   }
 
+// 파일 사이즈
   fseek(log, SEEK_SET, SEEK_END);
   size = ftell(log);
   line = (char*)malloc(size+3);
   fseek(log, 0, SEEK_SET);
 
+// log 파일에서 한 줄씩 읽어 들임
   while(fgets(line, size, log))
   {
     if(strlen(line) != 1)
@@ -37,7 +41,7 @@ void init_director()
       char *split, *origin;
       char *tag, *serial_number, *name, *sex, *birth, *title;
       int serial_number_integer;
-      // printf("입력받은 문장 > %s" , line);
+      // 읽어 들인 문장
       origin = (char*)malloc(size+3);
       strcpy(origin, line);
 
@@ -45,13 +49,14 @@ void init_director()
       split = strtok(line, ":");
       tag = (char*)malloc(strlen(split)+3);
       strcpy(tag, split);
-      // printf(">>> tag : %s\n", tag);
+
       // serial_number
       split = strtok(NULL, ":");
       serial_number = (char*)malloc(strlen(split)+3);
       strcpy(serial_number, split);
       serial_number_integer = atoi(serial_number);
-      // printf(">>> serial_number : %s\n", serial_number);
+
+      // tag 체크
       if(!strcmp(tag, "add"))
       {
         add_list_director(list, origin+4);
@@ -60,17 +65,17 @@ void init_director()
         split = strtok(NULL, ":");
         name = (char*)malloc(strlen(split)+3);
         strcpy(name, split);
-        // printf(">>> name : %s\n", name);
+
         // sex
         split = strtok(NULL, ":");
         sex = (char*)malloc(strlen(split)+3);
         strcpy(sex, split);
-        // printf(">>> sex : %s\n", sex);
+
         // birth
         split = strtok(NULL, ":");
         birth = (char*)malloc(strlen(split)+3);
         strcpy(birth, split);
-        // printf(">>> birth : %s\n", birth);
+
         // title
         split = strtok(NULL, ":");
         title = (char*)malloc(strlen(split)+3);
@@ -79,7 +84,8 @@ void init_director()
 
         // title
         split = strtok(title, ",\n");
-        // printf("MOVIE TITLE : %s \n", split);
+
+        // best movie 구조체 생성
         if(movie == NULL)
         {
           movie = list_movie_director(split);
@@ -87,12 +93,12 @@ void init_director()
         while(split = strtok(NULL, ",\n"))
         {
           strcpy(split, split+1);
-          // printf("MOVIE TITLE : %s \n", split);
 
           movie_tmp = list_movie_director(split);
           movie = put_list_movie_director(movie, movie_tmp);
         }
 
+        // director 구조체 생성
         if(director == NULL)
         {
           director = list_director(serial_number, name, sex, birth, movie);
@@ -103,12 +109,14 @@ void init_director()
           director = put_list_director(director, director_tmp);
         }
       }
+      // delete tag
       else if(!strcmp(tag, "delete"))
       {
         DIRECTOR delete_director = director;
         option_delete_director(serial_number_integer, delete_director, true);
         continue;
       }
+      // update tag
       else if(!strcmp(tag, "update"))
       {
         DIRECTOR update_director = director;
@@ -120,43 +128,48 @@ void init_director()
         split = strtok(NULL, ":");
         name = (char*)malloc(strlen(split)+3);
         strcpy(name, split);
+        // =이 아닐 때 update
         if(strcmp(name, "="))
         {
           free(update_director->name);
           update_director->name= (char*)malloc(strlen(name)+3);
           strcpy(update_director->name, name);
         }
-        // printf(">>> name : %s\n", name);
+
         // sex
         split = strtok(NULL, ":");
         sex = (char*)malloc(strlen(split)+3);
         strcpy(sex, split);
+        // =이 아닐 때 update
         if(*sex != '=')
         {
           update_director->sex = *sex;
         }
-        // printf(">>> sex : %s\n", sex);
+
         // birth
         split = strtok(NULL, ":");
         birth = (char*)malloc(strlen(split)+3);
         strcpy(birth, split);
+        // =이 아닐 때 update
         if(strcmp(birth, "="))
         {
           free(update_director->birth);
           update_director->birth= (char*)malloc(strlen(birth)+3);
           strcpy(update_director->birth, birth);
         }
-        // printf(">>> birth : %s\n", birth);
+
         // title
         split = strtok(NULL, ":");
         title = (char*)malloc(strlen(split)+3);
         strcpy(title, split);
         *(title + strlen(title) - 1) = '\0';
 
+        // best movie가 1개 일때 continue
         if(!strlen(title))
         {
           continue;
         }
+        // best movie가 여러 개 일때 update
         else
         {
           split = strtok(title, ",\n");
@@ -174,19 +187,10 @@ void init_director()
         continue;
       }
 
-
-      /*****************************/
-      printf("DIRECTOR LIST > \n");
-      print_director(director);
-      printf("\n");
-      printf("MOVIE LIST > \n");
-      print_movie_director(movie);
-      printf("\n");
-
-      /*****************************/
-
+      // best movie 초기화
       movie = NULL;
 
+      // free
       free(tag);
       free(origin);
       free(serial_number);
@@ -199,27 +203,26 @@ void init_director()
   fclose(log);
   fclose(list);
 
-  // printf("@@@@@@@@%s\n", director->director_next->movie->title);
-
   public_director = director;
 
   free(line);
-  // free(director);
-  // free(movie);
 }
 
 void add_list_director(FILE *list, char* origin)
 {
+  // list 파일 생성
   fprintf(list, "%s", origin);
 }
 
 MOVIE list_movie_director(char* title){
    MOVIE movie;
 
+   // best movie가 비어 있을 때
    if(movie == NULL)
    {
      return NULL;
    }
+   // best movie가 비어 있지 않을 때
    else
    {
       movie = (MOVIE)malloc(sizeof(struct best_movie));
@@ -235,10 +238,12 @@ MOVIE list_movie_director(char* title){
 DIRECTOR list_director(char* serial_number, char* name, char* sex, char* birth, MOVIE movie){
    DIRECTOR director;
 
+   // director가 비어 있을 때
    if(director == NULL)
    {
      return NULL;
    }
+   // director가 비어 있지 않을 때
    else
    {
       director = (DIRECTOR)malloc(sizeof(struct director));
@@ -259,10 +264,12 @@ DIRECTOR list_director(char* serial_number, char* name, char* sex, char* birth, 
 MOVIE put_list_movie_director(MOVIE origin, MOVIE tmp){
   MOVIE new;
   new = origin;
+  // best movie의 노드 값을 마지막 값으로 변경
   while(new->movie_next != NULL)
   {
     new = new->movie_next;
   }
+  // 마지막 노드에 삽입
   new->movie_next = tmp;
 
   return origin;
@@ -271,11 +278,12 @@ MOVIE put_list_movie_director(MOVIE origin, MOVIE tmp){
 DIRECTOR put_list_director(DIRECTOR origin, DIRECTOR tmp){
   DIRECTOR new;
   new = origin;
-
+ // director 노드 값을 마지막 값으로 변경
   while(new->director_next != NULL)
   {
     new = new->director_next;
   }
+  // 마지막 노드에 삽입
   new->director_next = tmp;
 
   return origin;
@@ -312,12 +320,11 @@ struct movie* search_director_to_movie_title(char* title)
 {
   struct movie* LINK = public_first_movie;
 
+  // movie 구조체와 일치하는 title 값을 검색
   while(LINK != NULL)
   {
     if(!strcmp(title, LINK->title))
     {
-      // printf("@@@@@@@@@@@@@@@@@@@@@@@@ SEARCH COMPLETE! %s /// %s\n", title, LINK->title);
-
       return LINK;
     }
 
@@ -332,18 +339,13 @@ int search_director_to_movie(DIRECTOR tmp)
   struct movie* result = NULL;
   struct best_movie* BEST_MOVIE = tmp->movie;
 
+  // best movie에서 movie 연결
   while(BEST_MOVIE != NULL)
   {
     result = search_director_to_movie_title(BEST_MOVIE->title);
-    // printf("@@@@@@@@@@@@@@@@@@@@@@@ %d %s ///\n", strlen(tmp->movie->title), tmp->movie->title);
-
     if(result != NULL)
     {
-      // printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS\n");
-      // printf("@@@@@@@@@@@@@@@@@@@@@@@@ SEARCH COMPLETE! %s /// %s\n", tmp->movie->title, result->title);
       BEST_MOVIE->movie_link = result;
-      printf("MOVIE and DIRECOTR CONNECTED > %s\n", BEST_MOVIE->movie_link->title);
-
       return 1;
     }
     BEST_MOVIE = BEST_MOVIE->movie_next;
@@ -357,6 +359,7 @@ void link_director_to_movie()
   DIRECTOR tmp = public_director;
   int result;
 
+  // movie 구조체의 title 값과 일치하는 director를 검색
   while(tmp != NULL)
   {
     result = search_director_to_movie(tmp);
