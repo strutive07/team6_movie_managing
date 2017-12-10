@@ -20,7 +20,7 @@ void init_movie(){//movie 초기화
   char *one_line = (char*)malloc(sizeof(char)*200);
   int main_isFirst = 1;
   while(fgets(one_line, 200, mv_log_read) != NULL){//log 파일에서 한줄씩 읽음
-    printf("%s", one_line);
+//     printf("%s", one_line);
     if(main_isFirst == 1){
       public_first_movie = parse_movie(one_line, main_isFirst);//head 에 연결해줌. 첫번쨰꺼는 무조건 add 일태니까 오류날수 없음
       main_isFirst = 0;
