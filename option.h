@@ -34,18 +34,18 @@ void print_list_director(DIRECTOR director, char *serial);
 void print_list_actor(ACTOR actor, char *serial);
 void print_list_movie(struct movie *movie, char *serial);
 
-DIRECTOR serach_last_director(DIRECTOR public_first_director);
-void option_add_movie(struct movie *movie);
-void option_add_director(DIRECTOR public_first_director);
-void option_add_actor(ACTOR public_actor);
-ACTOR serach_last_actor(ACTOR public_actor);
-void fprint_list_movie_director_actor(char isMovie_DIrector_Actor,struct movie *movie, DIRECTOR director, ACTOR actor);
-int option_search_meta_search(char* string_orign, char* string_search);
-int option_search_movie(struct movie* movie, char* search_string);
-int option_search_director(DIRECTOR director, char* search_string);
-int option_search_actor(ACTOR actor, char* search_string);
+DIRECTOR serach_last_director(DIRECTOR public_first_director); //마지막 director 찾는 함수
+void option_add_movie(struct movie *movie);//옵션 - add 명령어 - movie 추가
+void option_add_director(DIRECTOR public_first_director);//옵션 - add 명령어 - director 추가
+void option_add_actor(ACTOR public_actor);//옵션 - add 명령어 - actor 추가
+ACTOR serach_last_actor(ACTOR public_actor);//마지막 actor 찾는 함수
+void fprint_list_movie_director_actor(char isMovie_DIrector_Actor,struct movie *movie, DIRECTOR director, ACTOR actor);//movie, director, actor list 에 업데이트 해주는 함수. 이미 list 파일이 있으면 현재 시간 받아서 백업본 만듬.
+int option_search_meta_search(char* string_orign, char* string_search);//search 함수. string_search 인자로 메타문자가 포함될수 있는 문자열을 받아서 메타문자 문자열 검색 을 해주는 함수.
+int option_search_movie(struct movie* movie, char* search_string);//movie 의 멤버들에서 search 하는 함수
+int option_search_director(DIRECTOR director, char* search_string);//director 의 멤버들에서 search 하는 함수
+int option_search_actor(ACTOR actor, char* search_string);//actor 의 멤버들에서 search 하는 함수
 
-char* now_time_string();
+char* now_time_string();//현재 시간 문자열로 만들어서 리턴해주는 함수
 
 void save_list_movie(char* option, struct movie *movie, char* option2);
 void save_list_director(char* option, struct director *director, char* option2);
