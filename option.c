@@ -416,7 +416,7 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
        fprintf(write_in_log,"%s", movie_write_tmp->title); // movie의 모든 데이터를 입력
        movie_write_tmp = movie_write_tmp -> movie_next;
        if(movie_write_tmp != NULL)
-       fprintf(write_in_log,",");
+       fprintf(write_in_log,", ");
      }
    }
      fprintf(write_in_log, "\n");
@@ -575,7 +575,7 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
   fprintf(write_in_log,"%s", movie_write_tmp->title);
   movie_write_tmp = movie_write_tmp -> movie_next;
   if(movie_write_tmp != NULL)
-  fprintf(write_in_log,",");
+  fprintf(write_in_log,", ");
   }
 }
      fprintf(write_in_log, "\n");
@@ -755,7 +755,7 @@ void update_list_movie(char *option, char *serial, struct movie *movies){
     fprintf(write_in_log,"%s", actor_write_tmp->actor_name);
     actor_write_tmp = actor_write_tmp -> actor_next;
     if(actor_write_tmp   != NULL)
-    fprintf(write_in_log,",");
+    fprintf(write_in_log,", ");
     }
   }
      fprintf(write_in_log, "\n");
