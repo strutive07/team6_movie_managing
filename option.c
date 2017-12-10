@@ -338,8 +338,8 @@ void update_list_director(char *option, char *serial, DIRECTOR director){
   printf("Director sex > ");
   gets(tmp);
   char letter = *tmp;
-  if(letter != 'M' && letter != 'W'){ // M이나 W가 아니면 거절 후 i--(밑에서 i++를 하므로 값은 그대로)
-    printf("Wrong(Only M or W)\n");
+  if(letter != 'M' && letter != 'F'){ // M이나 F가 아니면 거절 후 i--(밑에서 i++를 하므로 값은 그대로)
+    printf("Wrong(Only M or F)\n");
     i--;
     break;
   }
@@ -495,10 +495,10 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
   gets(tmp);
   if(!strcmp(tmp, "M")){
     actor -> sex = 1;
-  }else if(!strcmp(tmp, "W")){
+  }else if(!strcmp(tmp, "F")){
     actor -> sex = 0;
   }else{
-    printf("ONLY W or M can run in data\n");  // M이나 W가 아니면 거절 후 i--(밑에서 i++를 하므로 값은 그대로)
+    printf("ONLY F or M can run in data\n");  // M이나 F가 아니면 거절 후 i--(밑에서 i++를 하므로 값은 그대로)
   }
   update_check *= 3; // 변경 진행됨
   break;
@@ -555,9 +555,9 @@ void update_list_actor(char *option, char *serial, ACTOR actor){
      fprintf(write_in_log, ":=");
    }else{
      if(actor->sex)
-    fprintf(write_in_log,":M", actor->sex);
+    fprintf(write_in_log,":M");
      else
-    fprintf(write_in_log,":W", actor->sex);
+    fprintf(write_in_log,":F");
 
   }
 
