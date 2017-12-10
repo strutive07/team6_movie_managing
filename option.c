@@ -195,7 +195,7 @@ void whats_up_commander(){ // 입력받는 함수
           printf("@@ No such record.\n");
         }
       }else if(!strcmp(split, "sort")){
-         // save m option -f filename
+         // sort m option -f filename
          command_what = strtok(NULL, " "); // mda
 
          if((option = strtok(NULL, " ")) != NULL){ // option이든 filename이든 있을 때 (-f 혹은 option을 잘랐다.)
@@ -211,18 +211,18 @@ void whats_up_commander(){ // 입력받는 함수
             strcpy(option, "ALL COMMANDS");
          }
 
-        }else{ // option이 없었다면 전부 디폴트였다. save m
+       }else{ // option이 없었다면 전부 디폴트였다. sort m
         option = (char *)malloc(sizeof(char)*13); // token 과정에서 NULL처리가 되서 할당안하면 안되네
         strcpy(option, "ALL COMMANDS");
-        option2 = NULL;
+        option2 = NULL; // filename는 default인 NULL로 넘겨받음
         }
 
-        char option_letter_tmp  = *option;
+        char option_letter_tmp  = *option; // option 전달용
 
          if(!strcmp(command_what, "m"))
          {
            if (!strcmp(option,"ALL COMMANDS"))
-             option_letter_tmp='t';
+             option_letter_tmp='t'; // option을 안줘 ALL COMMANDS상태면 default인 t로 넘김
             sort_movie(option_letter_tmp, movies, option2);
             if(split == NULL) // split가 NULL일 경우 이후 strcmp에서 에러가 발생
             split = (char *)malloc(sizeof(char)*100);
@@ -233,7 +233,7 @@ void whats_up_commander(){ // 입력받는 함수
          else if(!strcmp(command_what, "d"))
          {
            if (!strcmp(option,"ALL COMMANDS"))
-             option_letter_tmp='n';
+             option_letter_tmp='n'; // option을 안줘 ALL COMMANDS상태면 default인 n으로 넘김
             sort_director(option_letter_tmp, director, option2);
             if(split == NULL) // split가 NULL일 경우 이후 strcmp에서 에러가 발생
             split = (char *)malloc(sizeof(char)*100);
@@ -244,7 +244,7 @@ void whats_up_commander(){ // 입력받는 함수
          else if(!strcmp(command_what, "a"))
          {
            if (!strcmp(option,"ALL COMMANDS"))
-             option_letter_tmp='n';
+             option_letter_tmp='n'; // option을 안줘 ALL COMMANDS상태면 default인 n으로 넘김
             sort_actor(option_letter_tmp, actor, option2);
             if(split == NULL) // split가 NULL일 경우 이후 strcmp에서 에러가 발생
             split = (char *)malloc(sizeof(char)*100);
@@ -257,7 +257,7 @@ void whats_up_commander(){ // 입력받는 함수
          }
 
        }else{
-         printf("@@ Wrong Command\n");
+         printf("@@ Wrong Command\n"); // 해당 명령어가 없을 경우 wrong command를 출력
        }
 
   }
