@@ -3631,6 +3631,7 @@ void option_delete_actor(int num,ACTOR actor,bool from_where)//actor 삭제 함�
       actor_tmp2->actor_next=actor_next_tmp;
 
       free(actor_tmp->name);
+      free(actor_tmp->birth);
 
       while(actor_tmp->movie->movie_next!=NULL)
       {
@@ -3643,10 +3644,9 @@ void option_delete_actor(int num,ACTOR actor,bool from_where)//actor 삭제 함�
 
     link_actor_to_movie();//변경 사항을 movie 구조체에 연결
 
-    printf("Delete Complete!\n");
-
     if (!from_where)//명령어로 들어왔을 경우
     {
+      printf("Delete Complete!\n");
       FILE *actor_log_write;
       actor_log_write=fopen("actor_log.txt","a");
       fprintf(actor_log_write,"delete:%d::::\n",num);
@@ -3731,6 +3731,7 @@ void option_delete_director(int num,DIRECTOR director,bool from_where)//director
       director_tmp2->director_next=director_next_tmp;
 
       free(director_tmp->name);
+      free(director_tmp->birth);
 
       while(director_tmp->movie->movie_next!=NULL)
       {
@@ -3743,10 +3744,9 @@ void option_delete_director(int num,DIRECTOR director,bool from_where)//director
 
     link_director_to_movie();//변경 사항을 movie 구조체에 연결
 
-    printf("Delete Complete!\n");
-
     if (!from_where)//명령어로 들어왔을 경우
     {
+      printf("Delete Complete!\n");
       FILE *director_log_write;
       director_log_write=fopen("director_log.txt","a");
       fprintf(director_log_write,"delete:%d::::\n",num);
@@ -3850,10 +3850,9 @@ void option_delete_movie(int num,struct movie* movie,bool from_where)//movie 삭
     lint_movie_to_actor(public_actor,public_first_movie);//변경 사항을 actor 구조체와 연결
     lint_movie_to_director(public_director,public_first_movie);//변경 사항을 director 구조체와 연결
 
-    printf("Delete Complete!\n");
-
     if (!from_where)//명령어로 들어왔을 경우
     {
+      printf("Delete Complete!\n");
       FILE *movie_log_write;
       movie_log_write=fopen("movie_log.txt","a");
       fprintf(movie_log_write,"delete:%d::::\n",num);
