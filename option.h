@@ -47,10 +47,10 @@ int option_search_actor(ACTOR actor, char* search_string);//actor 의 멤버들�
 
 char* now_time_string();//현재 시간 문자열로 만들어서 리턴해주는 함수
 
-void save_list_movie(char* option, struct movie *movie, char* option2);
-void save_list_director(char* option, struct director *director, char* option2);
-void save_list_actor(char* option, struct actor *actor, char* option2);
-char* insert_string(char *origin, char *insert, int pos);
+void save_list_movie(char* option, struct movie *movie, char* option2); // movie 구조체 save 함수
+void save_list_director(char* option, struct director *director, char* option2); // director 구조체 save 함수
+void save_list_actor(char* option, struct actor *actor, char* option2); // actor 구조체 save 함수
+char* insert_string(char *origin, char *insert, int pos); // string 2개 연결 함수
 
 int cmp_actor_n(const void* a,const void* b);
 int cmp_actor_s(const void* a,const void* b);
