@@ -67,9 +67,9 @@ int cmp_movie_y(const void* a,const void* b);
 int cmp_movie_r(const void* a,const void* b);
 int cmp_movie_a(const void* a,const void* b);
 
-void sort_actor(char option, ACTOR actor);
-void sort_director(char option, DIRECTOR director);
-void sort_movie(char option, struct movie* movie);
+void sort_actor(char option, ACTOR actor,char* option2);
+void sort_director(char option, DIRECTOR director,char* option2);
+void sort_movie(char option, struct movie* movie,char* option2);
 
 int count_actor_list(ACTOR actor);
 int count_director_list(DIRECTOR director);
