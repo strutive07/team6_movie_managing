@@ -1045,7 +1045,7 @@ void option_add_movie(struct movie *movie){
   int tmp_flag_for_overlap_check = 0;
   while(tmp_head_movie != NULL){ //같은거 있나 채크.
     if(!strcmp(tmp_head_movie -> title, inMovie -> title)){
-      printf("%s", tmp_head_movie -> title);
+      // printf("%s", tmp_head_movie -> title);
       printf("You have the same record in movie list. \n%d:%s:%s:%s:%d:%d:", tmp_head_movie->Serial_number, tmp_head_movie-> title, tmp_head_movie->genre, tmp_head_movie->director.name,tmp_head_movie-> year, tmp_head_movie->time);
       struct linked_list_actor* tmp_head_overlap_actor = tmp_head_movie -> actor;
       while(tmp_head_overlap_actor != NULL){
@@ -1604,7 +1604,7 @@ void option_add_actor(ACTOR public_actor_ho){
 
   printf("best movie > ");
   gets(tmp_char);
-  printf("%s", tmp_char);
+  // printf("%s", tmp_char);
   // fseek(actor_log_read,0,SEEK_END);
   char* split = strtok(tmp_char, ",");
   MOVIE movie;
@@ -1661,7 +1661,7 @@ ACTOR serach_last_actor(ACTOR public_actor){
   while((actor -> actor_next) != NULL){
     actor = actor -> actor_next;
   }
-  printf("%d\n", actor -> serial_number);
+  // printf("%d\n", actor -> serial_number);
   return actor;
 }
 
@@ -2076,11 +2076,13 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
   char* filename = (char*)malloc(sizeof(char)*100);
   int size = 0;
 
+ // 옵션 중 - 체크
   if(*option == '-')
   {
     strcpy(option, option+1);
   }
 
+ // filename 있으면 변경
   if(option2 == NULL)
   {
     strcpy(filename, "movie_list.txt");
@@ -2091,6 +2093,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
   }
   fp = fopen(filename, "w");
 
+// 전체 옵션 실행
   if(!strcmp(option, "ALL COMMANDS"))
    {
       strcpy(option, "tgdyra");
@@ -2100,15 +2103,18 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
     {
       switch(*option)
       {
+        // 옵션 t
         case 't' :
         if(size == 0)
         {
+          // 파일이 비어 있을 경우 format 생성
           while(save_movie)
           {
             fprintf(fp ,"%d:%s:=:=:=:=:=\n", save_movie->Serial_number, save_movie->title);
             save_movie = save_movie->movie_next;
           }
         }
+        // 파일이 비어 있지 않을 경우
         else
         {
           tmp = fopen(filename, "r");
@@ -2121,6 +2127,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
             size = ftell(tmp) + 1;
             *(movie_list_str+strlen(movie_list_str)-1) = '\0';
 
+            // 콜론 위치 기준으로 데이터 삽입
             int collon_cnt = 0;
             for(int i = 0; i < strlen(movie_list_str); i++)
             {
@@ -2128,7 +2135,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 위치 일치
               if(collon_cnt == 1)
               {
                 movie_list_str = insert_string(movie_list_str, save_movie->title, i+1);
@@ -2151,16 +2158,18 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
         save_movie = public_first_movie;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 g
         case 'g' :
         if(size == 0)
         {
+          // 파일이 비어 있는 경우 format 생성
           while(save_movie)
           {
             fprintf(fp ,"%d:=:%s:=:=:=:=\n", save_movie->Serial_number, save_movie->genre);
             save_movie = save_movie->movie_next;
           }
         }
+        // 파일이 비어 있지 않은 경우 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2180,7 +2189,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 체크하여 데이터 위치 결정
               if(collon_cnt == 2)
               {
                 movie_list_str = insert_string(movie_list_str, save_movie->genre, i+1);
@@ -2203,16 +2212,18 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
         save_movie = public_first_movie;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 d
         case 'd' :
         if(size == 0)
         {
+          // 파일이 비어 있을 때 format 생성
           while(save_movie)
           {
             fprintf(fp ,"%d:=:=:%s:=:=:=\n", save_movie->Serial_number, save_movie->director.name);
             save_movie = save_movie->movie_next;
           }
         }
+        // 파일이 비어 있지 않을 때 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2232,7 +2243,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 위치가 일치하면 데이터 삽입
               if(collon_cnt == 3)
               {
                 movie_list_str = insert_string(movie_list_str, save_movie->director.name, i+1);
@@ -2255,16 +2266,18 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
         save_movie = public_first_movie;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 y
         case 'y' :
         if(size == 0)
         {
+          // 파일이 비어 있을 때 format 생성
           while(save_movie)
           {
             fprintf(fp ,"%d:=:=:=:%d:=:=\n", save_movie->Serial_number, save_movie->year);
             save_movie = save_movie->movie_next;
           }
         }
+        // 파일이 비어 있지 않을 때 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2284,7 +2297,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 개수가 일치하면 데이터 삽입
               if(collon_cnt == 4)
               {
                 char *year;
@@ -2312,16 +2325,18 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
         save_movie = public_first_movie;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 r
         case 'r' :
         if(size == 0)
         {
+          // 파일이 비어 있을 때 format 생성
           while(save_movie)
           {
             fprintf(fp ,"%d:=:=:=:=:%d:=\n", save_movie->Serial_number, save_movie->time);
             save_movie = save_movie->movie_next;
           }
         }
+        // 파일이 비어 있지 않을 때 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2341,7 +2356,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 개수가 일치하면 데이터 삽입
               if(collon_cnt == 5)
               {
                 char *time;
@@ -2369,16 +2384,17 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
         save_movie = public_first_movie;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 a
         case 'a' :
         if(size == 0)
         {
+          // 파일이 비어 있으면 format 생성
           while(save_movie)
           {
             struct linked_list_actor* actor_tmp = save_movie->actor;
 
             fprintf(fp ,"%d:=:=:=:=:=:%s", save_movie->Serial_number, save_movie->actor->actor_name);
-
+            // actor 리스트 출력
             while(save_movie->actor->actor_next != NULL)
             {
               save_movie->actor = save_movie->actor->actor_next;
@@ -2389,6 +2405,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
             save_movie = save_movie->movie_next;
           }
         }
+        // 파일이 비어 있지 않으면 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2409,6 +2426,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
               {
                 collon_cnt++;
               }
+              //  콜론 개수 일치하면 데이터 삽입
               if(collon_cnt == 6)
               {
                 struct linked_list_actor* actor_tmp = save_movie->actor;
@@ -2416,7 +2434,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
                 movie_list_str = insert_string(movie_list_str, save_movie->actor->actor_name, i+1);
                 fprintf(tmp_print, "%s", movie_list_str);
                 fflush(tmp_print);
-
+                // actor 삽입
                 while(save_movie->actor->actor_next != NULL)
                 {
                   save_movie->actor = save_movie->actor->actor_next;
@@ -2442,7 +2460,7 @@ void save_list_movie(char* option, struct movie *movie, char* option2)
         save_movie = public_first_movie;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 존재 하지 않은 옵션
         default :
         printf("There is no option for %c\n", *option);
         break;
@@ -2463,12 +2481,12 @@ void save_list_director(char* option, struct director *director, char* option2)
   char *director_list_str;
   char *filename = (char*)malloc(sizeof(char)*100);
   int size = 0;
-
+  // - 체크
   if(*option == '-')
   {
     strcpy(option, option+1);
   }
-
+  // filename 체크
   if(option2 == NULL)
   {
     strcpy(filename, "director_list.txt");
@@ -2478,7 +2496,7 @@ void save_list_director(char* option, struct director *director, char* option2)
     strcpy(filename, option2);
   }
   fp = fopen(filename, "w");
-
+  // 옵션 전체 실행
   if(!strcmp(option, "ALL COMMANDS"))
    {
       strcpy(option, "nsbm");
@@ -2488,15 +2506,18 @@ void save_list_director(char* option, struct director *director, char* option2)
     {
       switch(*option)
       {
+        // 옵션 n
         case 'n' :
         if(size == 0)
         {
+          // 파일이 비어 있다면 format 생성
           while(save_director)
           {
             fprintf(fp ,"%d:%s:=:=:=\n", save_director->serial_number, save_director->name);
             save_director = save_director->director_next;
           }
         }
+        // 파일이 비어 있지 않다면 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2516,7 +2537,7 @@ void save_list_director(char* option, struct director *director, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 개수 체크 일치하면 데이터 삽입
               if(collon_cnt == 1)
               {
                 director_list_str = insert_string(director_list_str, save_director->name, i+1);
@@ -2539,16 +2560,18 @@ void save_list_director(char* option, struct director *director, char* option2)
         save_director = public_director;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 s
         case 's' :
         if(size == 0)
         {
+          // 파일이 비어 있다면 format 생성
           while(save_director)
           {
             fprintf(fp ,"%d:=:%c:=:=\n", save_director->serial_number, save_director->sex);
             save_director = save_director->director_next;
           }
         }
+        // 파일이 비어 있지 않다면 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2569,7 +2592,7 @@ void save_list_director(char* option, struct director *director, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 개수 일치하면 데이터 삽입
               if(collon_cnt == 2)
               {
                 director_list_str = insert_string(director_list_str, &(save_director->sex), i+1);
@@ -2592,16 +2615,18 @@ void save_list_director(char* option, struct director *director, char* option2)
         save_director = public_director;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 b
         case 'b' :
         if(size == 0)
         {
+          // 파일이 비어 있다면 format 생성
           while(save_director)
           {
             fprintf(fp ,"%d:=:=:%s:=\n", save_director->serial_number, save_director->birth);
             save_director = save_director->director_next;
           }
         }
+        // 파일이 비어 있지 않다면 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2622,7 +2647,7 @@ void save_list_director(char* option, struct director *director, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 개수 일치하면 데이터삽입
               if(collon_cnt == 3)
               {
                 director_list_str = insert_string(director_list_str, save_director->birth, i+1);
@@ -2645,16 +2670,18 @@ void save_list_director(char* option, struct director *director, char* option2)
         save_director = public_director;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 m
         case 'm' :
         if(size == 0)
         {
+          // 파일이 비어 있다면 format 생성
           while(save_director)
           {
             struct best_movie* movie_tmp = save_director->movie;
 
             fprintf(fp, "%d:=:=:=:%s", save_director->serial_number, save_director->movie->title);
 
+            // best_movie 출력
             while(save_director->movie->movie_next != NULL)
             {
               save_director->movie = save_director->movie->movie_next;
@@ -2665,6 +2692,7 @@ void save_list_director(char* option, struct director *director, char* option2)
             save_director = save_director->director_next;
           }
         }
+        // 파일이 비어 있지 안다면 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2685,6 +2713,7 @@ void save_list_director(char* option, struct director *director, char* option2)
               {
                 collon_cnt++;
               }
+              // 콜론 개수 일치하면 데이터 삽입
               if(collon_cnt == 4)
               {
                 struct best_movie* movie_tmp = save_director->movie;
@@ -2692,6 +2721,7 @@ void save_list_director(char* option, struct director *director, char* option2)
                 director_list_str = insert_string(director_list_str, save_director->movie->title, i+1);
                 fprintf(tmp_print, "%s", director_list_str);
                 fflush(tmp_print);
+                // best movie 출력
                 while(save_director->movie->movie_next != NULL)
                 {
                   save_director->movie = save_director->movie->movie_next;
@@ -2717,7 +2747,7 @@ void save_list_director(char* option, struct director *director, char* option2)
         save_director = public_director;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 존재 하지 않는 옵션
         default :
         printf("There is no option for %c\n", *option);
         break;
@@ -2738,12 +2768,12 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
   char *actor_list_str;
   char *filename = (char*)malloc(sizeof(char)*100);
   int size = 0;
-
+  // - 체크
   if(*option == '-')
   {
     strcpy(option, option+1);
   }
-
+  // filename 체크
   if(option2 == NULL)
   {
     strcpy(filename, "actor_list.txt");
@@ -2753,7 +2783,7 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
     strcpy(filename, option2);
   }
   fp = fopen(filename, "w");
-
+  // 옵션 전체 실행
   if(!strcmp(option, "ALL COMMANDS"))
    {
       strcpy(option, "nsbm");
@@ -2763,15 +2793,18 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
     {
       switch(*option)
       {
+        // 옵션 n
         case 'n' :
         if(size == 0)
         {
+          // 파일이 비어 있다면 format 생성
           while(save_actor)
           {
             fprintf(fp ,"%d:%s:=:=:=\n", save_actor->serial_number, save_actor->name);
             save_actor = save_actor->actor_next;
           }
         }
+        // 파일이 비어 있지 않다면 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2791,7 +2824,7 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 개수 일치하면 데이터 삽입
               if(collon_cnt == 1)
               {
                 actor_list_str = insert_string(actor_list_str, save_actor->name, i+1);
@@ -2814,14 +2847,15 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
         save_actor = public_actor;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 s
         case 's' :
         if(size == 0)
         {
+          // 파일이 비어 있다면 format 생성
           while(save_actor)
           {
             char sex;
-
+            // 성별 구분
             if(save_actor->sex)
             {
               sex = 'M';
@@ -2835,6 +2869,7 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
             save_actor = save_actor->actor_next;
           }
         }
+        // 파일이 비어 있지 않다면 데이터 삽입
         else
         {
           char* sex;
@@ -2858,9 +2893,10 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 개수 일치하면 데이터 삽입
               if(collon_cnt == 2)
               {
+                // 성별 구분
                 if(save_actor->sex)
                 {
                   strcpy(sex, "M");
@@ -2890,16 +2926,18 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
         save_actor = public_actor;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 b
         case 'b' :
         if(size == 0)
         {
+          // 파일이 비어 있다면 format 셍성
           while(save_actor)
           {
             fprintf(fp ,"%d:=:=:%s:=\n", save_actor->serial_number, save_actor->birth);
             save_actor = save_actor->actor_next;
           }
         }
+        // 파일이 비어 있지 않다면 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2920,7 +2958,7 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
               {
                 collon_cnt++;
               }
-
+              // 콜론 개수 일치하면 데이터 삽입
               if(collon_cnt == 3)
               {
                 actor_list_str = insert_string(actor_list_str, save_actor->birth, i+1);
@@ -2943,16 +2981,17 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
         save_actor = public_actor;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 옵션 m
         case 'm' :
         if(size == 0)
         {
+          // 파일이 비어 있다면 format 생성
           while(save_actor)
           {
             struct best_movie* movie_tmp = save_actor->movie;
 
             fprintf(fp, "%d:=:=:=:%s", save_actor->serial_number, save_actor->movie->title);
-
+            // best movie 출력
             while(save_actor->movie->movie_next != NULL)
             {
               save_actor->movie = save_actor->movie->movie_next;
@@ -2963,6 +3002,7 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
             save_actor = save_actor->actor_next;
           }
         }
+        // 파일이 비어 있지 않다면 데이터 삽입
         else
         {
           tmp = fopen(filename, "r");
@@ -2983,6 +3023,7 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
               {
                 collon_cnt++;
               }
+              // 콜론 개수 일치하면 데이터 삽입
               if(collon_cnt == 4)
               {
                 struct best_movie* movie_tmp = save_actor->movie;
@@ -2990,6 +3031,7 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
                 actor_list_str = insert_string(actor_list_str, save_actor->movie->title, i+1);
                 fprintf(tmp_print, "%s", actor_list_str);
                 fflush(tmp_print);
+                // best movie 출력
                 while(save_actor->movie->movie_next != NULL)
                 {
                   save_actor->movie = save_actor->movie->movie_next;
@@ -3015,7 +3057,7 @@ void save_list_actor(char* option, struct actor *actor, char* option2)
         save_actor = public_actor;
         printf("Complete option for %c\n", *option);
         break;
-
+        // 존재 하지 않은 옵션
         default :
         printf("There is no option for %c\n", *option);
         break;
@@ -3033,11 +3075,13 @@ char* insert_string(char *origin, char *insert, int pos)
 {
   char *str;
   int size;
+  // string 2개의 길이 합침
   size = strlen(origin) + strlen(insert) + 1;
   str = (char*)malloc(size + 100);
   strncpy(str, origin, pos);
   strcpy(origin, origin+pos+1);
 
+  // string 2개 연결
   strcat(str, insert);
   strcat(str, origin);
 
@@ -3768,7 +3812,7 @@ void option_delete_movie(int num,struct movie* movie,bool from_where)//movie 삭
 
       public_first_movie->movie_next=public_first_movie_next_tmp->movie_next;
     }
-    else if (cnt==0 && n==1//영화가 1편 존재할 경우
+    else if (cnt==0 && n==1)//영화가 1편 존재할 경우
     {
       //public_first_movie 구조체에 NULL값을 넣음
       free(public_first_movie->title);
@@ -3823,4 +3867,3 @@ void option_delete_movie(int num,struct movie* movie,bool from_where)//movie 삭
   }
 
 }
-
