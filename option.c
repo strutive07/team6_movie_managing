@@ -1045,7 +1045,7 @@ void option_add_movie(struct movie *movie){
   int tmp_flag_for_overlap_check = 0;
   while(tmp_head_movie != NULL){ //같은거 있나 채크.
     if(!strcmp(tmp_head_movie -> title, inMovie -> title)){
-      printf("%s", tmp_head_movie -> title);
+      // printf("%s", tmp_head_movie -> title);
       printf("You have the same record in movie list. \n%d:%s:%s:%s:%d:%d:", tmp_head_movie->Serial_number, tmp_head_movie-> title, tmp_head_movie->genre, tmp_head_movie->director.name,tmp_head_movie-> year, tmp_head_movie->time);
       struct linked_list_actor* tmp_head_overlap_actor = tmp_head_movie -> actor;
       while(tmp_head_overlap_actor != NULL){
@@ -1604,7 +1604,7 @@ void option_add_actor(ACTOR public_actor_ho){
 
   printf("best movie > ");
   gets(tmp_char);
-  printf("%s", tmp_char);
+  // printf("%s", tmp_char);
   // fseek(actor_log_read,0,SEEK_END);
   char* split = strtok(tmp_char, ",");
   MOVIE movie;
@@ -1661,7 +1661,7 @@ ACTOR serach_last_actor(ACTOR public_actor){
   while((actor -> actor_next) != NULL){
     actor = actor -> actor_next;
   }
-  printf("%d\n", actor -> serial_number);
+  // printf("%d\n", actor -> serial_number);
   return actor;
 }
 
