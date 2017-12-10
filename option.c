@@ -1487,7 +1487,7 @@ void fprint_list_movie_director_actor(char isMovie_DIrector_Actor, struct movie 
       }
       char chch;
       while((chch=fgetc(tmp_actor_list)) != EOF){//원본꺼 복사해서 붙여넣기
-        printf("%c", chch);
+        //printf("%c", chch);
         fputc(chch, create_tmp_actor_list);
       }
       fclose(create_tmp_actor_list);
