@@ -3056,10 +3056,10 @@ void colon_rchange(char *tmp_char){ // ??; => : 출력용
   }
 }
 
-void colon_frchange(FILE* fm,char *tmp_char){ // ??; => :
+void colon_frchange(FILE* fm,char *tmp_char){ // ??; => : 파일출력용
   int tmp_char_length = strlen(tmp_char);
   for(int i=0; i<tmp_char_length; i++){
-    if(*(tmp_char+i) == '?'){
+    if(*(tmp_char+i) == '?'){// 문장을 한글자씩 출력하다 ??;가 있으면 : 출력 후 건너뜀
       if(*(tmp_char+i+1) == '?'){
         if(*(tmp_char+i+2) == ';'){
           fprintf(fm,":");
@@ -3071,7 +3071,7 @@ void colon_frchange(FILE* fm,char *tmp_char){ // ??; => :
   }
 }
 
-int cmp_actor_n(const void* a,const void* b)
+int cmp_actor_n(const void* a,const void* b)//배우 이름 기준 정렬
 {
 	ACTOR a_tmp=(ACTOR)a;
 	ACTOR b_tmp=(ACTOR)b;
@@ -3080,7 +3080,7 @@ int cmp_actor_n(const void* a,const void* b)
 }
 
 
-int cmp_actor_s(const void* a,const void* b)
+int cmp_actor_s(const void* a,const void* b)//배우 성별 기준 정렬
 {
 	ACTOR a_tmp=(ACTOR)a;
 	ACTOR b_tmp=(ACTOR)b;
@@ -3094,7 +3094,7 @@ int cmp_actor_s(const void* a,const void* b)
 
 }
 
-int cmp_actor_b(const void* a,const void* b)
+int cmp_actor_b(const void* a,const void* b)//배우 생년월일 기준 정렬
 {
 	ACTOR a_tmp=(ACTOR)a;
 	ACTOR b_tmp=(ACTOR)b;
@@ -3103,7 +3103,7 @@ int cmp_actor_b(const void* a,const void* b)
 }
 
 
-int cmp_actor_m(const void* a,const void* b)
+int cmp_actor_m(const void* a,const void* b)//배우 영화 기준 정렬
 {
 	ACTOR a_tmp=(ACTOR)a;
 	ACTOR b_tmp=(ACTOR)b;
@@ -3111,7 +3111,7 @@ int cmp_actor_m(const void* a,const void* b)
 	return strcmp(a_tmp->movie->title,b_tmp->movie->title);
 }
 
-int cmp_director_n(const void* a,const void* b)
+int cmp_director_n(const void* a,const void* b)//감독 이름 기준 정렬
 {
 	DIRECTOR a_tmp=(DIRECTOR)a;
 	DIRECTOR b_tmp=(DIRECTOR)b;
@@ -3120,7 +3120,7 @@ int cmp_director_n(const void* a,const void* b)
 }
 
 
-int cmp_director_s(const void* a,const void* b)
+int cmp_director_s(const void* a,const void* b)//감독 성별 기준 정렬
 {
 	DIRECTOR a_tmp=(DIRECTOR)a;
 	DIRECTOR b_tmp=(DIRECTOR)b;
@@ -3134,7 +3134,7 @@ int cmp_director_s(const void* a,const void* b)
 
 }
 
-int cmp_director_b(const void* a,const void* b)
+int cmp_director_b(const void* a,const void* b)//감독 생년월일 기준 정렬
 {
 	DIRECTOR a_tmp=(DIRECTOR)a;
 	DIRECTOR b_tmp=(DIRECTOR)b;
@@ -3143,7 +3143,7 @@ int cmp_director_b(const void* a,const void* b)
 }
 
 
-int cmp_director_m(const void* a,const void* b)
+int cmp_director_m(const void* a,const void* b)//감독 영화 기준 정렬
 {
 	DIRECTOR a_tmp=(DIRECTOR)a;
 	DIRECTOR b_tmp=(DIRECTOR)b;
@@ -3151,7 +3151,7 @@ int cmp_director_m(const void* a,const void* b)
 	return strcmp(a_tmp->movie->title,b_tmp->movie->title);
 }
 
-int cmp_movie_tt(const void* a,const void* b)
+int cmp_movie_tt(const void* a,const void* b)//영화 제목 기준 정렬
 {
 	struct movie* a_tmp=(struct movie*)a;
 	struct movie* b_tmp=(struct movie*)b;
@@ -3159,7 +3159,7 @@ int cmp_movie_tt(const void* a,const void* b)
 	return strcmp(a_tmp->title,b_tmp->title);
 }
 
-int cmp_movie_g(const void* a,const void* b)
+int cmp_movie_g(const void* a,const void* b)//영화 장르 기준 정렬
 {
   struct movie* a_tmp=(struct movie*)a;
 	struct movie* b_tmp=(struct movie*)b;
@@ -3167,7 +3167,7 @@ int cmp_movie_g(const void* a,const void* b)
 	return strcmp(a_tmp->genre,b_tmp->genre);
 }
 
-int cmp_movie_d(const void* a,const void* b)
+int cmp_movie_d(const void* a,const void* b)//영화 감독 기준 정렬
 {
   struct movie* a_tmp=(struct movie*)a;
 	struct movie* b_tmp=(struct movie*)b;
@@ -3175,7 +3175,7 @@ int cmp_movie_d(const void* a,const void* b)
 	return strcmp(a_tmp->director.name,b_tmp->director.name);
 }
 
-int cmp_movie_y(const void* a,const void* b)
+int cmp_movie_y(const void* a,const void* b)//영화 년도 기준 정렬
 {
   struct movie* a_tmp=(struct movie*)a;
 	struct movie* b_tmp=(struct movie*)b;
@@ -3188,7 +3188,7 @@ int cmp_movie_y(const void* a,const void* b)
 		return -1;
 }
 
-int cmp_movie_r(const void* a,const void* b)
+int cmp_movie_r(const void* a,const void* b)//영화 시간 기준 정렬
 {
   struct movie* a_tmp=(struct movie*)a;
 	struct movie* b_tmp=(struct movie*)b;
@@ -3201,7 +3201,7 @@ int cmp_movie_r(const void* a,const void* b)
 		return -1;
 }
 
-int cmp_movie_a(const void* a,const void* b)
+int cmp_movie_a(const void* a,const void* b)//영화 배우 기준 정렬
 {
   struct movie* a_tmp=(struct movie*)a;
 	struct movie* b_tmp=(struct movie*)b;
@@ -3209,7 +3209,7 @@ int cmp_movie_a(const void* a,const void* b)
 	return strcmp(a_tmp->actor->actor_name,b_tmp->actor->actor_name);
 }
 
-void sort_actor(char option, ACTOR actor,char* option2)
+void sort_actor(char option, ACTOR actor,char* option2)//actor 정렬 함수
 {
   FILE *fm;
   if (option2!=NULL)
@@ -3217,16 +3217,16 @@ void sort_actor(char option, ACTOR actor,char* option2)
     fm=fopen("filename_sort_tmp.txt","w");
   }
 
-  if (option==0)
-    option='n';
-	int n=count_actor_list(actor);
+  if (option==0)//option내용이 비었을경우
+    option='n';//이름 옵션으로 변경
+	int n=count_actor_list(actor);//구조체 연결 수 확인
 	ACTOR actor_tmp=actor;
 
 	ACTOR sort_list=(ACTOR)malloc(sizeof(struct actor)*n);
 
 	int cnt=0;
 
-	while(actor_tmp->actor_next!=NULL)
+	while(actor_tmp->actor_next!=NULL)//연결된 리스트를 배열로 만듬
 	{
 		(*(sort_list+cnt))= *actor_tmp;
 		cnt++;
@@ -3234,6 +3234,7 @@ void sort_actor(char option, ACTOR actor,char* option2)
 	}
 	(*(sort_list+cnt))= *actor_tmp;
 
+  //정렬
 	if (option=='n')
 		qsort(sort_list,n,sizeof(struct actor),cmp_actor_n);
 	else if (option=='s')
@@ -3245,7 +3246,7 @@ void sort_actor(char option, ACTOR actor,char* option2)
 
 	for (int i=0;i<n;i++)
 	{
-    if (option2==NULL)
+    if (option2==NULL)//파일 이름이 지정되지 않았을 경우
     {
   		printf("%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
   		if ((sort_list+i)->sex)
@@ -3262,7 +3263,7 @@ void sort_actor(char option, ACTOR actor,char* option2)
   		colon_rchange((sort_list+i)->movie->title);
       printf("\n");
     }
-    else
+    else//파일 이름이 지정되었을 경우
     {
       fprintf(fm,"%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
 
@@ -3298,7 +3299,7 @@ void sort_actor(char option, ACTOR actor,char* option2)
 
 }
 
-void sort_director(char option, DIRECTOR director,char* option2)
+void sort_director(char option, DIRECTOR director,char* option2)//director 정렬 함수
 {
   FILE *fm;
   if (option2!=NULL)
@@ -3306,15 +3307,15 @@ void sort_director(char option, DIRECTOR director,char* option2)
     fm=fopen("filename_sort_tmp.txt","w");
   }
 
-  if (option==0)
-    option='n';
+  if (option==0)//옵션이 들어오지 않았을 경우
+    option='n';//이름 옵션으로 변경
   int cnt=0;
-	int n=count_director_list(director);
+	int n=count_director_list(director);//구조체 연결 수 확인
 	DIRECTOR director_tmp=director;
 
 	DIRECTOR sort_list=(DIRECTOR)malloc(sizeof(struct director)*n);
 
-	while(director_tmp->director_next!=NULL)
+	while(director_tmp->director_next!=NULL)//연결된 리스트를 배열로 만듬
 	{
 		(*(sort_list+cnt))=*director_tmp;
 		cnt++;
@@ -3322,6 +3323,7 @@ void sort_director(char option, DIRECTOR director,char* option2)
 	}
 	(*(sort_list+cnt))=*director_tmp;
 
+  //정렬
 	if (option=='n')
 		qsort(sort_list,n,sizeof(struct director),cmp_director_n);
 	else if (option=='s')
@@ -3333,7 +3335,7 @@ void sort_director(char option, DIRECTOR director,char* option2)
 
     for (int i=0;i<n;i++)
   	{
-      if (option2==NULL)
+      if (option2==NULL)//파일 이름이 지정되지 않았을 경우
       {
     		printf("%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
         printf("%c:",(sort_list+i)->sex);
@@ -3347,7 +3349,7 @@ void sort_director(char option, DIRECTOR director,char* option2)
     		colon_rchange((sort_list+i)->movie->title);
         printf("\n");
       }
-      else
+      else//파일 이름이 지정되었을 경우
       {
 
         fprintf(fm,"%d:%s:",(sort_list+i)->serial_number,(sort_list+i)->name);
@@ -3379,12 +3381,12 @@ void sort_director(char option, DIRECTOR director,char* option2)
 
 }
 
-void sort_movie(char option, struct movie* movie,char* option2)
+void sort_movie(char option, struct movie* movie,char* option2)//movie 정렬 함수
 {
-  if (option==0)
-    option='t';
+  if (option==0)//옵션이 들어오지 않았을 경우
+    option='t';//제목 옵션으로 변경
   int cnt=0;
-	int n=count_movie_list(movie);
+	int n=count_movie_list(movie);//연결된 리스트 수 확인
 	struct movie* movie_tmp=movie;
 	struct movie* sort_list=(struct movie*)malloc(sizeof(struct movie)*n);
 
@@ -3394,7 +3396,7 @@ void sort_movie(char option, struct movie* movie,char* option2)
     fm=fopen("filename_sort_tmp.txt","w");
   }
 
-	while(movie_tmp->movie_next!=NULL)
+	while(movie_tmp->movie_next!=NULL)//연결된 리스트를 배열로 만듬
 	{
 		(*(sort_list+cnt))=(*movie_tmp);
 		cnt++;
@@ -3402,6 +3404,7 @@ void sort_movie(char option, struct movie* movie,char* option2)
 	}
 	(*(sort_list+cnt))=(*movie_tmp);
 
+  //정렬
 	if (option=='t')
 		qsort(sort_list,n,sizeof(struct movie),cmp_movie_tt);
 	else if (option=='d')
@@ -3417,7 +3420,7 @@ void sort_movie(char option, struct movie* movie,char* option2)
 
     for (int i=0;i<n;i++)
   	{
-      if (option2==NULL)
+      if (option2==NULL)//파일 이름이 지정되지 않았을 경우
       {
     		printf("%d:%s:",(sort_list+i)->Serial_number,(sort_list+i)->title);
         printf("%s:",(sort_list+i)->genre);
@@ -3430,7 +3433,7 @@ void sort_movie(char option, struct movie* movie,char* option2)
     		}
     		printf("%s\n",(sort_list+i)->actor->actor_name);
       }
-      else
+      else//파일 이름이 지정되었을 경우
       {
         fprintf(fm,"%d:%s:",(sort_list+i)->Serial_number,(sort_list+i)->title);
         fprintf(fm,"%s:",(sort_list+i)->genre);
@@ -3460,7 +3463,7 @@ void sort_movie(char option, struct movie* movie,char* option2)
 
 }
 
-int count_actor_list(ACTOR actor)
+int count_actor_list(ACTOR actor)//연결된 actor 리스트 수 확인
 {
 	int cnt=0;
 	ACTOR actor_tmp=actor;
@@ -3476,7 +3479,7 @@ int count_actor_list(ACTOR actor)
 	return cnt;
 }
 
-int count_director_list(DIRECTOR director)
+int count_director_list(DIRECTOR director)//연결된 director 리스트 수 확인
 {
 	int cnt=0;
 	DIRECTOR director_tmp=director;
@@ -3491,7 +3494,7 @@ int count_director_list(DIRECTOR director)
 	return cnt;
 }
 
-int count_movie_list(struct movie* movie)
+int count_movie_list(struct movie* movie)//연결된 movie 리스트 수 확인
 {
 	int cnt=0;
 	struct movie* movie_tmp=movie;
@@ -3506,20 +3509,20 @@ int count_movie_list(struct movie* movie)
 	return cnt;
 }
 
-void option_delete_actor(int num,ACTOR actor,bool from_where)
+void option_delete_actor(int num,ACTOR actor,bool from_where)//actor 삭제 함수
 {
   ACTOR actor_tmp=actor;
   ACTOR actor_tmp2=actor;
   bool break_flag=false;
   ACTOR actor_next_tmp;
   ACTOR public_actor_next_tmp;
-  int n=count_actor_list(actor);
+  int n=count_actor_list(actor);//연결된 리스트 수 확인
   int cnt=0;
   struct best_movie* movie_next_tmp;
 
   while (actor_tmp->actor_next!=NULL)
   {
-    if (actor_tmp->serial_number==num)
+    if (actor_tmp->serial_number==num)//삭제할 시리얼 넘버가 있는지 확인
     {
       break_flag=true;
       actor_next_tmp=actor_tmp->actor_next;
@@ -3534,10 +3537,11 @@ void option_delete_actor(int num,ACTOR actor,bool from_where)
     break_flag=true;
   }
 
-  if (break_flag)
+  if (break_flag)//시리얼 넘버가 있을경우
   {
-    if (cnt==0 && n!=1)
+    if (cnt==0 && n!=1)//2명 이상의 배우가 존재하는 상태에서 첫 번째 배우를 지울경우
     {
+      //public_actor 구조체를 수정함
       public_actor_next_tmp=public_actor->actor_next;
       public_actor->serial_number=public_actor_next_tmp->serial_number;
       strcpy(public_actor->name,public_actor_next_tmp->name);
@@ -3556,8 +3560,9 @@ void option_delete_actor(int num,ACTOR actor,bool from_where)
       free(public_actor_next_tmp->name);
       free(public_actor_next_tmp->birth);
     }
-    else if (cnt==0 && n==1)
+    else if (cnt==0 && n==1)//배우가 1명 존재할 경우
     {
+      //public_actor 구조체에 NULL값을 넣음
       free(public_actor->name);
       free(public_actor->birth);
       while(public_actor->movie->movie_next!=NULL)
@@ -3569,8 +3574,9 @@ void option_delete_actor(int num,ACTOR actor,bool from_where)
       free(public_actor->actor_next);
       public_actor=NULL;
     }
-    else
+    else//2명 이상의 배우가 존재하고 첫 번째가 아닌 배우를 지울경우
     {
+      //이전 구조체와 다음 구조체를 연결해줌
       for (int i=0;i<cnt-1;i++)
       {
         actor_tmp2=actor_tmp2->actor_next;
@@ -3588,11 +3594,11 @@ void option_delete_actor(int num,ACTOR actor,bool from_where)
       free(actor_tmp->movie->title);
     }
 
-    link_actor_to_movie();
+    link_actor_to_movie();//변경 사항을 movie 구조체에 연결
 
     printf("Delete Complete!\n");
 
-    if (!from_where)
+    if (!from_where)//명령어로 들어왔을 경우
     {
       FILE *actor_log_write;
       actor_log_write=fopen("actor_log.txt","a");
@@ -3607,20 +3613,20 @@ void option_delete_actor(int num,ACTOR actor,bool from_where)
   }
 }
 
-void option_delete_director(int num,DIRECTOR director,bool from_where)
+void option_delete_director(int num,DIRECTOR director,bool from_where)//director 삭제 함수
 {
   DIRECTOR director_tmp=director;
   DIRECTOR director_tmp2=director;
   bool break_flag=false;
   DIRECTOR director_next_tmp;
   DIRECTOR public_director_next_tmp;
-  int n=count_director_list(director);
+  int n=count_director_list(director);//연결된 리스트 수 확인
   int cnt=0;
   struct best_movie* movie_next_tmp;
 
   while (director_tmp->director_next!=NULL)
   {
-    if (director_tmp->serial_number==num)
+    if (director_tmp->serial_number==num)//삭제할 시리얼 넘버가 있는지 확인
     {
       break_flag=true;
       director_next_tmp=director_tmp->director_next;
@@ -3635,10 +3641,11 @@ void option_delete_director(int num,DIRECTOR director,bool from_where)
     break_flag=true;
   }
 
-  if (break_flag)
+  if (break_flag)//시리얼 넙버가 있을경우
   {
-    if (cnt==0 && n!=1)
+    if (cnt==0 && n!=1)//2명 이상의 감독이 존재하는 상태에서 첫 번째 감독을 지울경우
     {
+      //public_director 구조체를 수정함
       public_director_next_tmp=public_director->director_next;
       public_director->serial_number=public_director_next_tmp->serial_number;
       strcpy(public_director->name,public_director_next_tmp->name);
@@ -3653,8 +3660,9 @@ void option_delete_director(int num,DIRECTOR director,bool from_where)
       public_director->movie=public_director_next_tmp->movie;
       public_director->director_next=public_director_next_tmp->director_next;
     }
-    else if (cnt==0 && n==1)
+    else if (cnt==0 && n==1)//감독이 1명 존재할 경우
     {
+      //public_director 구조체에 NULL값을 넣음
       free(public_director->name);
       free(public_director->birth);
       while(director_tmp->movie->movie_next!=NULL)
@@ -3666,8 +3674,9 @@ void option_delete_director(int num,DIRECTOR director,bool from_where)
       free(public_director->movie->title);
       public_director=NULL;
     }
-    else
+    else//2명 이상의 감독이 존재하고 첫 번째가 아닌 감독을 지울경우
     {
+      //이전 구조체와 다음 구조체를 연결해줌
       for (int i=0;i<cnt-1;i++)
       {
         director_tmp2=director_tmp2->director_next;
@@ -3685,11 +3694,11 @@ void option_delete_director(int num,DIRECTOR director,bool from_where)
       free(director_tmp->movie->title);
     }
 
-    link_director_to_movie();
+    link_director_to_movie();//변경 사항을 movie 구조체에 연결
 
     printf("Delete Complete!\n");
 
-    if (!from_where)
+    if (!from_where)//명령어로 들어왔을 경우
     {
       FILE *director_log_write;
       director_log_write=fopen("director_log.txt","a");
@@ -3705,20 +3714,20 @@ void option_delete_director(int num,DIRECTOR director,bool from_where)
 
 }
 
-void option_delete_movie(int num,struct movie* movie,bool from_where)
+void option_delete_movie(int num,struct movie* movie,bool from_where)//movie 삭제 함수
 {
   struct movie* movie_tmp=movie;
   struct movie* movie_tmp2=movie;
   bool break_flag=false;
   struct movie* movie_next_tmp;
   struct movie* public_first_movie_next_tmp;
-  int n=count_movie_list(movie);
+  int n=count_movie_list(movie);//연결된 리스트 수 확인
   int cnt=0;
   struct linked_list_actor* actor_next_tmp;
 
   while (movie_tmp->movie_next!=NULL)
   {
-    if (movie_tmp->Serial_number==num)
+    if (movie_tmp->Serial_number==num)//삭제할 시리얼 넘버가 존재하는지 확인
     {
       break_flag=true;
       movie_next_tmp=movie_tmp->movie_next;
@@ -3733,10 +3742,11 @@ void option_delete_movie(int num,struct movie* movie,bool from_where)
     break_flag=true;
   }
 
-  if (break_flag)
+  if (break_flag)//삭제할 시리얼 넘버가 존재할 경우
   {
-    if (cnt==0 && n!=1)
+    if (cnt==0 && n!=1)//2편 이상의 영화가 존재하는 상태에서 첫 번째 영화를 지울경우
     {
+      //public_first_movie 구조체를 수정함
       public_first_movie_next_tmp=public_first_movie->movie_next;
       public_first_movie->Serial_number=public_first_movie_next_tmp->Serial_number;
       strcpy(public_first_movie->title,public_first_movie_next_tmp->title);
@@ -3755,8 +3765,9 @@ void option_delete_movie(int num,struct movie* movie,bool from_where)
 
       public_first_movie->movie_next=public_first_movie_next_tmp->movie_next;
     }
-    else if (cnt==0 && n==1)
+    else if (cnt==0 && n==1//영화가 1편 존재할 경우
     {
+      //public_first_movie 구조체에 NULL값을 넣음
       free(public_first_movie->title);
       free(public_first_movie->genre);
       while(public_first_movie->actor->actor_next!=NULL)
@@ -3768,8 +3779,9 @@ void option_delete_movie(int num,struct movie* movie,bool from_where)
       free(movie_tmp->actor->actor_name);
       public_first_movie=NULL;
     }
-    else
+    else//2편 이상의 영화가 존재하고 첫 번째가 아닌 영화를 지울경우
     {
+      //이전 구조체와 다음 구조체를 연결해줌
       for (int i=0;i<cnt-1;i++)
       {
         movie_tmp2=movie_tmp2->movie_next;
@@ -3788,12 +3800,12 @@ void option_delete_movie(int num,struct movie* movie,bool from_where)
       free(movie_tmp->actor->actor_name);
     }
 
-    lint_movie_to_actor(public_actor,public_first_movie);
-    lint_movie_to_director(public_director,public_first_movie);
+    lint_movie_to_actor(public_actor,public_first_movie);//변경 사항을 actor 구조체와 연결
+    lint_movie_to_director(public_director,public_first_movie);//변경 사항을 director 구조체와 연결
 
     printf("Delete Complete!\n");
 
-    if (!from_where)
+    if (!from_where)//명령어로 들어왔을 경우
     {
       FILE *movie_log_write;
       movie_log_write=fopen("movie_log.txt","a");
@@ -3808,3 +3820,4 @@ void option_delete_movie(int num,struct movie* movie,bool from_where)
   }
 
 }
+
