@@ -240,9 +240,9 @@ char* colon_change(char* tmp_char){//   :   ->   ??;   로 변환해주는 함�
   }
 }
 
-// void update_movie(struct movie* movie, FILE *mv_log){
+void update_movie(struct movie* movie, FILE *mv_log){
 
-// }
+}
 
 struct movie *search_last_movie(struct movie *movie){//마지막꺼 movie 탐색. movie 구조체가 없으면 NULL 반환하고 있으면 마지막 movie 구조체 주소 반환.
   if(movie == NULL){
