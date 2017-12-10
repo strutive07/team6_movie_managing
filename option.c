@@ -938,7 +938,12 @@ void print_list_actor(ACTOR actor, char *serial){ // 출력함수
     MOVIE actor_printonly = actor -> movie;
     printf("%d : ", actor -> serial_number); // 정보 출력 시작
     colon_rchange(actor -> name);
-    printf(" %c ", actor -> sex);
+    putchar(' ');
+    if(actor -> sex){
+      putchar('M');
+    }else{
+      putchar('W');
+    }
     printf("%s \n", actor -> birth);
 
     while(actor_printonly != NULL){
