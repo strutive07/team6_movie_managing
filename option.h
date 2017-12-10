@@ -11,28 +11,28 @@
 #include "director.h"
 #include "actor.h"
 
-void you_wanna_end();
-void whats_up_commander();
+void you_wanna_end(int sig); // 시그널 종료 여부를 묻는 함수
+void whats_up_commander(); // 명령 입력을 받는 함수
 
-void update_list_director(char *option, char *serial, DIRECTOR director);
-DIRECTOR move_serial_director(int serial, DIRECTOR origin);
+void update_list_director(char *option, char *serial, DIRECTOR director); // director update 함수
+DIRECTOR move_serial_director(int serial, DIRECTOR origin); // 특정 시리얼넘버 이동 함수
 
-void update_list_actor(char *option, char *serial, ACTOR actor);
-ACTOR move_serial_actor(int serial, ACTOR origin);
+void update_list_actor(char *option, char *serial, ACTOR actor); // actor update 함수
+ACTOR move_serial_actor(int serial, ACTOR origin); // 특정 시리얼 넘버 이동 함수
 
-void update_list_movie(char *option, char *serial, struct movie *movie);
-struct movie* move_serial_movie(int serial, struct movie *origin);
+void update_list_movie(char *option, char *serial, struct movie *movie); //movie update 함수
+struct movie* move_serial_movie(int serial, struct movie *origin); // 특정 시리얼 넘버 이동 함수
 
-int director_overlap(char *tmp);
-int actor_overlap(char *tmp);
-int movie_overlap(char *tmp);
+int director_overlap(char *tmp); // Same record 체크함수
+int actor_overlap(char *tmp); // Same record 체크함수
+int movie_overlap(char *tmp); // Same record 체크함수
 
-void colon_rchange(char *tmp_char);
+void colon_rchange(char *tmp_char); // ??; -> : 변경함수(출력용)
 void colon_frchange(FILE* fm,char *tmp_char);
 
-void print_list_director(DIRECTOR director, char *serial);
-void print_list_actor(ACTOR actor, char *serial);
-void print_list_movie(struct movie *movie, char *serial);
+void print_list_director(DIRECTOR director, char *serial); // director print 함수
+void print_list_actor(ACTOR actor, char *serial); // actor print 함수
+void print_list_movie(struct movie *movie, char *serial); // movie print 함수
 
 DIRECTOR serach_last_director(DIRECTOR public_first_director); //마지막 director 찾는 함수
 void option_add_movie(struct movie *movie);//옵션 - add 명령어 - movie 추가
