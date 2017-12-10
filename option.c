@@ -103,6 +103,7 @@ void whats_up_commander(){ // 입력받는 함수
       	 option2 = strtok(NULL, " "); // 다음으로 자른 것이 option2이다.
        }
        if(!strcmp(option, "-f")){ // -f였으면 option은 없었다. split에 filename가 저장되어있다.
+	 option2 = (char *)malloc(strlen(split)+1); // option2는 NULL로 초기화될 경우 새로 메모리할당을 하지 않으면 strcpy를 할 공간이 없어 오류가 발생한다.
          strcpy(option2,split);
       	 strcpy(option, "ALL COMMANDS");
        }
@@ -207,7 +208,8 @@ void whats_up_commander(){ // 입력받는 함수
             option2 = strtok(NULL, " "); // 다음으로 자른 것이 option2이다.
          }
          if(!strcmp(option, "-f")){ // -f였으면 option은 없었다. split에 filename가 저장되어있다.
-           strcpy(option2,split);
+            option2 = (char *)malloc(strlen(split)+1); // option2는 NULL로 초기화될 경우 새로 메모리할당을 하지 않으면 strcpy를 할 공간이 없어 오류가 발생한다.
+	    strcpy(option2,split);
             strcpy(option, "ALL COMMANDS");
          }
 
@@ -963,6 +965,7 @@ void print_list_movie(struct movie *movie, char *serial){ // 출력함수
     struct linked_list_actor *movie_printonly = movie -> actor;
     printf("%d : ", movie -> Serial_number); // 정보 출력 시작
     colon_rchange(movie -> title);
+    putchar('\n');
     colon_rchange(movie -> genre);
     putchar('\n');
     printf("D : ");
