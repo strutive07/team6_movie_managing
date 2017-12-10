@@ -28,7 +28,7 @@ int actor_overlap(char *tmp); // Same record 체크함수
 int movie_overlap(char *tmp); // Same record 체크함수
 
 void colon_rchange(char *tmp_char); // ??; -> : 변경함수(출력용)
-void colon_frchange(FILE* fm,char *tmp_char);
+void colon_frchange(FILE* fm,char *tmp_char); // ??; -> : 변경함수(파일 출력용)
 
 void print_list_director(DIRECTOR director, char *serial); // director print 함수
 void print_list_actor(ACTOR actor, char *serial); // actor print 함수
@@ -52,31 +52,31 @@ void save_list_director(char* option, struct director *director, char* option2);
 void save_list_actor(char* option, struct actor *actor, char* option2); // actor 구조체 save 함수
 char* insert_string(char *origin, char *insert, int pos); // string 2개 연결 함수
 
-int cmp_actor_n(const void* a,const void* b);
-int cmp_actor_s(const void* a,const void* b);
-int cmp_actor_b(const void* a,const void* b);
-int cmp_actor_m(const void* a,const void* b);
-int cmp_director_n(const void* a,const void* b);
-int cmp_director_s(const void* a,const void* b);
-int cmp_director_b(const void* a,const void* b);
-int cmp_director_m(const void* a,const void* b);
-int cmp_movie_tt(const void* a,const void* b);
-int cmp_movie_g(const void* a,const void* b);
-int cmp_movie_d(const void* a,const void* b);
-int cmp_movie_y(const void* a,const void* b);
-int cmp_movie_r(const void* a,const void* b);
-int cmp_movie_a(const void* a,const void* b);
+int cmp_actor_n(const void* a,const void* b);//배우 이름 기준 정렬 함수
+int cmp_actor_s(const void* a,const void* b);//배우 성별 기준 정렬 함수
+int cmp_actor_b(const void* a,const void* b);//배우 생년월일 기준 정렬 함수
+int cmp_actor_m(const void* a,const void* b);//배우 영화 기준 정렬 함수
+int cmp_director_n(const void* a,const void* b);//감독 이름 기준 정렬 함수
+int cmp_director_s(const void* a,const void* b);//감독 성별 기준 정렬 함수
+int cmp_director_b(const void* a,const void* b);//감독 생년월일 기준 정렬 함수
+int cmp_director_m(const void* a,const void* b);//감독 영화 기준 정렬 함수
+int cmp_movie_tt(const void* a,const void* b);//영화 제목 기준 정렬 함수
+int cmp_movie_g(const void* a,const void* b);//영화 장르 기준 정렬 함수
+int cmp_movie_d(const void* a,const void* b);//영화 감독 기준 정렬 함수
+int cmp_movie_y(const void* a,const void* b);//영화 년도 기준 정렬 함수
+int cmp_movie_r(const void* a,const void* b);//영화 시간 기준 정렬 함수
+int cmp_movie_a(const void* a,const void* b);//영화 배우 기준 정렬 함수
 
-void sort_actor(char option, ACTOR actor,char* option2);
-void sort_director(char option, DIRECTOR director,char* option2);
-void sort_movie(char option, struct movie* movie,char* option2);
+void sort_actor(char option, ACTOR actor,char* option2);//actor 구조체 sort 함수
+void sort_director(char option, DIRECTOR director,char* option2);//director 구조체 sort 함수
+void sort_movie(char option, struct movie* movie,char* option2);//movie 구조체 sort 함수
 
-int count_actor_list(ACTOR actor);
-int count_director_list(DIRECTOR director);
-int count_movie_list(struct movie* movie);
+int count_actor_list(ACTOR actor);//연결된 actor 리스트 수 확인 함수
+int count_director_list(DIRECTOR director);//연결된 director 리스트 수 확인 함수
+int count_movie_list(struct movie* movie);//연결된 movie 리스트 수 확인 함수
 
-void option_delete_actor(int num,ACTOR actor,bool from_where);
-void option_delete_director(int num,DIRECTOR director,bool from_where);
-void option_delete_movie(int num,struct movie* movie,bool from_where);
+void option_delete_actor(int num,ACTOR actor,bool from_where);//actor 구조체 delete 함수
+void option_delete_director(int num,DIRECTOR director,bool from_where);//director 구조체 delete 함수
+void option_delete_movie(int num,struct movie* movie,bool from_where);//movie 구조체 delete 함수
 
 #endif
